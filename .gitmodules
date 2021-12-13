@@ -1,0 +1,3 @@
+[submodule "glTF-Blender-IO"]
+	path = glTF-Blender-IO
+	url = https://github.com/KhronosGroup/glTF-Blender-IO.git

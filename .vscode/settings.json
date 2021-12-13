@@ -1,0 +1,6 @@
+{
+    "blender.addon.loadDirectory": "addons\\io_scene_gltf2_msfs",
+    "blender.addon.moduleName": "io_scene_gltf2_msfs",
+    "blender.addon.reloadOnSave": true,
+    "blender.addon.sourceDirectory": "addons\\io_scene_gltf2_msfs"
+}
