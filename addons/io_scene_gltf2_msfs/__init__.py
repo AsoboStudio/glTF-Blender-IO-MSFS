@@ -19,26 +19,27 @@ import importlib
 from pathlib import Path
 
 bl_info = {
-    "name" : "Microsoft Flight Simulator glTF Extension",
-    "author" : "Luca Pierabella, Wing42, pepperoni505, ronh991, tml1024, and others",
-    "description" : "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
-    "blender" : (3, 0, 0),
-    "version" : (0, 0, 1),
-    "location" : "File > Import-Export",
-    "warning" : "This version of the addon is work-in-progress. Don't use it in your active development cycle, as it adds variables and objects to the scene that may cause issues further down the line.",
-    "category" : "Import-Export",
+    "name": "Microsoft Flight Simulator glTF Extension",
+    "author": "Luca Pierabella, Wing42, pepperoni505, ronh991, tml1024, and others",
+    "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
+    "blender": (3, 0, 0),
+    "version": (0, 0, 1),
+    "location": "File > Import-Export",
+    "warning": "This version of the addon is work-in-progress. Don't use it in your active development cycle, as it adds variables and objects to the scene that may cause issues further down the line.",
+    "category": "Import-Export",
     "tracker_url": "https://github.com/AsoboStudio/FlightSim-glTF-Blender-IO"
 }
+
 
 class ExtAsoboProperties(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(
         name='ASOBO extensions',
         description='ASOBO extension for glTF',
         default=True
-        )
+    )
+
 
 class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
-
     bl_space_type = 'FILE_BROWSER'
     bl_region_type = 'TOOL_PROPS'
     bl_label = "Enabled"
@@ -53,7 +54,7 @@ class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
 
     def draw_header(self, context):
         layout = self.layout
-        layout.label(text="Blender2MSFS Extensions",icon='TOOL_SETTINGS')
+        layout.label(text="Blender2MSFS Extensions", icon='TOOL_SETTINGS')
 
     def draw(self, context):
         props = bpy.context.scene.msfs_ExtAsoboProperties
@@ -66,40 +67,54 @@ class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
 
 
 def recursive_module_search(path, root=""):
-    for _, module_name, is_package in pkgutil.iter_modules([str(path)]):
-        if is_package:
-            yield from recursive_module_search(path / module_name, root + module_name)
+    for _, name, ispkg in pkgutil.iter_modules([str(path)]):
+        if ispkg:
+            yield from recursive_module_search(path / name, f"{root}.{name}")
         else:
-            yield (root, module_name)
+            yield root, name
 
-modules = []
 
-# search all modules and find classes that inherit from bpy
-for module_name in recursive_module_search(Path(__file__).parent):
-    if module_name[1] in locals():
-        modules.append(importlib.reload(locals()[module_name[1]]))
-    else:
-        modules.append(importlib.import_module("." + module_name[1], package=__package__ + "." + module_name[0]))
+def modules():
+    for root, name in recursive_module_search(Path(__file__).parent):
+        if name in locals():
+            yield importlib.reload(locals()[name])
+        else:
+            yield importlib.import_module(f".{name}", package=f"{__package__}{root}")
+
 
 classes = []
 
-for module in modules:
-    for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj):
-            if module.__name__ in str(obj): # check if the class is in the same module
-                if "bpy" in str(inspect.getmro(obj)[1]): # sort of a hacky way to check if the class inherits from bpy
-                    classes.append(obj)
+
+# Refresh the list of classes
+def update_class_list():
+    global classes
+
+    classes = []
+
+    for module in modules():
+        for name, obj in inspect.getmembers(module):
+            if inspect.isclass(obj) \
+                    and module.__name__ in str(obj) \
+                    and "bpy" in str(inspect.getmro(obj)[1]):
+                classes.append(obj)
+
 
 def register():
+    # Refresh the list of classes whenever the addon is reloaded so we can stay up to date with the files on disk.
+    update_class_list()
+
     for cls in classes:
         try:
+            print(cls)
             bpy.utils.register_class(cls)
         except ValueError:
             pass
+
     try:
         bpy.utils.register_class(ExtAsoboProperties)
     except Exception:
         pass
+
     bpy.types.Scene.msfs_ExtAsoboProperties = bpy.props.PointerProperty(type=ExtAsoboProperties)
 
 
@@ -116,9 +131,11 @@ def register_panel():
     # Just return a function to the exporter so it can unregister the panel
     return unregister_panel
 
+
 def unregister():
     for cls in classes:
-        bpy.utils.register_class(cls)
+        bpy.utils.unregister_class(cls)
+
 
 def unregister_panel():
     try:

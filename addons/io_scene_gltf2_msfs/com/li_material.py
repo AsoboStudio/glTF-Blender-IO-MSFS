@@ -17,6 +17,7 @@ from bpy.types import Material, Image
 from bpy.props import IntProperty, BoolProperty, StringProperty, FloatProperty, EnumProperty, FloatVectorProperty, PointerProperty
 from .func_material import *
 
+
 class MSFS_LI_material():
     # Use this function to update the shader node tree
     def switch_msfs_material(self,context):

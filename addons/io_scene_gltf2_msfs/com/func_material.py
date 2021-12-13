@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import bpy
-from .li_material import *
 
 class MaterialError(Exception):
     def __init__(self, msg, objs=None):
