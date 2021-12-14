@@ -241,6 +241,18 @@ class glTF2ExportUserExtension:
                             required=False
                         )
 
+                if blender_material.msfs_show_windshield_options == True:
+                    if blender_material.msfs_rain_drop_scale > 0:
+                        gltf2_material.extensions["ASOBO_material_windshield_v2"] = self.Extension(
+                            name="ASOBO_material_windshield_v2",
+                            extension={ "rainDropScale": blender_material.msfs_rain_drop_scale,
+                            "wiper1State": blender_material.msfs_wiper_1_state,
+                            "wiper2State": blender_material.msfs_wiper_2_state,
+                            "wiper3State": blender_material.msfs_wiper_3_state,
+                            "wiper4State": blender_material.msfs_wiper_4_state },
+                            required=False
+                        )
+
                 if blender_material.msfs_show_draworder == True:
                     if blender_material.msfs_draw_order > 0:
                         gltf2_material.extensions["ASOBO_material_draw_order"] = self.Extension(
@@ -254,6 +266,16 @@ class glTF2ExportUserExtension:
                         gltf2_material.extensions["ASOBO_material_shadow_options"] = self.Extension(
                             name="ASOBO_material_shadow_options",
                             extension={"noCastShadow": blender_material.msfs_no_cast_shadow},
+                            required=False
+                        )
+
+                if blender_material.msfs_show_pearl == True:
+                    if blender_material.msfs_use_pearl_effect == True:
+                        gltf2_material.extensions["ASOBO_material_pearlescent"] = self.Extension(
+                            name="ASOBO_material_pearlescent",
+                            extension={"pearlShift": blender_material.msfs_pearl_shift,
+                            "pearlRange": blender_material.msfs_pearl_range,
+                            "pearlBrightness": blender_material.msfs_pearl_brightness},
                             required=False
                         )
 
