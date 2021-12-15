@@ -65,6 +65,20 @@ class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
 
         layout.prop(props, 'enabled')
 
+import bpy,nodeitems_utils
+from nodeitems_utils import NodeCategory, NodeItem
+class ExtraNodesCategory(NodeCategory):
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.tree_type == 'ShaderNodeTree' and
+                context.scene.render.engine in ['BLENDER_EEVEE', 'CYCLES'])
+ 
+node_categories = [
+    ExtraNodesCategory("SH_MSFS", "MSFS", items=[
+        NodeItem("MSFS_Standard"),
+        ]),
+    ]
+      
 
 def recursive_module_search(path, root=""):
     for _, name, ispkg in pkgutil.iter_modules([str(path)]):
@@ -115,6 +129,7 @@ def register():
     except Exception:
         pass
 
+    nodeitems_utils.register_node_categories("MSFS_NODES", node_categories)
     bpy.types.Scene.msfs_ExtAsoboProperties = bpy.props.PointerProperty(type=ExtAsoboProperties)
 
 
@@ -135,6 +150,7 @@ def register_panel():
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+    nodeitems_utils.unregister_node_categories("MSFS_NODES")
 
 
 def unregister_panel():
@@ -142,6 +158,8 @@ def unregister_panel():
         bpy.utils.unregister_class(GLTF_PT_AsoboExtensionPanel)
     except Exception:
         pass
+
+
 
 
 # todo :
