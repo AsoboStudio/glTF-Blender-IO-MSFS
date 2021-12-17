@@ -76,6 +76,7 @@ class ExtraNodesCategory(NodeCategory):
 node_categories = [
     ExtraNodesCategory("SH_MSFS", "MSFS", items=[
         NodeItem("MSFS_Standard"),
+        NodeItem("MSFS_ShaderNodeTextureSampler")
         ]),
     ]
       
