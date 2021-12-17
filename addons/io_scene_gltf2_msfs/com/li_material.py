@@ -45,7 +45,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -64,6 +64,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = True
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = True
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_standard material.")
 
@@ -90,7 +93,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = True
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -109,6 +112,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_anisotropic material.")
 
@@ -135,7 +141,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -154,6 +160,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_sss material.")
 
@@ -180,7 +189,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -199,6 +208,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_glass material.")
 
@@ -225,7 +237,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -244,6 +256,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_decal material.")
 
@@ -270,7 +285,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = True
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -289,6 +304,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_clearcoat material.")
 
@@ -315,7 +333,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -334,6 +352,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_env_occluder material.")
 
@@ -360,7 +381,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -379,6 +400,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_fake_terrain material.")
 
@@ -405,7 +429,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -424,6 +448,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_fresnel material.")
 
@@ -452,7 +479,7 @@ class MSFS_LI_material():
             mat.msfs_show_behind_glass = False
             mat.msfs_show_wiper_mask = False #Unlock this when available
 
-            mat.msfs_show_blend_mode = False
+            mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
 
             mat.msfs_show_draworder = True
@@ -469,8 +496,22 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = True
 
-            switch_msfs_blendmode()
+            #mat.msfs_roughness_scale = 0.0
+            #mat.msfs_metallic_scale = 0.0
+            
+            #switch_msfs_blendmode()
+            if mat.msfs_blend_mode == 'BLEND':
+                MakeTranslucent(mat)
+            elif mat.msfs_blend_mode == 'MASKED':
+                MakeMasked(mat)
+            elif mat.msfs_blend_mode == 'DITHER':
+                MakeDither(mat)
+            else:
+                MakeOpaque(mat)
             
             print("Switched to msfs_windshield material.")
 
@@ -497,7 +538,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -516,6 +557,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_porthole material.")
 
@@ -542,7 +586,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = True
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -561,6 +605,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_parallax material.")
 
@@ -587,7 +634,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -606,6 +653,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
 
             print("Switched to msfs_geo_decal material.")
 
@@ -632,7 +682,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = True
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -651,6 +701,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
             
             print("Switched to msfs_hair material.")
 
@@ -677,7 +730,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -696,6 +749,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
             
             print("Switched to msfs_invisible material.")
 
@@ -720,7 +776,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -739,6 +795,9 @@ class MSFS_LI_material():
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
             
             print("Switched to non-sim material.")
 
@@ -1006,7 +1065,7 @@ class MSFS_LI_material():
         links = mat.node_tree.links
 
 
-    def switch_msfs_blendmode(self,context):
+    def switch_msfs_blendmode(self, context):
         mat = context.active_object.active_material
         if mat.msfs_material_mode == 'msfs_windshield' or mat.msfs_blend_mode == 'BLEND':
             MakeTranslucent(mat)
@@ -1092,6 +1151,16 @@ class MSFS_LI_material():
             mat.node_tree.nodes["detail_uv_scale"].inputs["Location"].default_value[0] = mat.msfs_detail_uv_offset_x
             mat.node_tree.nodes["detail_uv_scale"].inputs["Location"].default_value[1] = mat.msfs_detail_uv_offset_y
 
+    def update_roughness_scale(self,context):
+        mat=context.active_object.active_material
+        if mat.node_tree.nodes.get("bsdf", None) != None:
+            mat.node_tree.nodes["bsdf"].inputs["Roughness"].default_value = mat.msfs_roughness_scale
+
+    def update_metallic_scale(self,context):
+        mat=context.active_object.active_material
+        if mat.node_tree.nodes.get("bsdf", None) != None:
+            mat.node_tree.nodes["bsdf"].inputs["Metallic"].default_value = mat.msfs_metallic_scale
+
 
     # Main material mode, in accordance with MSFS material shaders:
     Material.msfs_material_mode =  bpy.props.EnumProperty(items=(('NONE',"Disabled",""),
@@ -1118,6 +1187,7 @@ class MSFS_LI_material():
     Material.msfs_show_sss_color = bpy.props.BoolProperty(name="show_sss_color",default=False)
 
     Material.msfs_show_glass_parameters = bpy.props.BoolProperty(name="show_glass_parameters",default=False)
+    Material.msfs_show_windshield_options = bpy.props.BoolProperty(name="show_glass_parameters",default=False)
     Material.msfs_show_decal_parameters = bpy.props.BoolProperty(name="show_decal_parameters",default=False)
     Material.msfs_show_fresnel_parameters = bpy.props.BoolProperty(name="show_fresnel_parameters",default=False)
     Material.msfs_show_parallax_parameters = bpy.props.BoolProperty(name="show_parallax_parameters",default=False)
@@ -1152,7 +1222,7 @@ class MSFS_LI_material():
 
     Material.msfs_show_alpha_cutoff = bpy.props.BoolProperty(name="show_alpha_cutoff",default=False)
     Material.msfs_show_blend_threshold = bpy.props.BoolProperty(name="show_blend_threshold",default=False)
-
+    Material.msfs_show_pearl = bpy.props.BoolProperty(name="show_pearl",default=False)
 
     # MSFS Material properties
     # The following variables are written into the glTF file when exporting.
@@ -1162,10 +1232,67 @@ class MSFS_LI_material():
     Material.msfs_color_alpha_mix = bpy.props.FloatProperty(name="Alpha multiplier", min=0, max=1, default=1, description="The alpha value set here will be mixed in with the Alpha value of the texture.",update=update_color_alpha_mix)
     Material.msfs_color_base_mix = bpy.props.FloatProperty(name="Albedo Color Mix", min=0, max=1, default=1, description="Mix factor for the Albedo Color with the Albedo Texture.",update=update_color_base_mix)
     Material.msfs_color_sss = bpy.props.FloatVectorProperty(name="SSS Color", subtype='COLOR',min=0.0, max=1.0,size=4, default=[1.0,1.0,1.0,1.0], description = "Use the color picker to set the color of the subsurface scattering.",update=update_color_sss)
+    # Windshield
+    Material.msfs_rain_drop_scale = FloatProperty(
+        name="Rain Drop Scale",
+        min=0.0,
+        max=100.0,
+        default=1.0
+    )
+    Material.msfs_wiper_1_state = FloatProperty(
+        name="Wiper 1 State",
+        min=0.0,
+        max=1.0,
+        default=0.0
+    )
+    Material.msfs_wiper_2_state = FloatProperty(
+        name="Wiper 2 State",
+        min=0.0,
+        max=1.0,
+        default=0.0
+    )  # The 3DS Max plugin has up to 4 states, but the last 2 aren't visible
+    Material.msfs_wiper_3_state = FloatProperty(
+        name="Wiper 1 State",
+        min=0.0,
+        max=1.0,
+        default=0.0
+    )
+    Material.msfs_wiper_4_state = FloatProperty(
+        name="Wiper 1 State",
+        min=0.0,
+        max=1.0,
+        default=0.0
+    )
 
     #Glass parameters:
     Material.msfs_glass_reflection_mask_factor = bpy.props.FloatProperty(name="Reflection mask factor", min=0.0,max=1.0,default=1.0)
     Material.msfs_glass_deformation_factor = bpy.props.FloatProperty(name = "Deformation factor", min=0.0, max=1.0,default=0.0)
+
+    #Pearl
+    
+
+    Material.msfs_use_pearl_effect = BoolProperty(
+        name="Use Pearl Effect",
+        default=False
+    )
+    Material.msfs_pearl_shift = FloatProperty(
+        name="Color Shift",
+        min=-999.0,
+        max=999.0,
+        default=0.0
+    )
+    Material.msfs_pearl_range = FloatProperty(
+        name="Color Range",
+        min=-999.0,
+        max=999.0,
+        default=0.0
+    )
+    Material.msfs_pearl_brightness = FloatProperty(
+        name="Color Brightness",
+        min=-1.0,
+        max=1.0,
+        default=0.0
+    )
 
     #Decal parameters:
     Material.msfs_decal_blend_factor_color = bpy.props.FloatProperty(name="Color", min=0.0,max=1.0,default=1.0)
@@ -1183,7 +1310,7 @@ class MSFS_LI_material():
     Material.msfs_parallax_scale = bpy.props.FloatProperty(name="Scale", min=0.0,max=1.0,default=0.0)
     Material.msfs_parallax_room_size_x = bpy.props.FloatProperty(name="X", min=0.0,default=0.5)
     Material.msfs_parallax_room_size_y = bpy.props.FloatProperty(name="Y", min=0.0,default=0.5)
-    Material.msfs_parallax_room_number = bpy.props.FloatProperty(name="number XY", min=0.0,default=1.0)
+    Material.msfs_parallax_room_number = bpy.props.FloatProperty(name="Rm number XY", min=0.0,default=1.0)
     Material.msfs_parallax_corridor = bpy.props.BoolProperty(name="Corridor", default=False)
 
     #Geo Decal Frosted parameters:
@@ -1230,14 +1357,45 @@ class MSFS_LI_material():
     Material.msfs_road_material = bpy.props.BoolProperty(name="Road material",default=False)
 
     #UV options:
+    
+    Material.msfs_uv_offset_u = FloatProperty(
+        name="U",
+        min=-10.0,
+        max=10.0,
+        default=0.0
+    )
+    Material.msfs_uv_offset_v = FloatProperty(
+        name="V",
+        min=-10.0,
+        max=10.0,
+        default=0.0
+    )
+    Material.msfs_uv_tiling_u = FloatProperty(
+        name="U",
+        min=-10.0,
+        max=10.0,
+        default=1.0
+    )
+    Material.msfs_uv_tiling_v = FloatProperty(
+        name="V",
+        min=-10.0,
+        max=10.0,
+        default=1.0
+    )
+    Material.msfs_uv_rotation = FloatProperty(
+        name="UV Rotation",
+        min=-360.0,
+        max=360.0,
+        default=0.0
+    )
     Material.msfs_ao_use_uv2 = bpy.props.BoolProperty(name="AO use UV2",default=False)
     Material.msfs_uv_clamp_x = bpy.props.BoolProperty(name="X",default=False)
     Material.msfs_uv_clamp_y = bpy.props.BoolProperty(name="Y",default=False)
     Material.msfs_uv_clamp_z = bpy.props.BoolProperty(name="Z",default=False)
 
     #Material parameters
-    Material.msfs_roughness_scale = bpy.props.FloatProperty(name="Roughness scale",min=0,max=1,default=1)
-    Material.msfs_metallic_scale = bpy.props.FloatProperty(name="Metallic scale",min=0,max=1,default=1)
+    Material.msfs_roughness_scale = bpy.props.FloatProperty(name="Roughness scale",min=0,max=1,default=1, update = update_roughness_scale)
+    Material.msfs_metallic_scale = bpy.props.FloatProperty(name="Metallic scale",min=0,max=1,default=1, update = update_metallic_scale)
     Material.msfs_normal_scale = bpy.props.FloatProperty(name="Normal scale",min=0,default=1,update=update_normal_scale)
     Material.msfs_alpha_cutoff = bpy.props.FloatProperty(name="Alpha cutoff",min=0,max=1,default=0.1,update=update_alpha_cutoff)
     Material.msfs_detail_uv_scale = bpy.props.FloatProperty(name="Detail UV scale",min=0,default=1,update=update_detail_uv_scale)

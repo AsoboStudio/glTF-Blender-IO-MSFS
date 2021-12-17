@@ -626,6 +626,9 @@ def CreateMSFSWindshieldShader(Material):
     CreateBlendMask(Material,(-1000,-700))
     #CreateWiperMask(Material,(-1000,-950))
 
+    Material.msfs_roughness_scale = 0.0
+    Material.msfs_metallic_scale = 0.0
+    Material.msfs_color_alpha_mix = 0.1
     Material.msfs_blend_mode = 'BLEND'
 
 def CreateMSFSPortholeShader(Material):

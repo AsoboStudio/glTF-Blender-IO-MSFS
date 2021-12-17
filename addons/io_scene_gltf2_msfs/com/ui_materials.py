@@ -56,6 +56,15 @@ class MSFS_PT_material(bpy.types.Panel):
                 box.prop(mat, 'msfs_glass_reflection_mask_factor')
                 box.prop(mat, 'msfs_glass_deformation_factor')
 
+            if mat.msfs_show_windshield_options == True:
+                box = layout.box()
+                box.label(text="Windshield Options", icon="MATFLUID")
+                box.prop(mat, "msfs_rain_drop_scale")
+                box.prop(mat, "msfs_wiper_1_state")
+                box.prop(mat, "msfs_wiper_2_state")
+                box.prop(mat, "msfs_wiper_3_state")
+                box.prop(mat, "msfs_wiper_4_state")
+
             if mat.msfs_show_decal_parameters == True:
                 box = layout.box()
                 box.label(text="Decal per component blend factors:", icon='OUTLINER_OB_POINTCLOUD')
@@ -101,7 +110,7 @@ class MSFS_PT_material(bpy.types.Panel):
 
             if (mat.msfs_show_albedo == True or mat.msfs_show_metallic == True or mat.msfs_show_normal == True or mat.msfs_show_emissive == True or mat.msfs_show_detail_albedo == True or 
                 mat.msfs_show_detail_metallic == True or mat.msfs_show_detail_normal == True or mat.msfs_show_blend_mask == True or mat.msfs_show_anisotropic_direction == True or
-                mat.msfs_show_clearcoat == True or mat.msfs_show_behind_glass == True):
+                mat.msfs_show_clearcoat == True or mat.msfs_show_behind_glass == True or mat.msfs_show_wiper_mask == True):
 
                 box = layout.box()
                 box.label(text="Texture maps",icon='TEXTURE')
@@ -194,6 +203,14 @@ class MSFS_PT_material(bpy.types.Panel):
                 if mat.msfs_show_blend_threshold == True:
                     box.prop(mat, 'msfs_blend_threshold')
 
+            if mat.msfs_show_pearl == True:
+                box = layout.box()
+                box.label(text="Pearlescent Options", icon="NODE_MATERIAL")
+                box.prop(mat, "msfs_use_pearl_effect")
+                box.prop(mat, "msfs_pearl_shift")
+                box.prop(mat, "msfs_pearl_range")
+                box.prop(mat, "msfs_pearl_brightness")
+
             if (mat.msfs_show_collision_material == True or mat.msfs_show_road_material == True):
                 box= layout.box()
                 box.label(text="Gameplay parameters", icon='GHOST_ENABLED')
@@ -207,6 +224,17 @@ class MSFS_PT_material(bpy.types.Panel):
                 box.label(text="UV options", icon='UV')
                 #if mat.msfs_show_ao_use_uv2 == True:   - removed by Asobo
                 #    box.prop(mat, 'msfs_ao_use_uv2')
+                subbox = box.box()
+                row=subbox.row()
+                row.label(text="UV offset")
+                row.prop(mat,'msfs_uv_offset_u')
+                row.prop(mat,'msfs_uv_offset_v')
+                subbox = box.box()
+                row=subbox.row()
+                row.label(text="UV tiling")
+                row.prop(mat,'msfs_uv_tiling_u')
+                row.prop(mat,'msfs_uv_tiling_v')
+                box.prop(mat, 'msfs_uv_rotation')
                 if mat.msfs_show_uv_clamp == True:
                     subbox = box.box()
                     row=subbox.row()
