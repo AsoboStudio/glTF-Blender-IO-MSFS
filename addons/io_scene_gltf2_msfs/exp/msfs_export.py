@@ -61,7 +61,8 @@ class glTF2ExportUserExtension:
                     required = False
                 )
                 
-
+    def gather_mesh_hook(self, gltf2_mesh, blender_mesh, blender_object, vertex_groups, modifiers, skip_filter, material_names, export_settings):
+        print("gather mesh hook")
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if (self.properties.enabled == True and blender_material.msfs_material_mode != None):

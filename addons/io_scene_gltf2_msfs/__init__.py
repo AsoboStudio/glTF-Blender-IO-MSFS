@@ -105,10 +105,13 @@ def register():
 
     for cls in classes:
         try:
-            print( "registering class: {0}".format(cls))
             bpy.utils.register_class(cls)
         except ValueError:
             pass
+
+    for module in modules():
+        if hasattr(module, "register"):
+            module.register()
 
     try:
         bpy.utils.register_class(ExtAsoboProperties)
@@ -135,6 +138,10 @@ def register_panel():
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
+    for module in modules():
+        if hasattr(module, "unregister"):
+            module.unregister()
 
 
 def unregister_panel():
