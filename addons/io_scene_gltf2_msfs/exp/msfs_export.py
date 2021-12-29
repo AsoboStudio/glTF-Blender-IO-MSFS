@@ -14,7 +14,7 @@
 
 import bpy
 
-class glTF2ExportUserExtension:
+class Export:
 
     def __init__(self):
         # We need to wait until we create the gltf2UserExtension to import the gltf2 modules
