@@ -43,7 +43,7 @@ class MSFSGizmoProperties():
 
 class AddGizmo(bpy.types.Operator):
     bl_idname = "msfs_collision_gizmo.add_gizmo"
-    bl_label = "Gizmo"
+    bl_label = "Add MSFS Collision Gizmo"
 
     gizmo_type: bpy.types.Object.gizmo_type
 
@@ -63,6 +63,7 @@ class AddGizmo(bpy.types.Operator):
 
 class MSFSCollisionGizmo(bpy.types.Gizmo):
     bl_idname = "VIEW3D_GT_msfs_collision_gizmo"
+    bl_label = "MSFS Collision Gizmo"
 
     bl_target_properties = (
         {"id": "matrix", "type": 'FLOAT', "array_length": 16}, # We can't actually store a matrix, so we "flatten" it and reconstruct it
@@ -160,7 +161,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
 
 class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
     bl_idname = "VIEW3D_GT_msfs_collision_gizmo_group"
-    bl_label = "test"
+    bl_label = "MSFS Collision Gizmo Group"
     bl_space_type = "VIEW_3D"
     bl_region_type = "WINDOW"
     bl_options = {'3D', 'PERSISTENT', 'SHOW_MODAL_ALL', 'SELECT'}
