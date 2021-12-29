@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import bpy
+import math
 
 class Export:
 
@@ -27,8 +28,6 @@ class Export:
             )
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
-        import math
-
         if self.properties.enabled == True:
             if gltf2_object.extensions is None:
                 gltf2_object.extensions = {}
@@ -62,18 +61,18 @@ class Export:
                 params = None
                 if object.gizmo_type == "sphere":
                     params = {
-                        "radius": object.scale.x * object.scale.y * object.scale.z
+                        "radius": math.abs(object.scale.x * object.scale.y * object.scale.z)
                     }
                 elif object.gizmo_type == "box":
                     params = {
-                        "length": object.scale.x,
-                        "width": object.scale.y,
-                        "height": object.scale.z
+                        "length": math.abs(object.scale.x),
+                        "width": math.abs(object.scale.y),
+                        "height": math.abs(object.scale.z)
                     }
                 elif object.gizmo_type == "cylinder":
                     params = {
-                        "radius": object.scale.x * object.scale.y,
-                        "height": object.scale.z
+                        "radius": math.abs(object.scale.x * object.scale.y),
+                        "height": math.abs(object.scale.z)
                     }
 
                 tags = ["Collision"]
