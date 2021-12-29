@@ -78,8 +78,8 @@ class MSFS_PT_ObjectProperties(bpy.types.Panel):
         elif active_object.type == 'EMPTY':
             box = layout.box()
             box.label(text="MSFS Collision Parameters", icon='SHADING_BBOX')
-            box.prop(active_object, "gizmo_type") # TODO: change to msfs_gizmo_type
-            if active_object.gizmo_type != "NONE":
+            box.prop(active_object, "msfs_gizmo_type") # TODO: change to msfs_msfs_gizmo_type
+            if active_object.msfs_gizmo_type != "NONE":
                 box.prop(active_object, "msfs_collision_target")
                 box.prop(active_object, "msfs_collision_is_road_collider")
 

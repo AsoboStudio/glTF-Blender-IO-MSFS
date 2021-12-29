@@ -57,19 +57,19 @@ class Export:
         # Set gizmo objects extension
         gizmo_objects = []
         for object in bpy.context.scene.objects:
-            if object.type == 'EMPTY' and object.gizmo_type != "NONE" and object.msfs_collision_target == bpy.data.meshes[gltf2_mesh.name]:
+            if object.type == 'EMPTY' and object.msfs_gizmo_type != "NONE" and object.msfs_collision_target == bpy.data.meshes[gltf2_mesh.name]:
                 params = None
-                if object.gizmo_type == "sphere":
+                if object.msfs_gizmo_type == "sphere":
                     params = {
                         "radius": abs(object.scale.x * object.scale.y * object.scale.z)
                     }
-                elif object.gizmo_type == "box":
+                elif object.msfs_gizmo_type == "box":
                     params = {
                         "length": abs(object.scale.x),
                         "width": abs(object.scale.y),
                         "height": abs(object.scale.z)
                     }
-                elif object.gizmo_type == "cylinder":
+                elif object.msfs_gizmo_type == "cylinder":
                     params = {
                         "radius": abs(object.scale.x * object.scale.y),
                         "height": abs(object.scale.z)
@@ -81,7 +81,7 @@ class Export:
 
                 gizmo_objects.append({
                     "translation": list(object.location),
-                    "type": object.gizmo_type,
+                    "type": object.msfs_gizmo_type,
                     "params": params,
                     "extensions": self.Extension(
                         name = "ASOBO_tags",
@@ -105,7 +105,7 @@ class Export:
         for i, node in enumerate(gltf2_plan.nodes):
             object = bpy.context.scene.objects.get(node.name)
             if object:
-                if object.type == "EMPTY" and object.gizmo_type != "NONE":
+                if object.type == "EMPTY" and object.msfs_gizmo_type != "NONE":
                     gltf2_plan.nodes.pop(i)
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):

@@ -23,15 +23,15 @@ from gpu_extras.batch import batch_for_shader
 
 
 class MSFSGizmoProperties():
-    def gizmo_type_update(self, context):
+    def msfs_gizmo_type_update(self, context):
         empties = MSFSCollisionGizmoGroup.empties
         object = context.object
         if object in empties.keys():
-            if object.gizmo_type != empties[object].gizmo_type:
-                empties[object].gizmo_type = object.gizmo_type
+            if object.msfs_gizmo_type != empties[object].msfs_gizmo_type:
+                empties[object].msfs_gizmo_type = object.msfs_gizmo_type
                 empties[object].create_custom_shape()
 
-    bpy.types.Object.gizmo_type = bpy.props.EnumProperty(
+    bpy.types.Object.msfs_gizmo_type = bpy.props.EnumProperty(
         name = "Type",
         description = "Type of collision gizmo to add",
         items = (("NONE", "Disabled", ""),
@@ -39,26 +39,26 @@ class MSFSGizmoProperties():
                 ("box", "Box Collision Gizmo", ""),
                 ("cylinder", "Cylinder Collision Gizmo", "")
         ),
-        update=gizmo_type_update
+        update=msfs_gizmo_type_update
     )
 
 class AddGizmo(bpy.types.Operator):
     bl_idname = "msfs_collision_gizmo.add_gizmo"
     bl_label = "Add MSFS Collision Gizmo"
 
-    gizmo_type: bpy.types.Object.gizmo_type
+    msfs_gizmo_type: bpy.types.Object.msfs_gizmo_type
 
     def execute(self, context):
         bpy.ops.object.empty_add()
         obj = context.active_object
-        if self.gizmo_type == "sphere":
+        if self.msfs_gizmo_type == "sphere":
             obj.name = "Sphere Collision Gizmo"
-        elif self.gizmo_type == "box":
+        elif self.msfs_gizmo_type == "box":
             obj.name = "Box Collision Gizmo"
-        elif self.gizmo_type == "cylinder":
+        elif self.msfs_gizmo_type == "cylinder":
             obj.name = "Cylinder Collision Gizmo"
 
-        obj.gizmo_type = self.gizmo_type
+        obj.msfs_gizmo_type = self.msfs_gizmo_type
 
         return {"FINISHED"}
 
@@ -72,7 +72,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
 
     __slots__ = (
         "empty",
-        "gizmo_type",
+        "msfs_gizmo_type",
         "custom_shape",
         "custom_shape_edges",
     )
@@ -96,16 +96,16 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
     def create_custom_shape(self):
         mesh = bpy.data.meshes.new("Gizmo Mesh")
         bm = bmesh.new()
-        if self.gizmo_type == "sphere":
+        if self.msfs_gizmo_type == "sphere":
             bmesh.ops.create_circle(bm, segments=32, radius=1)
             bm.to_mesh(mesh)
             bmesh.ops.create_circle(bm, segments=32, radius=1, matrix=Matrix.Rotation(radians(90), 4, 'X'))
             bm.to_mesh(mesh)
             bmesh.ops.create_circle(bm, segments=32, radius=1, matrix=Matrix.Rotation(radians(90), 4, 'Y'))
             bm.to_mesh(mesh)
-        elif self.gizmo_type == "box":
+        elif self.msfs_gizmo_type == "box":
             bmesh.ops.create_cube(bm, size=2)
-        elif self.gizmo_type == "cylinder":
+        elif self.msfs_gizmo_type == "cylinder":
             bmesh.ops.create_cone(bm, cap_ends=True, segments=32, radius1=1, radius2=1, depth=2) # Create cone with both ends having the same diameter - this creates a cylinder
 
         bm.to_mesh(mesh)
@@ -176,18 +176,18 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
     @classmethod
     def poll(cls, context):
         for object in context.view_layer.objects:
-            if object.type == 'EMPTY' and object.gizmo_type != "NONE":
+            if object.type == 'EMPTY' and object.msfs_gizmo_type != "NONE":
                 return True
         return False
 
     def setup(self, context):
         for object in context.view_layer.objects:
-            if object.type == 'EMPTY' and object.gizmo_type != "NONE" and object not in self.__class__.empties.keys():
+            if object.type == 'EMPTY' and object.msfs_gizmo_type != "NONE" and object not in self.__class__.empties.keys():
                 def get_matrix():
                     # Re-calculate matrix without rotation
-                    if object.gizmo_type == "sphere":
+                    if object.msfs_gizmo_type == "sphere":
                         scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (0, 0, 1))
-                    elif object.gizmo_type == "cylinder":
+                    elif object.msfs_gizmo_type == "cylinder":
                         scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
                     else:
                         scale_matrix = Matrix.Scale(object.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
@@ -203,7 +203,7 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
 
                 gz = self.gizmos.new(MSFSCollisionGizmo.bl_idname)
 
-                gz.gizmo_type = object.gizmo_type
+                gz.msfs_gizmo_type = object.msfs_gizmo_type
                 gz.empty = object
 
                 gz.target_set_handler("matrix", get=get_matrix, set=set_matrix)
@@ -215,7 +215,7 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
         # We have to get a list of gizmo empties in the scene first in order to avoid a crash due to referencing a removed object
         found_empties = []
         for object in context.view_layer.objects:
-            if object.type == 'EMPTY' and object.gizmo_type != "NONE":
+            if object.type == 'EMPTY' and object.msfs_gizmo_type != "NONE":
                 found_empties.append(object)
 
         for _, (empty, gizmo) in enumerate(self.__class__.empties.copy().items()):
@@ -225,7 +225,7 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
 
         # Check if there are any new gizmo empties, and if so create new gizmo. We can't do this in the above loop due to the crash mentioned above
         for object in context.view_layer.objects:
-            if object.type == 'EMPTY' and object.gizmo_type != "NONE":
+            if object.type == 'EMPTY' and object.msfs_gizmo_type != "NONE":
                 if object not in self.__class__.empties.keys():
                     self.setup(context)
 
@@ -235,9 +235,9 @@ class MSFSCollisionAddMenu(bpy.types.Menu):
     bl_label = "Flight Simulator Collision"
 
     def draw(self, context):
-        self.layout.operator(AddGizmo.bl_idname, text="Add Sphere Collision Gizmo", icon="MESH_UVSPHERE").gizmo_type = "sphere"
-        self.layout.operator(AddGizmo.bl_idname, text="Add Box Collision Gizmo", icon="MESH_CUBE").gizmo_type = "box"
-        self.layout.operator(AddGizmo.bl_idname, text="Add Cylinder Collision Gizmo", icon="MESH_CYLINDER").gizmo_type = "cylinder"
+        self.layout.operator(AddGizmo.bl_idname, text="Add Sphere Collision Gizmo", icon="MESH_UVSPHERE").msfs_gizmo_type = "sphere"
+        self.layout.operator(AddGizmo.bl_idname, text="Add Box Collision Gizmo", icon="MESH_CUBE").msfs_gizmo_type = "box"
+        self.layout.operator(AddGizmo.bl_idname, text="Add Cylinder Collision Gizmo", icon="MESH_CYLINDER").msfs_gizmo_type = "cylinder"
 
 def draw_menu(self, context):
     self.layout.menu(menu=MSFSCollisionAddMenu.bl_idname, icon="SHADING_BBOX")
