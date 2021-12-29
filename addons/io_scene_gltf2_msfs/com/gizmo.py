@@ -101,7 +101,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
         elif self.gizmo_type == "cylinder":
             bmesh.ops.create_cone(bm, cap_ends=True, segments=32, radius1=1, radius2=1, depth=2) # Create cone with both ends having the same diameter - this creates a cylinder
 
-        mesh = bpy.data.meshes.new("Mesh")
+        mesh = bpy.data.meshes.new("Gizmo Mesh")
         bm.to_mesh(mesh)
         bm.free()
 
@@ -225,8 +225,8 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
 
 
 class MSFSCollisionAddMenu(bpy.types.Menu):
-    bl_label = "Flight Simulator Collision"
     bl_idname = "VIEW3D_MT_msfs_collision_add_menu"
+    bl_label = "Flight Simulator Collision"
 
     def draw(self, context):
         self.layout.operator(AddGizmo.bl_idname, text="Add Sphere Collision Gizmo", icon="MESH_UVSPHERE").gizmo_type = "sphere"
