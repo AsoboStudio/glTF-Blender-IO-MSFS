@@ -94,7 +94,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
         batch.draw(shader)
 
     def create_custom_shape(self):
-        mesh = bpy.data.meshes.new("Mesh")
+        mesh = bpy.data.meshes.new("Gizmo Mesh")
         bm = bmesh.new()
         if self.gizmo_type == "sphere":
             bmesh.ops.create_circle(bm, segments=32, radius=1)
@@ -231,8 +231,8 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
 
 
 class MSFSCollisionAddMenu(bpy.types.Menu):
-    bl_label = "Flight Simulator Collision"
     bl_idname = "VIEW3D_MT_msfs_collision_add_menu"
+    bl_label = "Flight Simulator Collision"
 
     def draw(self, context):
         self.layout.operator(AddGizmo.bl_idname, text="Add Sphere Collision Gizmo", icon="MESH_UVSPHERE").gizmo_type = "sphere"
