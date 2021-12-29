@@ -55,7 +55,59 @@ class Export:
                 )
                 
     def gather_mesh_hook(self, gltf2_mesh, blender_mesh, blender_object, vertex_groups, modifiers, skip_filter, material_names, export_settings):
-        print("gather mesh hook")
+        # Set gizmo objects extension
+        gizmo_objects = []
+        for object in bpy.context.scene.objects:
+            if object.type == 'EMPTY' and object.gizmo_type != "NONE" and object.msfs_collision_target == bpy.data.meshes[gltf2_mesh.name]:
+                params = None
+                if object.gizmo_type == "sphere":
+                    params = {
+                        "radius": object.scale.x * object.scale.y
+                    }
+                elif object.gizmo_type == "box":
+                    params = {
+                        "length": object.scale.x,
+                        "width": object.scale.y,
+                        "height": object.scale.z
+                    }
+                elif object.gizmo_type == "cylinder":
+                    params = {
+                        "radius": object.scale.x * object.scale.y,
+                        "height": object.scale.z
+                    }
+
+                tags = ["Collision"]
+                if object.msfs_collision_is_road_collider:
+                    tags.append("Road")
+
+                gizmo_objects.append({
+                    "translation": list(object.location),
+                    "type": object.gizmo_type,
+                    "params": params,
+                    "extensions": self.Extension(
+                        name = "ASOBO_tags",
+                        extension = {
+                            "tags": tags
+                        },
+                        required = False
+                    )
+                })
+
+        gltf2_mesh.extensions["ASOBO_gizmo_object"] = self.Extension(
+            name = "ASOBO_gizmo_object",
+            extension = {
+                "gizmo_objects": gizmo_objects
+            },
+            required = False
+        )
+
+    def gather_gltf_hook(self, gltf2_plan, export_settings):
+        # Remove all gizmo empties from the glTF export plan
+        for i, node in enumerate(gltf2_plan.nodes):
+            object = bpy.context.scene.objects.get(node.name)
+            if object:
+                if object.type == "EMPTY" and object.gizmo_type != "NONE":
+                    gltf2_plan.nodes.pop(i)
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if (self.properties.enabled == True and blender_material.msfs_material_mode != None):

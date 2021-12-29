@@ -20,9 +20,9 @@ class MSFSGizmoProperties():
         name = "Type",
         description = "Type of collision gizmo to add",
         items = (("NONE", "Disabled", ""),
-                ("sphere_gizmo", "Sphere Collision Gizmo", ""),
-                ("box_gizmo", "Box Collision Gizmo", ""),
-                ("cylinder_gizmo", "Cylinder Collision Gizmo", "")
+                ("sphere", "Sphere Collision Gizmo", ""),
+                ("box", "Box Collision Gizmo", ""),
+                ("cylinder", "Cylinder Collision Gizmo", "")
         ),
         update=gizmo_type_update
     )
@@ -36,11 +36,11 @@ class AddGizmo(bpy.types.Operator):
     def execute(self, context):
         bpy.ops.object.empty_add()
         obj = context.active_object
-        if self.gizmo_type == "sphere_gizmo":
+        if self.gizmo_type == "sphere":
             obj.name = "Sphere Collision Gizmo"
-        elif self.gizmo_type == "box_gizmo":
+        elif self.gizmo_type == "box":
             obj.name = "Box Collision Gizmo"
-        elif self.gizmo_type == "cylinder_gizmo":
+        elif self.gizmo_type == "cylinder":
             obj.name = "Cylinder Collision Gizmo"
 
         obj.gizmo_type = self.gizmo_type
@@ -79,11 +79,11 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
 
     def create_custom_shape(self):
         bm = bmesh.new()
-        if self.gizmo_type == "sphere_gizmo":
+        if self.gizmo_type == "sphere":
             bmesh.ops.create_uvsphere(bm, u_segments=8, v_segments=8, radius=1)
-        elif self.gizmo_type == "box_gizmo":
+        elif self.gizmo_type == "box":
             bmesh.ops.create_cube(bm, size=2)
-        elif self.gizmo_type == "cylinder_gizmo":
+        elif self.gizmo_type == "cylinder":
             bmesh.ops.create_cone(bm, cap_ends=True, segments=32, radius1=1, radius2=1, depth=2) # Create cone with both ends having the same diameter - this creates a cylinder
 
         mesh = bpy.data.meshes.new("Mesh")
@@ -165,7 +165,10 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
             if object.type == 'EMPTY' and object.gizmo_type != "NONE" and object not in self.__class__.empties.keys():
                 def get_matrix():
                     # Re-calculate matrix without rotation
-                    scale_matrix = Matrix.Scale(object.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
+                    if object.gizmo_type in ["sphere", "cylinder"]:
+                        scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
+                    else:
+                        scale_matrix = Matrix.Scale(object.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
                     object_matrix = Matrix.Translation(object.location) @ scale_matrix
 
                     matrix = []
@@ -210,9 +213,9 @@ class MSFSCollisionAddMenu(bpy.types.Menu):
     bl_idname = "VIEW3D_MT_msfs_collision_add_menu"
 
     def draw(self, context):
-        self.layout.operator(AddGizmo.bl_idname, text="Add Sphere Collision Gizmo", icon="MESH_UVSPHERE").gizmo_type = "sphere_gizmo"
-        self.layout.operator(AddGizmo.bl_idname, text="Add Box Collision Gizmo", icon="MESH_CUBE").gizmo_type = "box_gizmo"
-        self.layout.operator(AddGizmo.bl_idname, text="Add Cylinder Collision Gizmo", icon="MESH_CYLINDER").gizmo_type = "cylinder_gizmo"
+        self.layout.operator(AddGizmo.bl_idname, text="Add Sphere Collision Gizmo", icon="MESH_UVSPHERE").gizmo_type = "sphere"
+        self.layout.operator(AddGizmo.bl_idname, text="Add Box Collision Gizmo", icon="MESH_CUBE").gizmo_type = "box"
+        self.layout.operator(AddGizmo.bl_idname, text="Add Cylinder Collision Gizmo", icon="MESH_CYLINDER").gizmo_type = "cylinder"
 
 def draw_menu(self, context):
     self.layout.menu(menu=MSFSCollisionAddMenu.bl_idname, icon="SHADING_BBOX")

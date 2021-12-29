@@ -26,18 +26,6 @@ class MSFS_attached_behavior(bpy.types.PropertyGroup):
 bpy.utils.register_class(MSFS_attached_behavior)
 
 class MSFS_LI_object_properties():
-    def collision_target_update(self, context):
-        object = context.object
-        if object.msfs_collision_target:
-            if object.msfs_collision_target.type != "MESH":
-                object.msfs_collision_target = None
-                return
-
-            object.parent = object.msfs_collision_target
-            object.matrix_parent_inverse = object.msfs_collision_target.matrix_world.inverted()
-        else:
-            object.parent = None
-
     bpy.types.Object.msfs_behavior = bpy.props.CollectionProperty(type = MSFS_attached_behavior)
     bpy.types.Object.msfs_active_behavior = bpy.props.IntProperty(name="Active behavior",min=0,default=0)
 
@@ -48,4 +36,5 @@ class MSFS_LI_object_properties():
     bpy.types.Object.msfs_light_rotation_speed = bpy.props.FloatProperty(name='Rotation speed',default=0.0)
     bpy.types.Object.msfs_light_day_night_cycle = bpy.props.BoolProperty(name='Day/Night cycle',default=False,description="Set this value to 'true' if you want the light to be visible at night only.")
 
-    bpy.types.Object.msfs_collision_target = bpy.props.PointerProperty(type=bpy.types.Object, name="Target", description="Object to apply collision gizmo to", update=collision_target_update)
+    bpy.types.Object.msfs_collision_target = bpy.props.PointerProperty(type=bpy.types.Mesh, name="Target", description="Object to apply collision gizmo to")
+    bpy.types.Object.msfs_collision_is_road_collider = bpy.props.BoolProperty(name="Road Collider", default=False)

@@ -81,6 +81,7 @@ class MSFS_PT_ObjectProperties(bpy.types.Panel):
             box.prop(active_object, "gizmo_type") # TODO: change to msfs_gizmo_type
             if active_object.gizmo_type != "NONE":
                 box.prop(active_object, "msfs_collision_target")
+                box.prop(active_object, "msfs_collision_is_road_collider")
 
 
         #if bpy.context.active_object.type == 'ARMATURE':
