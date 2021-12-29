@@ -129,6 +129,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
 
             bgl.glEnable(bgl.GL_BLEND)
             bgl.glEnable(bgl.GL_LINE_SMOOTH)
+            bgl.glEnable(bgl.GL_DEPTH_TEST)
 
             # Use Blender theme colors to keep everything consistent
             draw_color = list(context.preferences.themes[0].view_3d.empty)
