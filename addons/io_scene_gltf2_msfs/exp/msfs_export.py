@@ -61,18 +61,18 @@ class Export:
                 params = None
                 if object.gizmo_type == "sphere":
                     params = {
-                        "radius": math.abs(object.scale.x * object.scale.y * object.scale.z)
+                        "radius": abs(object.scale.x * object.scale.y * object.scale.z)
                     }
                 elif object.gizmo_type == "box":
                     params = {
-                        "length": math.abs(object.scale.x),
-                        "width": math.abs(object.scale.y),
-                        "height": math.abs(object.scale.z)
+                        "length": abs(object.scale.x),
+                        "width": abs(object.scale.y),
+                        "height": abs(object.scale.z)
                     }
                 elif object.gizmo_type == "cylinder":
                     params = {
-                        "radius": math.abs(object.scale.x * object.scale.y),
-                        "height": math.abs(object.scale.z)
+                        "radius": abs(object.scale.x * object.scale.y),
+                        "height": abs(object.scale.z)
                     }
 
                 tags = ["Collision"]
