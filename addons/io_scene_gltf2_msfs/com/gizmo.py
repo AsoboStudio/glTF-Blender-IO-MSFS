@@ -18,6 +18,7 @@ import gpu
 import bmesh
 import numpy as np
 from mathutils import Matrix
+from math import radians
 from gpu_extras.batch import batch_for_shader
 
 
@@ -93,15 +94,20 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
         batch.draw(shader)
 
     def create_custom_shape(self):
+        mesh = bpy.data.meshes.new("Mesh")
         bm = bmesh.new()
         if self.gizmo_type == "sphere":
-            bmesh.ops.create_uvsphere(bm, u_segments=8, v_segments=8, radius=1)
+            bmesh.ops.create_circle(bm, segments=32, radius=1)
+            bm.to_mesh(mesh)
+            bmesh.ops.create_circle(bm, segments=32, radius=1, matrix=Matrix.Rotation(radians(90), 4, 'X'))
+            bm.to_mesh(mesh)
+            bmesh.ops.create_circle(bm, segments=32, radius=1, matrix=Matrix.Rotation(radians(90), 4, 'Y'))
+            bm.to_mesh(mesh)
         elif self.gizmo_type == "box":
             bmesh.ops.create_cube(bm, size=2)
         elif self.gizmo_type == "cylinder":
             bmesh.ops.create_cone(bm, cap_ends=True, segments=32, radius1=1, radius2=1, depth=2) # Create cone with both ends having the same diameter - this creates a cylinder
 
-        mesh = bpy.data.meshes.new("Mesh")
         bm.to_mesh(mesh)
         bm.free()
 
@@ -135,7 +141,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
             draw_color = list(context.preferences.themes[0].view_3d.empty)
             if self.empty.select_get():
                 draw_color = list(context.preferences.themes[0].view_3d.object_active)
-            
+
             draw_color.append(1) # Add alpha (there isn't any functions in the Color class to add an alpha, so we have to convert to a list)
 
             vertex_pos = []
