@@ -349,7 +349,7 @@ class glTF2ExportUserExtension():
 
                 #Let's inject some detail maps, through Asobo extensions:
                 if (blender_material.msfs_show_detail_albedo == True or blender_material.msfs_show_detail_metallic == True or blender_material.msfs_show_detail_normal == True):
-                    from ..exporter.exp.gltf2_blender_gather_texture_info import gather_texture_info
+                    from io_scene_gltf2.blender.exp.gltf2_blender_gather_texture_info import gather_texture_info
 
                     nodes = blender_material.node_tree.nodes
 
@@ -464,7 +464,7 @@ class glTF2ExportUserExtension():
                         required=False
                     )
                 elif blender_material.msfs_material_mode == 'msfs_parallax':
-                    from ..exporter.exp.gltf2_blender_gather_texture_info import gather_texture_info
+                    from io_scene_gltf2.blender.exp.gltf2_blender_gather_texture_info import gather_texture_info
 
                     nodes = blender_material.node_tree.nodes
 
