@@ -15,14 +15,6 @@
 import bpy
 
 class Export:
-
-    def __init__(self):
-        # We need to wait until we create the gltf2UserExtension to import the gltf2 modules
-        # Otherwise, it may fail because the gltf2 may not be loaded yet
-        from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
-        self.Extension = Extension
-        self.properties = bpy.context.scene.msfs_ExtAsoboProperties
-
     def gather_asset_hook(self, gltf2_asset, export_settings):
         if self.properties.enabled == True:
             if gltf2_asset.extensions is None:
