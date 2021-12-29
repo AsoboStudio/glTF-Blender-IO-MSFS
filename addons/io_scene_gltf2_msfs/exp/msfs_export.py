@@ -62,7 +62,7 @@ class Export:
                 params = None
                 if object.gizmo_type == "sphere":
                     params = {
-                        "radius": object.scale.x * object.scale.y
+                        "radius": object.scale.x * object.scale.y * object.scale.z
                     }
                 elif object.gizmo_type == "box":
                     params = {

@@ -129,7 +129,6 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
 
             bgl.glEnable(bgl.GL_BLEND)
             bgl.glEnable(bgl.GL_LINE_SMOOTH)
-            bgl.glEnable(bgl.GL_DEPTH_TEST)
 
             # Use Blender theme colors to keep everything consistent
             draw_color = list(context.preferences.themes[0].view_3d.empty)
@@ -151,7 +150,6 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
             bgl.glLineWidth(1)
             bgl.glDisable(bgl.GL_BLEND)
             bgl.glDisable(bgl.GL_LINE_SMOOTH)
-            bgl.glEnable(bgl.GL_DEPTH_TEST)
 
     def apply_vert_transforms(self, vert, matrix):
         vert = list(vert.co)
@@ -180,7 +178,9 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
             if object.type == 'EMPTY' and object.gizmo_type != "NONE" and object not in self.__class__.empties.keys():
                 def get_matrix():
                     # Re-calculate matrix without rotation
-                    if object.gizmo_type in ["sphere", "cylinder"]:
+                    if object.gizmo_type == "sphere":
+                        scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (0, 0, 1))
+                    elif object.gizmo_type == "cylinder":
                         scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
                     else:
                         scale_matrix = Matrix.Scale(object.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
