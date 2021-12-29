@@ -123,7 +123,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
         return formatted_matrix
 
     def draw(self, context):
-        if self.custom_shape_edges:
+        if self.custom_shape_edges and not self.empty.hide_get():
             matrix = self.get_matrix()
 
             bgl.glEnable(bgl.GL_BLEND)
