@@ -27,12 +27,13 @@ bpy.utils.register_class(MSFS_attached_behavior)
 
 class MSFS_LI_object_properties():
     bpy.types.Object.msfs_behavior = bpy.props.CollectionProperty(type = MSFS_attached_behavior)
-    bpy.types.Object.msfs_active_behavior = bpy.props.IntProperty(name="active_behavior",min=0,default=0)
+    bpy.types.Object.msfs_active_behavior = bpy.props.IntProperty(name="Active behavior",min=0,default=0)
 
-    bpy.types.Object.msfs_light_has_symmetry = bpy.props.BoolProperty(name='has symmetry',default=False)
-    bpy.types.Object.msfs_light_flash_frequency = bpy.props.FloatProperty(name='flash frequency',min=0.0,default=0.0)
-    bpy.types.Object.msfs_light_flash_duration = bpy.props.FloatProperty(name='flash duration',min=0.0,default=0.0)
-    bpy.types.Object.msfs_light_flash_phase = bpy.props.FloatProperty(name='flash phase',default=0.0)
-    bpy.types.Object.msfs_light_rotation_speed = bpy.props.FloatProperty(name='rotation speed',default=0.0)
+    bpy.types.Object.msfs_light_has_symmetry = bpy.props.BoolProperty(name='Has symmetry',default=False)
+    bpy.types.Object.msfs_light_flash_frequency = bpy.props.FloatProperty(name='Flash frequency',min=0.0,default=0.0)
+    bpy.types.Object.msfs_light_flash_duration = bpy.props.FloatProperty(name='Flash duration',min=0.0,default=0.0)
+    bpy.types.Object.msfs_light_flash_phase = bpy.props.FloatProperty(name='Flash phase',default=0.0)
+    bpy.types.Object.msfs_light_rotation_speed = bpy.props.FloatProperty(name='Rotation speed',default=0.0)
     bpy.types.Object.msfs_light_day_night_cycle = bpy.props.BoolProperty(name='Day/Night cycle',default=False,description="Set this value to 'true' if you want the light to be visible at night only.")
 
+    bpy.types.Object.msfs_collision_is_road_collider = bpy.props.BoolProperty(name="Road Collider", default=False)

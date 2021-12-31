@@ -105,10 +105,13 @@ def register():
 
     for cls in classes:
         try:
-            print( "registering class: {0}".format(cls))
             bpy.utils.register_class(cls)
         except ValueError:
             pass
+
+    for module in modules():
+        if hasattr(module, "register"):
+            module.register()
 
     try:
         bpy.utils.register_class(ExtAsoboProperties)
@@ -136,6 +139,10 @@ def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
+    for module in modules():
+        if hasattr(module, "unregister"):
+            module.unregister()
+
 
 def unregister_panel():
     try:
@@ -144,14 +151,8 @@ def unregister_panel():
         pass
 
 
-# todo :
-# find a way to move this in exp.msfs_export.py 
-class glTF2ExportUserExtension:
-
-    ## all glTF2ExportUserExtension  must be decalred here
-    # the khronos exporter look only of the __init__ in the preferences-> addons modules
-    # look \io_scene_gltf2\__init__.py line 622
-
+import math
+class glTF2ExportUserExtension():
     def __init__(self):
         # We need to wait until we create the gltf2UserExtension to import the gltf2 modules
         # Otherwise, it may fail because the gltf2 may not be loaded yet
@@ -159,6 +160,7 @@ class glTF2ExportUserExtension:
         self.Extension = Extension
         self.properties = bpy.context.scene.msfs_ExtAsoboProperties
 
+    
     def gather_asset_hook(self, gltf2_asset, export_settings):
         if self.properties.enabled == True:
             if gltf2_asset.extensions is None:
@@ -170,8 +172,6 @@ class glTF2ExportUserExtension:
             )
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
-        import math
-
         if self.properties.enabled == True:
             if gltf2_object.extensions is None:
                 gltf2_object.extensions = {}
@@ -197,7 +197,78 @@ class glTF2ExportUserExtension:
                     required = False
                 )
                 
+    def gather_mesh_hook(self, gltf2_mesh, blender_mesh, blender_object, vertex_groups, modifiers, skip_filter, material_names, export_settings):
+        # Set gizmo objects extension
+        gizmo_objects = []
+        for object in bpy.context.scene.objects:
+            if object.type == "MESH" and bpy.data.meshes[object.data.name] == blender_mesh:
+                for child in object.children:
+                    if child.type == 'EMPTY' and child.msfs_gizmo_type != "NONE":
+                        params = None
+                        if child.msfs_gizmo_type == "sphere":
+                            params = {
+                                "radius": abs(child.scale.x * child.scale.y * child.scale.z)
+                            }
+                        elif child.msfs_gizmo_type == "box":
+                            params = {
+                                "length": abs(child.scale.x),
+                                "width": abs(child.scale.y),
+                                "height": abs(child.scale.z)
+                            }
+                        elif child.msfs_gizmo_type == "cylinder":
+                            params = {
+                                "radius": abs(child.scale.x * child.scale.y),
+                                "height": abs(child.scale.z)
+                            }
 
+                        tags = ["Collision"]
+                        if child.msfs_collision_is_road_collider:
+                            tags.append("Road")
+
+                        gizmo_objects.append({
+                            "translation": list(child.location),
+                            "type": child.msfs_gizmo_type,
+                            "params": params,
+                            "extensions": {
+                                "ASOBO_tags": self.Extension(
+                                    name = "ASOBO_tags",
+                                    extension = {
+                                        "tags": tags
+                                    },
+                                    required = False
+                                )
+                            }
+                        })
+
+        if gizmo_objects:
+            gltf2_mesh.extensions["ASOBO_gizmo_object"] = self.Extension(
+                name = "ASOBO_gizmo_object",
+                extension = {
+                    "gizmo_objects": gizmo_objects
+                },
+                required = False
+            )
+
+    def gather_scene_hook(self, gltf2_scene, blender_scene, export_settings):
+        # Recursive function to filter children that are gizmos
+        def get_children(node):
+            children = []
+            for child in node.children:
+                blender_object = bpy.context.scene.objects.get(child.name)
+                print(child.name, blender_object)
+                if blender_object:
+                    if blender_object.type != "EMPTY" and blender_object.msfs_gizmo_type == "NONE":
+                        child.children = get_children(child)
+                        children.append(child)
+            return children
+
+        # Construct new node list with filtered children
+        new_nodes = []
+        for node in list(gltf2_scene.nodes.copy()):
+            node.children = get_children(node)
+            new_nodes.append(node)
+
+        gltf2_scene.nodes = new_nodes
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if (self.properties.enabled == True and blender_material.msfs_material_mode != None):

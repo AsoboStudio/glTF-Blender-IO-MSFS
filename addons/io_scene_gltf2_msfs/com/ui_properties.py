@@ -55,19 +55,32 @@ class MSFS_PT_ObjectProperties(bpy.types.Panel):
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "object"
+
+    @classmethod
+    def poll(cls, context):
+        return (context.object.type in ['LIGHT', 'EMPTY'])
     
     def draw(self, context):
         layout = self.layout
 
-        if bpy.context.active_object.type == 'LIGHT':
+        active_object = context.object
+
+        if active_object.type == 'LIGHT':
             box = layout.box()
-            box.label(text = "MSFS Light parameters", icon='LIGHT')
-            box.prop(bpy.context.active_object, 'msfs_light_has_symmetry')
-            box.prop(bpy.context.active_object, 'msfs_light_flash_frequency')
-            box.prop(bpy.context.active_object, 'msfs_light_flash_duration')
-            box.prop(bpy.context.active_object, 'msfs_light_flash_phase')
-            box.prop(bpy.context.active_object, 'msfs_light_rotation_speed')
-            box.prop(bpy.context.active_object, 'msfs_light_day_night_cycle')
+            box.label(text = "MSFS Light Parameters", icon='LIGHT')
+            box.prop(active_object, 'msfs_light_has_symmetry')
+            box.prop(active_object, 'msfs_light_flash_frequency')
+            box.prop(active_object, 'msfs_light_flash_duration')
+            box.prop(active_object, 'msfs_light_flash_phase')
+            box.prop(active_object, 'msfs_light_rotation_speed')
+            box.prop(active_object, 'msfs_light_day_night_cycle')
+
+        elif active_object.type == 'EMPTY':
+            box = layout.box()
+            box.label(text="MSFS Collision Parameters", icon='SHADING_BBOX')
+            box.prop(active_object, "msfs_gizmo_type") # TODO: change to msfs_msfs_gizmo_type
+            if active_object.msfs_gizmo_type != "NONE":
+                box.prop(active_object, "msfs_collision_is_road_collider")
 
 
         #if bpy.context.active_object.type == 'ARMATURE':
