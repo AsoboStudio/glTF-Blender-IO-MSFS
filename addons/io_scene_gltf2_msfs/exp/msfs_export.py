@@ -110,7 +110,6 @@ class Export:
             children = []
             for child in node.children:
                 blender_object = bpy.context.scene.objects.get(child.name)
-                print(child.name, blender_object)
                 if blender_object:
                     if blender_object.type != "EMPTY" and blender_object.msfs_gizmo_type == "NONE":
                         child.children = get_children(child)
