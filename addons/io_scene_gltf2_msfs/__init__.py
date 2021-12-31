@@ -1,4 +1,4 @@
-# Copyright 2021 The FlightSim-glTF-Blender-IO authors.
+# Copyright 2021 The glTF-Blender-IO-MSFS authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ bl_info = {
 
 class ExtAsoboProperties(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(
-        name='ASOBO extensions',
-        description='ASOBO extension for glTF',
+        name='Microsoft Flight Simulator Extensions',
+        description='Enable MSFS glTF extensions',
         default=True
     )
 
@@ -54,7 +54,7 @@ class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
 
     def draw_header(self, context):
         layout = self.layout
-        layout.label(text="Blender2MSFS Extensions", icon='TOOL_SETTINGS')
+        layout.label(text="glTF-Blender-IO-MSFS Extensions", icon='TOOL_SETTINGS')
 
     def draw(self, context):
         props = bpy.context.scene.msfs_ExtAsoboProperties
