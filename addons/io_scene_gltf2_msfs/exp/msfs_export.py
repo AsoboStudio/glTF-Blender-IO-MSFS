@@ -92,13 +92,14 @@ class Export:
                     )
                 })
 
-        gltf2_mesh.extensions["ASOBO_gizmo_object"] = self.Extension(
-            name = "ASOBO_gizmo_object",
-            extension = {
-                "gizmo_objects": gizmo_objects
-            },
-            required = False
-        )
+        if gizmo_objects:
+            gltf2_mesh.extensions["ASOBO_gizmo_object"] = self.Extension(
+                name = "ASOBO_gizmo_object",
+                extension = {
+                    "gizmo_objects": gizmo_objects
+                },
+                required = True
+            )
 
     def gather_gltf_hook(self, gltf2_plan, export_settings):
         # Remove all gizmo empties from the glTF export plan

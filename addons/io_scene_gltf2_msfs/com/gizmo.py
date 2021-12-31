@@ -49,16 +49,25 @@ class AddGizmo(bpy.types.Operator):
     msfs_gizmo_type: bpy.types.Object.msfs_gizmo_type
 
     def execute(self, context):
-        bpy.ops.object.empty_add()
-        obj = context.active_object
-        if self.msfs_gizmo_type == "sphere":
-            obj.name = "Sphere Collision Gizmo"
-        elif self.msfs_gizmo_type == "box":
-            obj.name = "Box Collision Gizmo"
-        elif self.msfs_gizmo_type == "cylinder":
-            obj.name = "Cylinder Collision Gizmo"
+        def add_gizmo(parent):
+            bpy.ops.object.empty_add()
+            gizmo = context.object
+            if self.msfs_gizmo_type == "sphere":
+                gizmo.name = "Sphere Collision"
+            elif self.msfs_gizmo_type == "box":
+                gizmo.name = "Box Collision"
+            elif self.msfs_gizmo_type == "cylinder":
+                gizmo.name = "Cylinder Collision"
 
-        obj.msfs_gizmo_type = self.msfs_gizmo_type
+            gizmo.msfs_gizmo_type = self.msfs_gizmo_type
+            if parent:
+                gizmo.parent = parent
+        
+        if bpy.context.selected_objects:
+            for selected_object in bpy.context.selected_objects:
+                add_gizmo(selected_object)
+        else:
+            add_gizmo(None)
 
         return {"FINISHED"}
 
@@ -191,7 +200,7 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
                         scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
                     else:
                         scale_matrix = Matrix.Scale(object.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
-                    object_matrix = Matrix.Translation(object.location) @ scale_matrix
+                    object_matrix = object.matrix_world @ scale_matrix
 
                     matrix = []
                     for i in range(4):
@@ -235,9 +244,9 @@ class MSFSCollisionAddMenu(bpy.types.Menu):
     bl_label = "Flight Simulator Collision"
 
     def draw(self, context):
-        self.layout.operator(AddGizmo.bl_idname, text="Add Sphere Collision Gizmo", icon="MESH_UVSPHERE").msfs_gizmo_type = "sphere"
-        self.layout.operator(AddGizmo.bl_idname, text="Add Box Collision Gizmo", icon="MESH_CUBE").msfs_gizmo_type = "box"
-        self.layout.operator(AddGizmo.bl_idname, text="Add Cylinder Collision Gizmo", icon="MESH_CYLINDER").msfs_gizmo_type = "cylinder"
+        self.layout.operator(AddGizmo.bl_idname, text="Sphere Collision", icon="MESH_UVSPHERE").msfs_gizmo_type = "sphere"
+        self.layout.operator(AddGizmo.bl_idname, text="Box Collision", icon="MESH_CUBE").msfs_gizmo_type = "box"
+        self.layout.operator(AddGizmo.bl_idname, text="Cylinder Collision", icon="MESH_CYLINDER").msfs_gizmo_type = "cylinder"
 
 def draw_menu(self, context):
     self.layout.menu(menu=MSFSCollisionAddMenu.bl_idname, icon="SHADING_BBOX")

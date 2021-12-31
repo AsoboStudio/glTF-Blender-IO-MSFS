@@ -201,56 +201,74 @@ class glTF2ExportUserExtension():
         # Set gizmo objects extension
         gizmo_objects = []
         for object in bpy.context.scene.objects:
-            if object.type == 'EMPTY' and object.msfs_gizmo_type != "NONE" and object.msfs_collision_target == bpy.data.meshes[gltf2_mesh.name]:
-                params = None
-                if object.msfs_gizmo_type == "sphere":
-                    params = {
-                        "radius": abs(object.scale.x * object.scale.y * object.scale.z)
-                    }
-                elif object.msfs_gizmo_type == "box":
-                    params = {
-                        "length": abs(object.scale.x),
-                        "width": abs(object.scale.y),
-                        "height": abs(object.scale.z)
-                    }
-                elif object.msfs_gizmo_type == "cylinder":
-                    params = {
-                        "radius": abs(object.scale.x * object.scale.y),
-                        "height": abs(object.scale.z)
-                    }
+            if object.type == "MESH" and bpy.data.meshes[object.data.name] == blender_mesh:
+                for child in object.children:
+                    if child.type == 'EMPTY' and child.msfs_gizmo_type != "NONE":
+                        params = None
+                        if child.msfs_gizmo_type == "sphere":
+                            params = {
+                                "radius": abs(child.scale.x * child.scale.y * child.scale.z)
+                            }
+                        elif child.msfs_gizmo_type == "box":
+                            params = {
+                                "length": abs(child.scale.x),
+                                "width": abs(child.scale.y),
+                                "height": abs(child.scale.z)
+                            }
+                        elif child.msfs_gizmo_type == "cylinder":
+                            params = {
+                                "radius": abs(child.scale.x * child.scale.y),
+                                "height": abs(child.scale.z)
+                            }
 
-                tags = ["Collision"]
-                if object.msfs_collision_is_road_collider:
-                    tags.append("Road")
+                        tags = ["Collision"]
+                        if child.msfs_collision_is_road_collider:
+                            tags.append("Road")
 
-                gizmo_objects.append({
-                    "translation": list(object.location),
-                    "type": object.msfs_gizmo_type,
-                    "params": params,
-                    "extensions": self.Extension(
-                        name = "ASOBO_tags",
-                        extension = {
-                            "tags": tags
-                        },
-                        required = False
-                    )
-                })
+                        gizmo_objects.append({
+                            "translation": list(child.location),
+                            "type": child.msfs_gizmo_type,
+                            "params": params,
+                            "extensions": {
+                                "ASOBO_tags": self.Extension(
+                                    name = "ASOBO_tags",
+                                    extension = {
+                                        "tags": tags
+                                    },
+                                    required = False
+                                )
+                            }
+                        })
 
-        gltf2_mesh.extensions["ASOBO_gizmo_object"] = self.Extension(
-            name = "ASOBO_gizmo_object",
-            extension = {
-                "gizmo_objects": gizmo_objects
-            },
-            required = False
-        )
+        if gizmo_objects:
+            gltf2_mesh.extensions["ASOBO_gizmo_object"] = self.Extension(
+                name = "ASOBO_gizmo_object",
+                extension = {
+                    "gizmo_objects": gizmo_objects
+                },
+                required = False
+            )
 
-    def gather_gltf_hook(self, gltf2_plan, export_settings):
-        # Remove all gizmo empties from the glTF export plan
-        for i, node in enumerate(gltf2_plan.nodes):
-            object = bpy.context.scene.objects.get(node.name)
-            if object:
-                if object.type == "EMPTY" and object.msfs_gizmo_type != "NONE":
-                    gltf2_plan.nodes.pop(i)
+    def gather_scene_hook(self, gltf2_scene, blender_scene, export_settings):
+        # Recursive function to filter children that are gizmos
+        def get_children(node):
+            children = []
+            for child in node.children:
+                blender_object = bpy.context.scene.objects.get(child.name)
+                print(child.name, blender_object)
+                if blender_object:
+                    if blender_object.type != "EMPTY" and blender_object.msfs_gizmo_type == "NONE":
+                        child.children = get_children(child)
+                        children.append(child)
+            return children
+
+        # Construct new node list with filtered children
+        new_nodes = []
+        for node in list(gltf2_scene.nodes.copy()):
+            node.children = get_children(node)
+            new_nodes.append(node)
+
+        gltf2_scene.nodes = new_nodes
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if (self.properties.enabled == True and blender_material.msfs_material_mode != None):
