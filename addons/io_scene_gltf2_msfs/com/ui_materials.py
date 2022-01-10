@@ -27,6 +27,10 @@ class MSFS_PT_material(bpy.types.Panel):
     bl_context = "material"
     bl_options = {'DEFAULT_CLOSED'}
 
+    @classmethod
+    def poll(cls, context):
+        return context.active_object.active_material is not None
+
     def draw(self, context):
         mat = context.active_object.active_material
 
