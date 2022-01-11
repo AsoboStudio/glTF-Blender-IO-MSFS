@@ -215,10 +215,29 @@ class glTF2ExportUserExtension:
                     },
                     required = False
                 )
-                
-
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
+        if (self.properties.enabled == True):
+            
+            #todo: 
+            #currently the khronos exporter does not evaluate custom node group so this entire branch is stacked
+            # https://github.com/KhronosGroup/glTF-Blender-IO/issues/1141
+
+            # standardMat = blender_material.node_tree.nodes["MSFS_Standard"]
+            # if gltf2_material.extensions is None:
+            #         gltf2_material.extensions = {}
+            # if gltf2_material.extras is None:
+            #     gltf2_material.extras = {}
+
+            
+            # node = standardMat.getNode("MulBaseColor")
+            # if node != None:
+            #     inputs = (node.inputs[2],)
+            # base_color_texture = gather_texture_info(inputs, export_settings)
+            # if base_color_texture != None:
+            #          gltf2_material.pbr_metallic_roughness.base_color_texture = base_color_texture
+            return
+
         if (self.properties.enabled == True and blender_material.msfs_material_mode != None):
             if blender_material.msfs_material_mode != 'NONE':
                 if gltf2_material.extensions is None:
@@ -453,3 +472,6 @@ class glTF2ExportUserExtension:
                     gltf2_material.extras["ASOBO_material_code"] = "Porthole"
                 elif blender_material.msfs_material_mode == 'msfs_windshield':
                     gltf2_material.extras["ASOBO_material_code"] = "Windshield"
+
+    def gather_material_pbr_metallic_roughness(self, gltf2_material, blender_material,orm_texture, export_settings):
+        print("hello")
