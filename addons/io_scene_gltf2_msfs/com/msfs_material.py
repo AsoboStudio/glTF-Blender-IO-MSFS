@@ -1,6 +1,6 @@
 import bpy
 from enum import Enum 
-
+import idprop
 # Derived from the Node base type.
 
 class MSFS_MaterialProperties(Enum):
@@ -53,8 +53,9 @@ class MSFS_ShaderNodes(Enum):
     principledBSDF = 'Principled BSDF'
     baseColorTex = 'Base Color Texture'
     baseColorRGB = 'Base Color RGB'
-    baseColorA = 'Base Color RGB'
-    baseColorMul = 'Base Color Multiplier'
+    baseColorA = 'Base Color A'
+    baseColorMulRGB = 'Base Color Multiplier RGB'
+    baseColorMulA = 'Base Color Multiplier A'
 
 
 class MSFS_Material():
@@ -67,6 +68,7 @@ class MSFS_Material():
         self.cleanNodeTree()
         self.displayParams()
         self.createNodetree()
+        self.refresh()
 
     def cleanNodeTree(self):
         nodes = self.material.node_tree.nodes
@@ -74,6 +76,18 @@ class MSFS_Material():
         for idx,node in enumerate(nodes):
             print("Deleting: %s | %s"%(node.name,node.type))
             nodes.remove(node)
+
+    def refresh(self):
+        # self.material.msfs_albedo_texture = 
+        pass
+        # for k in self.material.keys():
+        #     if k == "msfs_material_mode":
+        #         continue
+        #     if type(self.material[k]) is not idprop.types.IDPropertyGroup:
+        #         continue
+        #     if k.startswith("msfs"):
+        #         # print(self.material[k])
+        #         self.material[k].update()
 
     def displayParams(self):
         self.material.msfs_show_tint = False
@@ -120,8 +134,8 @@ class MSFS_Material():
         self.material.msfs_show_windshield_options = False
 
     def createNodetree(self):
-        self.nodeOutputMaterial = self.addNode('ShaderNodeOutputMaterial', {'location':(700.0,0.0) })
-        self.nodebsdf = self.addNode('ShaderNodeBsdfPrincipled', {'location':(400.0,0.0) })
+        self.nodeOutputMaterial = self.addNode('ShaderNodeOutputMaterial', {'location':(1000.0,0.0) })
+        self.nodebsdf = self.addNode('ShaderNodeBsdfPrincipled', {'location':(500.0,0.0) })
 
         self.innerLink('nodes["Principled BSDF"].outputs[0]', 'nodes["Material Output"].inputs[0]')
 
@@ -238,20 +252,24 @@ class MSFS_Standard(MSFS_Material):
         self.material.msfs_show_pearl = True
         self.material.msfs_show_windshield_options = False
 
+    def refresh(self):
+        self.material.msfs_albedo_texture = self.material.msfs_albedo_texture
+        self.material.msfs_color_albedo_mix = self.material.msfs_color_albedo_mix
+
     def createNodetree(self) :
         super().createNodetree()
         # self.node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
         
         #NODES
-        self.nodeOutputMaterial = self.addNode('ShaderNodeOutputMaterial', {'location':(700.0,0.0) })
-        self.nodebsdf = self.addNode('ShaderNodeBsdfPrincipled', {'location':(400.0,0.0) })
 
-        self.nodeBaseColorTex = self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.baseColorTex.value})
-        self.nodeBaseColorRGB = self.addNode('ShaderNodeRGB', { 'name': MSFS_ShaderNodes.baseColorRGB.value })
-        self.nodeBaseColorA = self.addNode('ShaderNodeRGB', { 'name': MSFS_ShaderNodes.baseColorA.value })
+        self.nodeBaseColorTex = self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.baseColorTex.value,'location':(-500,0.0)})
+        self.nodeBaseColorRGB = self.addNode('ShaderNodeRGB', { 'name': MSFS_ShaderNodes.baseColorRGB.value,'location':(-500,-500.0)})
+        self.nodeBaseColorA = self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.baseColorA.value,'location':(-500,-1000.0)})
+        self.nodeBaseColorA.outputs[0].default_value = 1
         
-        mulBaseColorNode =self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.baseColorMul.value ,'blend_type':'MULTIPLY' })
-        mulBaseColorNode.inputs[0].default_value = 1.0
+        mulBaseColorRGBNode =self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.baseColorMulRGB.value ,'blend_type':'MULTIPLY', 'location':(0,0.0) })
+        mulBaseColorRGBNode.inputs[0].default_value = 1
+        mulBaseColorANode =self.addNode('ShaderNodeMath', { 'name':MSFS_ShaderNodes.baseColorMulA.value ,'operation':'MULTIPLY','location':(0,-500.0)})
 
         # nodeMulEmissive = "MulEmissive"
         # self.addNode('ShaderNodeMixRGB', { 'name':nodeMulEmissive ,'blend_type':'MULTIPLY' })
@@ -269,9 +287,12 @@ class MSFS_Standard(MSFS_Material):
         #LINKS
         # self.innerLink('nodes["Principled BSDF"].outputs[0]', 'nodes["Material Output"].inputs[0]')
 
-        #color
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.baseColorMul.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorRGB.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMul.value))
+        #color RGB
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.baseColorMulRGB.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorRGB.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMulRGB.value))
+        #color A
+        self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMulA.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorA.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value))
         
 
         # #emissive
@@ -293,7 +314,8 @@ class MSFS_Standard(MSFS_Material):
 
 
         #PrincipledBSDF connections
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMul.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulRGB.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value), 'nodes["{0}"].inputs[21]'.format(MSFS_ShaderNodes.principledBSDF.value))
 
         # self.innerLink('nodes["MulEmissive"].outputs[0]', 'nodes["PrincipledBSDF"].inputs[19]')
         # self.innerLink('nodes["MulOccl"].outputs[0]', 'nodes["PrincipledBSDF"].inputs[0]')

@@ -49,8 +49,8 @@ class MSFS_PT_material(bpy.types.Panel):
                 row.prop(mat, 'msfs_color_albedo_mix')
                 row = subbox.row()
                 row.prop(mat, 'msfs_color_emissive_mix')
-                subbox.prop(mat, 'msfs_color_alpha_mix')
-                subbox.prop(mat, 'msfs_color_base_mix')
+                # subbox.prop(mat, 'msfs_color_alpha_mix')
+                # subbox.prop(mat, 'msfs_color_base_mix')
                 if mat.msfs_show_sss_color == True:
                     subbox.prop(mat, 'msfs_color_sss')
 

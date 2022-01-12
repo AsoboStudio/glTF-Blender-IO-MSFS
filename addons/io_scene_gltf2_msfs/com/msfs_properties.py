@@ -19,6 +19,8 @@ from .msfs_material import *
 
 
 class MSFS_LI_material():
+
+
     # Use this function to update the shader node tree
     def switch_msfs_material(self,context):
         mat = context.active_object.active_material
@@ -719,8 +721,8 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
 
-        albedo = nodes.get(MSFS_ShaderNodes.baseColorTex.value)
-        albedo.image = mat.msfs_albedo_texture             
+        base_color_tex = nodes.get(MSFS_ShaderNodes.baseColorTex.value)
+        base_color_tex.image = mat.msfs_albedo_texture             
 
     def match_metallic(self, context):
         mat = context.active_object.active_material
@@ -977,11 +979,11 @@ class MSFS_LI_material():
     def match_base_color(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        nodeColor = nodes.get(MSFS_ShaderNodes.baseColor.value).outputs[0].default_value
-        nodeColor[0]= mat.msfs_color_albedo_mix[0]
-        nodeColor[1]= mat.msfs_color_albedo_mix[1]
-        nodeColor[2]= mat.msfs_color_albedo_mix[2]
-        nodeColor[3]= mat.msfs_color_albedo_mix[3]
+        nodeColorRGB = nodes.get(MSFS_ShaderNodes.baseColorRGB.value).outputs[0].default_value
+        nodeColorRGB[0]= mat.msfs_color_albedo_mix[0]
+        nodeColorRGB[1]= mat.msfs_color_albedo_mix[1]
+        nodeColorRGB[2]= mat.msfs_color_albedo_mix[2]
+        nodes.get(MSFS_ShaderNodes.baseColorA.value).outputs[0].default_value =  mat.msfs_color_albedo_mix[3]
 
     def update_color_alpha_mix(self, context):
         mat = context.active_object.active_material
@@ -1120,10 +1122,10 @@ class MSFS_LI_material():
     # MSFS Material properties
     # The following variables are written into the glTF file when exporting.
     #Color blends:
-    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=3,default=[1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=match_base_color)
-    Material.msfs_color_emissive_mix = bpy.props.FloatVectorProperty(name="Emissive Color", subtype='COLOR', min=0.0, max=1.0, size=3,default=[0.0,0.0,0.0], description="The color value set here will be mixed in with the emissive value of the material.", update=update_color_emissive_mix)
-    Material.msfs_color_alpha_mix = bpy.props.FloatProperty(name="Alpha multiplier", min=0, max=1, default=1, description="The alpha value set here will be mixed in with the Alpha value of the texture.",update=update_color_alpha_mix)
-    Material.msfs_color_base_mix = bpy.props.FloatProperty(name="Albedo Color Mix", min=0, max=1, default=1, description="Mix factor for the Albedo Color with the Albedo Texture.",update=update_color_base_mix)
+    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=4,default=[1.0,1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=match_base_color)
+    Material.msfs_color_emissive_mix = bpy.props.FloatVectorProperty(name="Emissive Color", subtype='COLOR', min=0.0, max=1.0, size=4,default=[0.0,0.0,0.0,0.0], description="The color value set here will be mixed in with the emissive value of the material.", update=update_color_emissive_mix)
+    # Material.msfs_color_alpha_mix = bpy.props.FloatProperty(name="Alpha multiplier", min=0, max=1, default=1, description="The alpha value set here will be mixed in with the Alpha value of the texture.",update=update_color_alpha_mix)
+    # Material.msfs_color_base_mix = bpy.props.FloatProperty(name="Albedo Color Mix", min=0, max=1, default=1, description="Mix factor for the Albedo Color with the Albedo Texture.",update=update_color_base_mix)
     Material.msfs_color_sss = bpy.props.FloatVectorProperty(name="SSS Color", subtype='COLOR',min=0.0, max=1.0,size=4, default=[1.0,1.0,1.0,1.0], description = "Use the color picker to set the color of the subsurface scattering.",update=update_color_sss)
     # Windshield
     Material.msfs_rain_drop_scale = FloatProperty(
