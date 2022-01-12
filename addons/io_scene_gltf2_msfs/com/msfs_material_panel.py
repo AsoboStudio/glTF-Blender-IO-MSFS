@@ -16,7 +16,7 @@ import bpy
 from bpy.types import Material
 #from bpy.props import IntProperty, BoolProperty, StringProperty, FloatProperty, EnumProperty, FloatVectorProperty
 #import os
-from .li_material import *
+from .msfs_properties import *
 
 
 class MSFS_PT_material(bpy.types.Panel):
@@ -112,58 +112,7 @@ class MSFS_PT_material(bpy.types.Panel):
                 row.prop(mat, 'msfs_geo_decal_blend_factor_normal')
                 row.prop(mat, 'msfs_geo_decal_blend_factor_melt_sys')
 
-            if (mat.msfs_show_albedo == True or mat.msfs_show_metallic == True or mat.msfs_show_normal == True or mat.msfs_show_emissive == True or mat.msfs_show_detail_albedo == True or 
-                mat.msfs_show_detail_metallic == True or mat.msfs_show_detail_normal == True or mat.msfs_show_blend_mask == True or mat.msfs_show_anisotropic_direction == True or
-                mat.msfs_show_clearcoat == True or mat.msfs_show_behind_glass == True or mat.msfs_show_wiper_mask == True):
-
-                box = layout.box()
-                box.label(text="Texture maps",icon='TEXTURE')
-                if mat.msfs_show_albedo == True:
-                    box.label(text = "Albedo:")
-                    box.template_ID(mat, "msfs_albedo_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_metallic == True:
-                    box.label(text = "Metallic:")
-                    box.label(text="(Occlusion(R),Roughness(G),Metallic(B))")
-                    box.template_ID(mat, "msfs_metallic_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_normal == True:
-                    box.label(text = "Normal:")
-                    box.template_ID(mat, "msfs_normal_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_emissive == True:
-                    box.label(text = "Emissive:")
-                    box.template_ID(mat, "msfs_emissive_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_detail_albedo == True:
-                    box.label(text = "Detail Albedo:")
-                    if mat.msfs_material_mode == 'windshield':
-                        box.label(text="(Scratches (R), Fingerprints(B))")
-                    box.template_ID(mat, "msfs_detail_albedo_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_detail_metallic == True:
-                    box.label(text = "Detail Metallic:")
-                    if mat.msfs_material_mode == 'geo_decal':
-                        box.label(text="(Melt Pattern(R),Roughness(G),Metallic(B))")
-                    else:
-                        box.label(text="(Occlusion(R),Roughness(G),Metallic(B))")
-                    box.template_ID(mat, "msfs_detail_metallic_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_detail_normal == True:
-                    if mat.msfs_material_mode == 'windshield':
-                        box.label(text = "Icing Normal:")
-                    else:
-                        box.label(text = "Detail Normal:")
-                    box.template_ID(mat, "msfs_detail_normal_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_blend_mask == True:
-                    box.label(text = "Blend Mask:")
-                    box.template_ID(mat, "msfs_blend_mask_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_anisotropic_direction == True:
-                    box.label(text=  "Anisotropic direction (RG):")
-                    box.template_ID(mat, "msfs_anisotropic_direction_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_clearcoat == True:
-                    box.label(text=  "Clearcoat amount (R), Clearcoat rough(G):")
-                    box.template_ID(mat, "msfs_clearcoat_texture", new = "image.new", open = "image.open")
-                if mat.msfs_show_behind_glass == True:
-                    box.label(text = "Behind glass Albedo:")
-                    box.template_ID(mat, "msfs_behind_glass_texture", new="image.new", open = "image.open")
-                if mat.msfs_show_wiper_mask == True:
-                    box.label(text = "Wiper Mask (RG):")
-                    box.template_ID(mat, "msfs_wiper_mask_texture", new="image.new", open = "image.open")
+            
 
             if (mat.msfs_show_blend_mode == True or mat.msfs_show_draworder == True or mat.msfs_show_no_cast_shadow == True or mat.msfs_show_double_sided == True or 
                 mat.msfs_show_responsive_aa == True or mat.msfs_show_day_night_cycle):
@@ -246,6 +195,59 @@ class MSFS_PT_material(bpy.types.Panel):
                     row.prop(mat,'msfs_uv_clamp_x')
                     row.prop(mat,'msfs_uv_clamp_y')
                     #row.prop(mat,'msfs_uv_clamp_z')    - removed by Asobo, probably because it never made sense in the first place.
+
+            if (mat.msfs_show_albedo == True or mat.msfs_show_metallic == True or mat.msfs_show_normal == True or mat.msfs_show_emissive == True or mat.msfs_show_detail_albedo == True or 
+                mat.msfs_show_detail_metallic == True or mat.msfs_show_detail_normal == True or mat.msfs_show_blend_mask == True or mat.msfs_show_anisotropic_direction == True or
+                mat.msfs_show_clearcoat == True or mat.msfs_show_behind_glass == True or mat.msfs_show_wiper_mask == True):
+
+                box = layout.box()
+                box.label(text="Texture maps",icon='TEXTURE')
+                if mat.msfs_show_albedo == True:
+                    box.label(text = "Albedo:")
+                    box.template_ID(mat, "msfs_albedo_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_metallic == True:
+                    box.label(text = "Metallic:")
+                    box.label(text="(Occlusion(R),Roughness(G),Metallic(B))")
+                    box.template_ID(mat, "msfs_metallic_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_normal == True:
+                    box.label(text = "Normal:")
+                    box.template_ID(mat, "msfs_normal_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_emissive == True:
+                    box.label(text = "Emissive:")
+                    box.template_ID(mat, "msfs_emissive_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_detail_albedo == True:
+                    box.label(text = "Detail Albedo:")
+                    if mat.msfs_material_mode == 'windshield':
+                        box.label(text="(Scratches (R), Fingerprints(B))")
+                    box.template_ID(mat, "msfs_detail_albedo_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_detail_metallic == True:
+                    box.label(text = "Detail Metallic:")
+                    if mat.msfs_material_mode == 'geo_decal':
+                        box.label(text="(Melt Pattern(R),Roughness(G),Metallic(B))")
+                    else:
+                        box.label(text="(Occlusion(R),Roughness(G),Metallic(B))")
+                    box.template_ID(mat, "msfs_detail_metallic_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_detail_normal == True:
+                    if mat.msfs_material_mode == 'windshield':
+                        box.label(text = "Icing Normal:")
+                    else:
+                        box.label(text = "Detail Normal:")
+                    box.template_ID(mat, "msfs_detail_normal_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_blend_mask == True:
+                    box.label(text = "Blend Mask:")
+                    box.template_ID(mat, "msfs_blend_mask_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_anisotropic_direction == True:
+                    box.label(text=  "Anisotropic direction (RG):")
+                    box.template_ID(mat, "msfs_anisotropic_direction_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_clearcoat == True:
+                    box.label(text=  "Clearcoat amount (R), Clearcoat rough(G):")
+                    box.template_ID(mat, "msfs_clearcoat_texture", new = "image.new", open = "image.open")
+                if mat.msfs_show_behind_glass == True:
+                    box.label(text = "Behind glass Albedo:")
+                    box.template_ID(mat, "msfs_behind_glass_texture", new="image.new", open = "image.open")
+                if mat.msfs_show_wiper_mask == True:
+                    box.label(text = "Wiper Mask (RG):")
+                    box.template_ID(mat, "msfs_wiper_mask_texture", new="image.new", open = "image.open")
 
 
 

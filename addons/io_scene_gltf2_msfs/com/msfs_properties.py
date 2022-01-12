@@ -15,7 +15,7 @@
 import bpy
 from bpy.types import Material, Image
 from bpy.props import IntProperty, BoolProperty, StringProperty, FloatProperty, EnumProperty, FloatVectorProperty, PointerProperty
-from .func_material import *
+from .msfs_material import *
 
 
 class MSFS_LI_material():
@@ -23,55 +23,11 @@ class MSFS_LI_material():
     def switch_msfs_material(self,context):
         mat = context.active_object.active_material
         if mat.msfs_material_mode == 'msfs_standard':
-            CreateMSFSStandardShader(mat)
-
-            mat.msfs_show_tint = True
-            mat.msfs_show_sss_color = False
-
-            mat.msfs_show_glass_parameters = False
-            mat.msfs_show_decal_parameters = False
-            mat.msfs_show_fresnel_parameters = False
-            mat.msfs_show_parallax_parameters = False
-            mat.msfs_show_geo_decal_parameters = False
-
-            mat.msfs_show_albedo = True
-            mat.msfs_show_metallic = True
-            mat.msfs_show_normal = True
-            mat.msfs_show_emissive = True
-            mat.msfs_show_detail_albedo = True
-            mat.msfs_show_detail_metallic = True
-            mat.msfs_show_detail_normal = True
-            mat.msfs_show_blend_mask = True
-            mat.msfs_show_anisotropic_direction = False
-            mat.msfs_show_clearcoat = False
-            mat.msfs_show_behind_glass = False
-            mat.msfs_show_wiper_mask = False
-
-            mat.msfs_show_blend_mode = True
-            mat.use_backface_culling = not mat.msfs_double_sided
-
-            mat.msfs_show_draworder = True
-            mat.msfs_show_no_cast_shadow = True
-            mat.msfs_show_double_sided = True
-            mat.msfs_show_responsive_aa = False
-            mat.msfs_show_day_night_cycle = True
-
-            mat.msfs_show_collision_material = True
-            mat.msfs_show_road_material = True
-
-            mat.msfs_show_ao_use_uv2 = True
-            mat.msfs_show_uv_clamp = True
-
-            mat.msfs_show_alpha_cutoff = True
-            mat.msfs_show_blend_threshold = True
-            #New
-            mat.msfs_show_pearl = True
-            mat.msfs_show_windshield_options = False
-
+            MSFS_Standard(mat)
             print("Switched to msfs_standard material.")
-
+        
         elif mat.msfs_material_mode == 'msfs_anisotropic':
-            CreateMSFSAnisotropicShader(mat)
+            # CreateMSFSAnisotropicShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -119,7 +75,7 @@ class MSFS_LI_material():
             print("Switched to msfs_anisotropic material.")
 
         elif mat.msfs_material_mode == 'msfs_sss':
-            CreateMSFSSSSShader(mat)
+            # CreateMSFSSSSShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = True
@@ -167,7 +123,7 @@ class MSFS_LI_material():
             print("Switched to msfs_sss material.")
 
         elif mat.msfs_material_mode == 'msfs_glass':
-            CreateMSFSGlassShader(mat)
+            # CreateMSFSGlassShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -215,7 +171,7 @@ class MSFS_LI_material():
             print("Switched to msfs_glass material.")
 
         elif mat.msfs_material_mode == 'msfs_decal':
-            CreateMSFSDecalShader(mat)
+            # CreateMSFSDecalShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -263,7 +219,7 @@ class MSFS_LI_material():
             print("Switched to msfs_decal material.")
 
         elif mat.msfs_material_mode == 'msfs_clearcoat':
-            CreateMSFSClearcoatShader(mat)
+            # CreateMSFSClearcoatShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -311,7 +267,7 @@ class MSFS_LI_material():
             print("Switched to msfs_clearcoat material.")
 
         elif mat.msfs_material_mode == 'msfs_env_occluder':
-            CreateMSFSEnvOccluderShader(mat)
+            # CreateMSFSEnvOccluderShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -359,7 +315,7 @@ class MSFS_LI_material():
             print("Switched to msfs_env_occluder material.")
 
         elif mat.msfs_material_mode == 'msfs_fake_terrain':
-            CreateMSFSFakeTerrainShader(mat)
+            # CreateMSFSFakeTerrainShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -407,7 +363,7 @@ class MSFS_LI_material():
             print("Switched to msfs_fake_terrain material.")
 
         elif mat.msfs_material_mode == 'msfs_fresnel':
-            CreateMSFSFresnelShader(mat)
+            # CreateMSFSFresnelShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -455,7 +411,7 @@ class MSFS_LI_material():
             print("Switched to msfs_fresnel material.")
 
         elif mat.msfs_material_mode == 'msfs_windshield':
-            CreateMSFSWindshieldShader(mat)
+            # CreateMSFSWindshieldShader(mat)
  
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -516,7 +472,7 @@ class MSFS_LI_material():
             print("Switched to msfs_windshield material.")
 
         elif mat.msfs_material_mode == 'msfs_porthole':
-            CreateMSFSPortholeShader(mat)
+            # CreateMSFSPortholeShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -564,7 +520,7 @@ class MSFS_LI_material():
             print("Switched to msfs_porthole material.")
 
         elif mat.msfs_material_mode == 'msfs_parallax':
-            CreateMSFSParallaxShader(mat)
+            # CreateMSFSParallaxShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -612,7 +568,7 @@ class MSFS_LI_material():
             print("Switched to msfs_parallax material.")
 
         elif mat.msfs_material_mode == 'msfs_geo_decal':
-            CreateMSFSGeoDecalShader(mat)
+            # CreateMSFSGeoDecalShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -660,7 +616,7 @@ class MSFS_LI_material():
             print("Switched to msfs_geo_decal material.")
 
         elif mat.msfs_material_mode == 'msfs_hair':
-            CreateMSFSHairShader(mat)
+            # CreateMSFSHairShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = True
@@ -708,7 +664,7 @@ class MSFS_LI_material():
             print("Switched to msfs_hair material.")
 
         elif mat.msfs_material_mode == 'msfs_invisible':
-            CreateMSFSInvisibleShader(mat)
+            # CreateMSFSInvisibleShader(mat)
 
             mat.msfs_show_tint = False
             mat.msfs_show_sss_color = False
@@ -756,78 +712,15 @@ class MSFS_LI_material():
             print("Switched to msfs_invisible material.")
 
         else:
-            mat.msfs_show_tint = False
-            mat.msfs_show_sss_color = False
-
-            mat.msfs_show_glass_parameters = False
-            mat.msfs_show_decal_parameters = False
-            mat.msfs_show_fresnel_parameters = False
-            mat.msfs_show_parallax_parameters = False
-            mat.msfs_show_geo_decal_parameters = False
-
-            mat.msfs_show_albedo = False
-            mat.msfs_show_metallic = False
-            mat.msfs_show_normal = False
-            mat.msfs_show_emissive = False
-            mat.msfs_show_detail_albedo = False
-            mat.msfs_show_detail_metallic = False
-            mat.msfs_show_detail_normal = False
-            mat.msfs_show_blend_mask = False
-            mat.msfs_show_anisotropic_direction = False
-            mat.msfs_show_clearcoat = False
-            mat.msfs_show_behind_glass = False
-            mat.msfs_show_wiper_mask = False
-
-            mat.msfs_show_blend_mode = False
-            mat.use_backface_culling = not mat.msfs_double_sided
-
-            mat.msfs_show_draworder = False
-            mat.msfs_show_no_cast_shadow = False
-            mat.msfs_show_double_sided = False
-            mat.msfs_show_responsive_aa = False
-            mat.msfs_show_day_night_cycle = False
-
-            mat.msfs_show_collision_material = False
-            mat.msfs_show_road_material = False
-
-            mat.msfs_show_ao_use_uv2 = False
-            mat.msfs_show_uv_clamp = False
-
-            mat.msfs_show_alpha_cutoff = False
-            mat.msfs_show_blend_threshold = False
-            #New
-            mat.msfs_show_pearl = False
-            mat.msfs_show_windshield_options = False
-            
+            MSFS_Material(mat)
             print("Switched to non-sim material.")
 
-    def match_albedo(self, context):
+    def match_base_color_tex(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        links = mat.node_tree.links
 
-        bsdf_node = nodes.get("bsdf")
-        albedo = nodes.get("albedo")
-        albedo_tint_mix = nodes.get("albedo_tint_mix")
-        albedo_detail_mix = nodes.get("albedo_detail_mix")
-
-        if albedo != None:
-            nodes["albedo"].image = mat.msfs_albedo_texture
-
-            if mat.msfs_albedo_texture != None:
-                # Create the link:
-                if albedo_tint_mix != None:
-                    links.new(albedo.outputs["Color"], albedo_tint_mix.inputs["Color2"])
-                if albedo_detail_mix != None:
-                    links.new(albedo_detail_mix.outputs["Color"], bsdf_node.inputs["Base Color"])
-            else:
-                #unlink the separator:
-                if albedo_tint_mix != None:
-                    l = albedo_tint_mix.inputs["Color2"].links[0]
-                    links.remove(l)                
-                if bsdf_node != None:
-                    l = bsdf_node.inputs["Base Color"].links[0]
-                    links.remove(l)                
+        albedo = nodes.get(MSFS_ShaderNodes.baseColorTex.value)
+        albedo.image = mat.msfs_albedo_texture             
 
     def match_metallic(self, context):
         mat = context.active_object.active_material
@@ -1068,27 +961,27 @@ class MSFS_LI_material():
     def switch_msfs_blendmode(self, context):
         mat = context.active_object.active_material
         if mat.msfs_material_mode == 'msfs_windshield' or mat.msfs_blend_mode == 'BLEND':
-            MakeTranslucent(mat)
+            pass
+            # MakeTranslucent(mat)
         elif mat.msfs_blend_mode == 'MASKED':
-            MakeMasked(mat)
+            # MakeMasked(mat)
+            pass
         elif mat.msfs_blend_mode == 'DITHER':
-            MakeDither(mat)
+            # MakeDither(mat)
+            pass
         else:
-            MakeOpaque(mat)
+            # MakeOpaque(mat)
+            pass
 
     #Update functions for the "tint" parameters:
-    def update_color_albedo_mix(self, context):
+    def match_base_color(self, context):
         mat = context.active_object.active_material
-        if mat.node_tree.nodes.get("bsdf", None) != None:
-            mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[0] = mat.msfs_color_albedo_mix[0]
-            mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[1] = mat.msfs_color_albedo_mix[1]
-            mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[2] = mat.msfs_color_albedo_mix[2]
-            mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[0] = mat.msfs_color_albedo_mix[0]
-            mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[1] = mat.msfs_color_albedo_mix[1]
-            mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[2] = mat.msfs_color_albedo_mix[2]
-            mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[0] = mat.msfs_color_albedo_mix[0]
-            mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[1] = mat.msfs_color_albedo_mix[1]
-            mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[2] = mat.msfs_color_albedo_mix[2]
+        nodes = mat.node_tree.nodes
+        nodeColor = nodes.get(MSFS_ShaderNodes.baseColor.value).outputs[0].default_value
+        nodeColor[0]= mat.msfs_color_albedo_mix[0]
+        nodeColor[1]= mat.msfs_color_albedo_mix[1]
+        nodeColor[2]= mat.msfs_color_albedo_mix[2]
+        nodeColor[3]= mat.msfs_color_albedo_mix[3]
 
     def update_color_alpha_mix(self, context):
         mat = context.active_object.active_material
@@ -1227,7 +1120,7 @@ class MSFS_LI_material():
     # MSFS Material properties
     # The following variables are written into the glTF file when exporting.
     #Color blends:
-    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=3,default=[1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=update_color_albedo_mix)
+    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=3,default=[1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=match_base_color)
     Material.msfs_color_emissive_mix = bpy.props.FloatVectorProperty(name="Emissive Color", subtype='COLOR', min=0.0, max=1.0, size=3,default=[0.0,0.0,0.0], description="The color value set here will be mixed in with the emissive value of the material.", update=update_color_emissive_mix)
     Material.msfs_color_alpha_mix = bpy.props.FloatProperty(name="Alpha multiplier", min=0, max=1, default=1, description="The alpha value set here will be mixed in with the Alpha value of the texture.",update=update_color_alpha_mix)
     Material.msfs_color_base_mix = bpy.props.FloatProperty(name="Albedo Color Mix", min=0, max=1, default=1, description="Mix factor for the Albedo Color with the Albedo Texture.",update=update_color_base_mix)
@@ -1322,7 +1215,7 @@ class MSFS_LI_material():
     Material.msfs_geo_decal_blend_factor_melt_sys = bpy.props.FloatProperty(name="Melt Sys", min=0.0,max=1.0,default=1.0)
 
     #Textures:
-    Material.msfs_albedo_texture = PointerProperty(type = Image, name = "Albedo map", update = match_albedo)
+    Material.msfs_albedo_texture = PointerProperty(type = Image, name = "Albedo map", update = match_base_color_tex)
     Material.msfs_metallic_texture = PointerProperty(type = Image, name = "Metallic map", update = match_metallic)
     Material.msfs_normal_texture = PointerProperty(type = Image, name = "Normal map", update = match_normal)
     Material.msfs_emissive_texture = PointerProperty(type = Image, name = "Emissive map", update = match_emissive)
