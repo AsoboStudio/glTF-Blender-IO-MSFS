@@ -140,7 +140,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
             scale_matrix = Matrix.Scale(scale_xy, 4, (1, 0, 0)) @ Matrix.Scale(scale_xy, 4, (0, 1, 0)) @ Matrix.Scale(self.empty.scale[2], 4, (0, 0, 1))
         else:
             scale_matrix = Matrix.Scale(self.empty.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(self.empty.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(self.empty.scale[2], 4, (0, 0, 1))
-        matrix = Matrix.Translation(self.empty.location) @ scale_matrix
+        matrix = Matrix.Translation(self.empty.matrix_world.translation) @ scale_matrix
         return matrix
 
     def draw(self, context):
