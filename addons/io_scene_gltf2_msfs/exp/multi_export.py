@@ -1,5 +1,6 @@
 import bpy
 import re
+from bpy_extras.io_utils import ExportHelper
 
 class MultiExportLOD(bpy.types.PropertyGroup):
     object: bpy.props.PointerProperty(name="", type=bpy.types.Object)
@@ -12,6 +13,7 @@ class MultiExportLOD(bpy.types.PropertyGroup):
 
 class MultiExporterPropertyGroup(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
+    expanded: bpy.props.BoolProperty(name="", default=True)
     lods: bpy.props.CollectionProperty(type=MultiExportLOD)
     folder_name: bpy.props.StringProperty(name="", default="")
 
@@ -53,27 +55,22 @@ def update_lods(scene):
                     obj_item.object = obj
                     obj_item.file_name = obj.name
 
-class MSFS_OT_Export(bpy.types.Operator):
-    bl_idname = "msfs.multi_export_execute"
-    bl_label = "Change tab"
-
-    def execute(self, context):
-        return {"FINISHED"}
 class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_label = "Multi-Exporter"
-    bl_parent_id = "MSFS_PT_MultiExporter"
+    bl_space_type = 'FILE_BROWSER'
+    bl_region_type = 'TOOL_PROPS'
+    bl_label = ""
+    bl_parent_id = "FILE_PT_operator"
     bl_options = {'HIDE_HEADER'}
 
     @classmethod
     def poll(cls, context):
-        return context.scene.msfs_multi_exporter_current_tab == "OBJECTS"
+        sfile = context.space_data
+        operator = sfile.active_operator
+
+        return context.scene.msfs_multi_exporter_current_tab == "OBJECTS" and operator.bl_idname == "EXPORT_SCENE_OT_multi_gltf"
 
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = True
-        layout.use_property_decorate = False  # No animation.
 
         property_collection = context.scene.msfs_multi_exporter_collection
         total_lods = 0
@@ -87,22 +84,20 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                 row = layout.row()
                 if len(prop.lods) > 0:
                     box = row.box()
-                    box.label(text=prop.collection.name)
-                    box.prop(prop, "folder_name", text="Folder")
+                    box.prop(prop, "expanded", text=prop.collection.name,
+                             icon="DOWNARROW_HLT" if prop.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+                    if prop.expanded:
+                        box.prop(prop, "folder_name", text="Folder")
 
-                    col = box.column()
-                    for lod in prop.lods:
-                        row = col.row()
-                        row.prop(lod, "checked", text=lod.object.name)
-                        subrow = row.column()
-                        subrow.prop(lod, "lod_value", text="LOD Value")
-                        subrow.prop(lod, "flatten_on_export", text="Flatten on Export")
-                        subrow.prop(lod, "keep_instances", text="Keep Instances")
-                        subrow.prop(lod, "file_name", text="Name")
-
-        row = layout.row(align=True)
-        row.operator(MSFS_OT_Export.bl_idname, text="Export Enabled")
-        row.operator(MSFS_OT_Export.bl_idname, text="Export All")
+                        col = box.column()
+                        for lod in prop.lods:
+                            row = col.row()
+                            row.prop(lod, "checked", text=lod.object.name)
+                            subrow = row.column()
+                            subrow.prop(lod, "lod_value", text="LOD Value")
+                            subrow.prop(lod, "flatten_on_export", text="Flatten on Export")
+                            subrow.prop(lod, "keep_instances", text="Keep Instances")
+                            subrow.prop(lod, "file_name", text="Name")
 
 class MSFS_OT_ChangeTab(bpy.types.Operator):
     bl_idname = "msfs.multi_export_change_tab"
@@ -115,15 +110,18 @@ class MSFS_OT_ChangeTab(bpy.types.Operator):
         return {"FINISHED"}
 
 class MSFS_PT_MultiExporter(bpy.types.Panel):
-    bl_label = "MSFS Multi-Exporter"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = "MSFS Multi-Exporter"
-    bl_context = "objectmode"
+    bl_space_type = 'FILE_BROWSER'
+    bl_region_type = 'TOOL_PROPS'
+    bl_label = ""
+    bl_parent_id = "FILE_PT_operator"
+    bl_options = {'HIDE_HEADER'}
 
     @classmethod
     def poll(cls, context):
-        return context.scene.msfs_ExtAsoboProperties.enabled
+        sfile = context.space_data
+        operator = sfile.active_operator
+        print(operator.bl_idname)
+        return context.scene.msfs_ExtAsoboProperties.enabled and operator.bl_idname == "EXPORT_SCENE_OT_multi_gltf"
 
     def draw(self, context):
         layout = self.layout
@@ -138,15 +136,31 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
         row.operator(MSFS_OT_ChangeTab.bl_idname, text="Presets",
                      depress=(current_tab == "PRESETS")).current_tab = "PRESETS"
 
+class MultiExportGLTF2(bpy.types.Operator, ExportHelper):
+    """Export scene as glTF 2.0 file"""
+    bl_idname = 'export_scene.multi_gltf'
+    bl_label = 'Multi-Export glTF 2.0'
+
+    filename_ext = ''
+
+    filter_glob: bpy.props.StringProperty(default='*.glb;*.gltf', options={'HIDDEN'})
+
+def menu_func_export(self, context):
+    self.layout.operator(MultiExportGLTF2.bl_idname, text='Multi-Export glTF 2.0 (.glb/.gltf)')
+
 def register():
     bpy.types.Scene.msfs_multi_exporter_collection = bpy.props.CollectionProperty(type=MultiExporterPropertyGroup) # for some reason this has to be here. TODO: move this to the property class
     bpy.app.handlers.depsgraph_update_post.append(update_lods)
+
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
 
 def unregister():
     try:
         bpy.app.handlers.depsgraph_update_post.remove(update_lods)
     except ValueError:
         pass
+
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
 
 def register_panel():
     # Register the panel on demand, we need to be sure to only register it once
