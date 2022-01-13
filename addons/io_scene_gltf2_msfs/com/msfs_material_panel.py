@@ -155,6 +155,8 @@ class MSFS_PT_material(bpy.types.Panel):
                     box.prop(mat, 'msfs_detail_normal_scale')
                 if mat.msfs_show_blend_threshold == True:
                     box.prop(mat, 'msfs_blend_threshold')
+                if mat.msfs_show_emissive == True:
+                    box.prop(mat, 'msfs_emissive_scale')
 
             if mat.msfs_show_pearl == True:
                 box = layout.box()
