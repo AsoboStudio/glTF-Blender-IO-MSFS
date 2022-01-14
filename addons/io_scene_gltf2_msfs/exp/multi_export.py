@@ -1,10 +1,12 @@
-import bpy
+import os
 import re
+import bpy
 from bpy_extras.io_utils import ExportHelper
+
 
 class MultiExportLOD(bpy.types.PropertyGroup):
     object: bpy.props.PointerProperty(name="", type=bpy.types.Object)
-    checked: bpy.props.BoolProperty(name="", default=False)
+    enabled: bpy.props.BoolProperty(name="", default=False)
 
     lod_value: bpy.props.IntProperty(name="", default=0, min=0)  # TODO: add max
     flatten_on_export: bpy.props.BoolProperty(name="", default=False)
@@ -92,7 +94,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                         col = box.column()
                         for lod in prop.lods:
                             row = col.row()
-                            row.prop(lod, "checked", text=lod.object.name)
+                            row.prop(lod, "enabled", text=lod.object.name)
                             subrow = row.column()
                             subrow.prop(lod, "lod_value", text="LOD Value")
                             subrow.prop(lod, "flatten_on_export", text="Flatten on Export")
@@ -120,7 +122,7 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
     def poll(cls, context):
         sfile = context.space_data
         operator = sfile.active_operator
-        print(operator.bl_idname)
+
         return context.scene.msfs_ExtAsoboProperties.enabled and operator.bl_idname == "EXPORT_SCENE_OT_multi_gltf"
 
     def draw(self, context):
@@ -144,6 +146,35 @@ class MultiExportGLTF2(bpy.types.Operator, ExportHelper):
     filename_ext = ''
 
     filter_glob: bpy.props.StringProperty(default='*.glb;*.gltf', options={'HIDDEN'})
+
+    def execute(self, context):
+        folder_path = os.path.dirname(self.filepath)
+
+        property_collection = context.scene.msfs_multi_exporter_collection
+
+        for collection in property_collection:
+            export_path = os.path.join(folder_path, collection.folder_name)
+            if not os.path.exists(export_path):
+                export_path = os.mkdir(export_path)
+            for lod in collection.lods:
+                for obj in bpy.context.selected_objects:
+                    obj.select_set(False)
+
+                def select_recursive(obj):
+                    obj.select_set(True)
+                    for child in obj.children:
+                        select_recursive(child)
+
+                select_recursive(lod.object)
+
+                if lod.enabled:
+                    bpy.ops.export_scene.gltf(
+                        export_format="GLTF_SEPARATE",
+                        export_selected=True,
+                        filepath=os.path.join(export_path, lod.file_name)
+                    )
+
+        return {"FINISHED"}
 
 def menu_func_export(self, context):
     self.layout.operator(MultiExportGLTF2.bl_idname, text='Multi-Export glTF 2.0 (.glb/.gltf)')
