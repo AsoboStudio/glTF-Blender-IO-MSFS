@@ -28,6 +28,19 @@ class MSFSMultiExporterProperties():
 def update_lods(scene):
     property_collection = bpy.context.scene.msfs_multi_exporter_collection
 
+    lod_groups = {} # TODO: actually use this
+    for obj in bpy.data.objects:
+        matches = re.findall("(?i)x\d_|_lod[0-9]+", obj.name)
+        if matches:
+            filtered_string = obj.name
+            for match in matches:
+                filtered_string = filtered_string.replace(match, "")
+            
+            if filtered_string in lod_groups.keys():
+                lod_groups[filtered_string].append(obj)
+            else:
+                lod_groups[filtered_string] = [obj]
+
     # Remove deleted collections and objects
     for i, property_group in enumerate(property_collection):
         if property_group.collection:
@@ -50,8 +63,8 @@ def update_lods(scene):
                     break
         
         for obj in collection.all_objects:
-            # If the object starts with x(NUM)_ or ends with LOD_(NUM), add to lods
-            if re.match("x\d_", obj.name.lower()) or re.match(".+_lod[0-9]+", obj.name.lower()):
+            # If the object is at the root level (no parent)
+            if obj.parent is None:
                 if not obj in [lod.object for lod in collection_prop_group.lods]:
                     obj_item = collection_prop_group.lods.add()
                     obj_item.object = obj
@@ -177,7 +190,7 @@ class MultiExportGLTF2(bpy.types.Operator, ExportHelper):
         return {"FINISHED"}
 
 def menu_func_export(self, context):
-    self.layout.operator(MultiExportGLTF2.bl_idname, text='Multi-Export glTF 2.0 (.glb/.gltf)')
+    self.layout.operator(MultiExportGLTF2.bl_idname, text='Multi-Export glTF 2.0 (.gltf)')
 
 def register():
     bpy.types.Scene.msfs_multi_exporter_collection = bpy.props.CollectionProperty(type=MultiExporterPropertyGroup) # for some reason this has to be here. TODO: move this to the property class
