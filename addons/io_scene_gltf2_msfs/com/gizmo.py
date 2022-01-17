@@ -45,6 +45,7 @@ class MSFSGizmoProperties():
 class AddGizmo(bpy.types.Operator):
     bl_idname = "msfs_collision_gizmo.add_gizmo"
     bl_label = "Add MSFS Collision Gizmo"
+    bl_options = {"REGISTER", "UNDO"}
 
     msfs_gizmo_type: bpy.types.Object.msfs_gizmo_type
 
@@ -65,7 +66,10 @@ class AddGizmo(bpy.types.Operator):
         
         if bpy.context.selected_objects:
             for selected_object in bpy.context.selected_objects:
-                add_gizmo(selected_object)
+                if selected_object.type == "MESH":
+                    add_gizmo(selected_object)
+                else:
+                    add_gizmo(None)
         else:
             add_gizmo(None)
 
@@ -74,10 +78,7 @@ class AddGizmo(bpy.types.Operator):
 class MSFSCollisionGizmo(bpy.types.Gizmo):
     bl_idname = "VIEW3D_GT_msfs_collision_gizmo"
     bl_label = "MSFS Collision Gizmo"
-
-    bl_target_properties = (
-        {"id": "matrix", "type": 'FLOAT', "array_length": 16}, # We can't actually store a matrix, so we "flatten" it and reconstruct it
-    )
+    bl_options = {"UNDO"}
 
     __slots__ = (
         "empty",
@@ -130,13 +131,17 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
         self.custom_shape_edges = edges
 
     def get_matrix(self):
-        matrix = self.target_get_value("matrix")
-        formatted_matrix = Matrix()
-        for i in range(4):
-            for j in range(4):
-                formatted_matrix[i][j] = matrix[i * 4 + j]
-
-        return formatted_matrix
+        # Re-calculate matrix without rotation
+        if self.empty.msfs_gizmo_type == "sphere":
+            scale = self.empty.scale[0] * self.empty.scale[1] * self.empty.scale[2]
+            scale_matrix = Matrix.Scale(scale, 4, (1, 0, 0)) @ Matrix.Scale(scale, 4, (0, 1, 0)) @ Matrix.Scale(scale, 4, (0, 0, 1))
+        elif self.empty.msfs_gizmo_type == "cylinder":
+            scale_xy = self.empty.scale[0] * self.empty.scale[1]
+            scale_matrix = Matrix.Scale(scale_xy, 4, (1, 0, 0)) @ Matrix.Scale(scale_xy, 4, (0, 1, 0)) @ Matrix.Scale(self.empty.scale[2], 4, (0, 0, 1))
+        else:
+            scale_matrix = Matrix.Scale(self.empty.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(self.empty.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(self.empty.scale[2], 4, (0, 0, 1))
+        matrix = Matrix.Translation(self.empty.matrix_world.translation) @ scale_matrix
+        return matrix
 
     def draw(self, context):
         if self.custom_shape_edges and not self.empty.hide_get():
@@ -192,30 +197,11 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
     def setup(self, context):
         for object in context.view_layer.objects:
             if object.type == 'EMPTY' and object.msfs_gizmo_type != "NONE" and object not in self.__class__.empties.keys():
-                def get_matrix():
-                    # Re-calculate matrix without rotation
-                    if object.msfs_gizmo_type == "sphere":
-                        scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1] * object.scale[2], 4, (0, 0, 1))
-                    elif object.msfs_gizmo_type == "cylinder":
-                        scale_matrix = Matrix.Scale(object.scale[0] * object.scale[1], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[0] * object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
-                    else:
-                        scale_matrix = Matrix.Scale(object.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(object.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(object.scale[2], 4, (0, 0, 1))
-                    object_matrix = object.matrix_world @ scale_matrix
-
-                    matrix = []
-                    for i in range(4):
-                        for j in range(4):
-                            matrix.append(object_matrix[i][j])
-                    return matrix
-                def set_matrix(matrix):
-                    object.matrix_world = matrix
-
                 gz = self.gizmos.new(MSFSCollisionGizmo.bl_idname)
 
                 gz.msfs_gizmo_type = object.msfs_gizmo_type
                 gz.empty = object
 
-                gz.target_set_handler("matrix", get=get_matrix, set=set_matrix)
                 gz.create_custom_shape()
 
                 self.__class__.empties[object] = gz
