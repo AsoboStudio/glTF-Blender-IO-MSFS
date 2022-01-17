@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "C:\\Program Files\\Blender Foundation\\Blender 3.0\\3.0\\scripts\\addons\\io_scene_gltf2"
 		}
 	],
 	"settings": {}
