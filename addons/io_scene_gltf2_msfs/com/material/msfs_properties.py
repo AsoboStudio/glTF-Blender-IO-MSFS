@@ -35,77 +35,60 @@ from .msfs_material_windshield import *
 from .msfs_material_parallax import *
 class MSFS_LI_material():
 
-
     # Use this function to update the shader node tree
     def switch_msfs_material(self,context):
         mat = context.active_object.active_material
+        msfs_mat = None
         if mat.msfs_material_mode == 'msfs_standard':
-            MSFS_Standard(mat)
+            msfs_mat = MSFS_Standard(mat)
             print("Switched to msfs_standard material.")
         elif mat.msfs_material_mode == 'msfs_anisotropic':
-            MSFS_Anisotropic(mat)
+            msfs_mat =MSFS_Anisotropic(mat)
             print("Switched to msfs_anisotropic material.")
         elif mat.msfs_material_mode == 'msfs_sss':
-            MSFS_SSS(mat)
+            msfs_mat = MSFS_SSS(mat)
             print("Switched to msfs_sss material.")
         elif mat.msfs_material_mode == 'msfs_glass':
-            MSFS_Glass(mat)
+            msfs_mat = MSFS_Glass(mat)
             print("Switched to msfs_glass material.")
         elif mat.msfs_material_mode == 'msfs_decal':
-            MSFS_Decal(mat)
+            msfs_mat = MSFS_Decal(mat)
             print("Switched to msfs_decal material.")
         elif mat.msfs_material_mode == 'msfs_clearcoat':
-            MSFS_Clearcoat(mat)
+            msfs_mat = MSFS_Clearcoat(mat)
             print("Switched to msfs_clearcoat material.")
         elif mat.msfs_material_mode == 'msfs_env_occluder':
-            MSFS_EnvOccluder(mat)
+            msfs_mat = MSFS_EnvOccluder(mat)
             print("Switched to msfs_env_occluder material.")
         elif mat.msfs_material_mode == 'msfs_fake_terrain':
-            MSFS_FakeTerrain(mat)
+            msfs_mat = MSFS_FakeTerrain(mat)
             print("Switched to msfs_fake_terrain material.")
         elif mat.msfs_material_mode == 'msfs_fresnel':
-            MSFS_Fresnel(mat)
+            msfs_mat = MSFS_Fresnel(mat)
             print("Switched to msfs_fresnel material.")
         elif mat.msfs_material_mode == 'msfs_windshield':
-            MSFS_Windshield(mat)
-            #mat.msfs_roughness_scale = 0.0
-            #mat.msfs_metallic_scale = 0.0
-            
-            #switch_msfs_blendmode()
-            if mat.msfs_blend_mode == 'BLEND':
-                pass
-                # MakeTranslucent(mat)
-            elif mat.msfs_blend_mode == 'MASKED':
-                pass
-                # MakeMasked(mat)
-            elif mat.msfs_blend_mode == 'DITHER':
-                pass
-                # MakeDither(mat)
-            else:
-                pass
-                # MakeOpaque(mat)
-            
+            msfs_mat = MSFS_Windshield(mat)            
             print("Switched to msfs_windshield material.")
-
         elif mat.msfs_material_mode == 'msfs_porthole':
-            MSFS_PortHole(mat)
+            msfs_mat = MSFS_PortHole(mat)
             print("Switched to msfs_porthole material.")
         elif mat.msfs_material_mode == 'msfs_parallax':
-            MSFS_Parallax(mat)
+            msfs_mat = MSFS_Parallax(mat)
             print("Switched to msfs_parallax material.")
         elif mat.msfs_material_mode == 'msfs_geo_decal':
-            MSFS_GeoDecal(mat)
+            msfs_mat = MSFS_GeoDecal(mat)
             print("Switched to msfs_geo_decal material.")
         elif mat.msfs_material_mode == 'msfs_hair':
-            MSFS_Hair(mat)
+            msfs_mat = MSFS_Hair(mat)
             print("Switched to msfs_hair material.")
         elif mat.msfs_material_mode == 'msfs_invisible':
-            MSFS_Invisible(mat)
+            msfs_mat = MSFS_Invisible(mat)
             print("Switched to msfs_invisible material.")
-
         else:
-            MSFS_Material(mat)
+            msfs_mat = MSFS_Material(mat)
             print("Switched to non-sim material.")
+
+        msfs_mat.buildShaderTree()
 
     def match_base_color_tex(self, context):
         mat = context.active_object.active_material
@@ -300,15 +283,15 @@ class MSFS_LI_material():
 
 
     def switch_msfs_blendmode(self, context):
-        mat = context.active_object.active_material
-        if mat.msfs_blend_mode == 'BLEND':
-            pass #mat.makeAlphaBlend()
-        elif mat.msfs_blend_mode == 'MASKED':
-            pass #mat.makeMasked()
-        elif mat.msfs_blend_mode == 'DITHER':
-            pass #mat.makeDither()
+        msfs_mat = MSFS_Material(self)
+        if self.msfs_blend_mode == 'BLEND':
+            msfs_mat.makeAlphaBlend()
+        elif self.msfs_blend_mode == 'MASKED':
+            msfs_mat.makeMasked()
+        elif self.msfs_blend_mode == 'DITHER':
+            msfs_mat.makeDither()
         else:
-            pass #mat.makeOpaque()
+            msfs_mat.makeOpaque()
 
     #Update functions for the "tint" parameters:
     def match_base_color(self, context):

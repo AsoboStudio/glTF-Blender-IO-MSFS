@@ -51,7 +51,7 @@ class MSFS_MaterialProperties(Enum):
 class MSFS_ShaderNodes(Enum):
     materialOutput= 'Material Output'
     principledBSDF = 'Principled BSDF'
-    glTFSettings = " "
+    glTFSettings = 'glTF Settings'
     baseColorTex = 'Base Color Texture'
     baseColorRGB = 'Base Color RGB'
     baseColorA = 'Base Color A'
@@ -72,18 +72,42 @@ class MSFS_ShaderNodes(Enum):
     emissiveScale = 'Emissive Scale'
     emissiveMul = "Emissive Multiplier"
     normalMap = "Normal Map"
+    detailColorTex = "Detail Color(RGBA)"
+    detailCompTex = "Detail Occlusion(R) Roughness(G) Metallic(B)"
+    detailNormalTex = "Detail Normal"
+    blendMaskTex = "Blend Mask"
+    detailNormalScale = "Detail Normal Scale"
+    detailUVScale = "Detail UV Scale"
+    detailUVOffsetU = "Detail UV Offset U"
+    detailUVOffsetV = "Detail UV Offset V"
+    uvMap = "UV Map"
+    combineUVScale = "Combine UV Scale"
+    combineUVOffset = "Combine UV Offset"
+    mulUVScale = "Multiply UV Scale"
+    addUVOffset = "Multiply UV Offset"
+    detailNormalMap = "Detail Normal Map"
 
 class MSFS_Material():
 
-    def __init__(self, material):
+    bl_idname = 'MSFS_ShaderNodeTree'
+        # Label for nice name display
+    bl_label = "MSFS Shader Node Tree"
+
+    bl_icon = 'SOUND'
+
+    def __init__(self,material):
         self.material = material
-        self.node_tree = material.node_tree
-        self.nodes = material.node_tree.nodes
+        self.node_tree = self.material.node_tree
+        self.nodes = self.material.node_tree.nodes
         self.links = material.node_tree.links
+        
+
+    def buildShaderTree(self): 
         self.cleanNodeTree()
         self.displayParams()
         self.createNodetree()
-        self.refresh()
+        self.refresh()       
+        
 
     def cleanNodeTree(self):
         nodes = self.material.node_tree.nodes

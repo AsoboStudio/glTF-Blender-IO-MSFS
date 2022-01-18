@@ -75,8 +75,24 @@ class MSFS_Standard(MSFS_Material):
         self.nodeEmissiveScale = self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.emissiveScale.value,'location':(-500,-800.0)})
         self.nodeNormalTex = self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.normalTex.value,'location':(-500,-900.0)})
         self.nodeNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.normalScale.value,'location':(-500,-1000.0)})
+        self.nodeDetailColor =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailColorTex.value,'location':(-500,-1100.0)})
+        self.nodeDetailComp =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailCompTex.value,'location':(-500,-1200.0)})
+        self.nodeDetailNormal =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailNormalTex.value,'location':(-500,-1300.0)})
+        self.nodeNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailNormalScale.value,'location':(-500,-1400.0)})
+        self.nodeBlendMask =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.blendMaskTex.value,'location':(-500,-1500.0)})
+        self.nodeDetailUVScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailUVScale.value,'location':(-1350,-600.0)})
+        self.nodeDetailUVOffsetU =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailUVOffsetU.value,'location':(-1350,-700.0)})
+        self.nodeDetailUVOffsetV =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailUVOffsetV.value,'location':(-1350,-800.0)})
 
 
+
+
+        #uv
+        uvMapNode =  self.addNode('ShaderNodeUVMap', { 'name':MSFS_ShaderNodes.uvMap.value , 'location':(-1350,-500.0) })
+        combineVectorScale =  self.addNode('ShaderNodeCombineXYZ', { 'name':MSFS_ShaderNodes.combineUVScale.value , 'location':(-1100,-550.0) })
+        combineVectorOffset =  self.addNode('ShaderNodeCombineXYZ', { 'name':MSFS_ShaderNodes.combineUVOffset.value , 'location':(-1100,-600.0) })
+        mulUVScale =  self.addNode('ShaderNodeVectorMath', { 'name':MSFS_ShaderNodes.mulUVScale.value , 'operation':'MULTIPLY', 'location':(-900,-500.0) })
+        addUVOffset =  self.addNode('ShaderNodeVectorMath', { 'name':MSFS_ShaderNodes.addUVOffset.value , 'operation':'ADD','location':(-800,-600.0) })
 
         #basecolor operators 
         mulBaseColorRGBNode =self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.baseColorMulRGB.value ,'blend_type':'MULTIPLY', 'location':(0,0.0) })
@@ -99,8 +115,22 @@ class MSFS_Standard(MSFS_Material):
         
         #normal operators
         normalMapNode = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.normalMap.value,'location':(0.0,-900.0) })
+
+        #detail normal operators
+        detailNormalMapNode = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.detailNormalMap.value,'location':(0.0,-1300.0) })
         
         #LINKS
+
+        #uv
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailUVScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.combineUVScale.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailUVScale.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.combineUVScale.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailUVScale.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.combineUVScale.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailUVOffsetU.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.combineUVOffset.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailUVOffsetV.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.combineUVOffset.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.uvMap.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.mulUVScale.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.combineUVScale.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.mulUVScale.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.mulUVScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.combineUVOffset.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.addUVOffset.value))
 
         #color RGB
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMulRGB.value))
@@ -127,6 +157,14 @@ class MSFS_Standard(MSFS_Material):
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.normalMap.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.normalMap.value))
 
+        #detail uv
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailColorTex.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailCompTex.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailNormalTex.value))
+
+        #detail normal
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.detailNormalMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailNormalMap.value))
 
 
         #PrincipledBSDF connections
