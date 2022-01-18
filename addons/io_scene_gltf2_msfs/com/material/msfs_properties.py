@@ -301,18 +301,14 @@ class MSFS_LI_material():
 
     def switch_msfs_blendmode(self, context):
         mat = context.active_object.active_material
-        if mat.msfs_material_mode == 'msfs_windshield' or mat.msfs_blend_mode == 'BLEND':
-            pass
-            # MakeTranslucent(mat)
+        if mat.msfs_blend_mode == 'BLEND':
+            pass #mat.makeAlphaBlend()
         elif mat.msfs_blend_mode == 'MASKED':
-            # MakeMasked(mat)
-            pass
+            pass #mat.makeMasked()
         elif mat.msfs_blend_mode == 'DITHER':
-            # MakeDither(mat)
-            pass
+            pass #mat.makeDither()
         else:
-            # MakeOpaque(mat)
-            pass
+            pass #mat.makeOpaque()
 
     #Update functions for the "tint" parameters:
     def match_base_color(self, context):
@@ -361,7 +357,7 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         mat.use_backface_culling = not mat.msfs_double_sided
 
-    def update_alpha_cutoff(self,context):
+    def match_alpha_cutoff(self,context):
         mat = context.active_object.active_material
         mat.alpha_threshold = mat.msfs_alpha_cutoff
 
@@ -615,7 +611,7 @@ class MSFS_LI_material():
     Material.msfs_metallic_scale = bpy.props.FloatProperty(name="Metallic scale",min=0,max=1,default=1, update = match_metallic_scale)
     Material.msfs_emissive_scale = bpy.props.FloatProperty(name="Emissive scale",min=0,max=1,default=1, update = match_emissive_scale)
     Material.msfs_normal_scale = bpy.props.FloatProperty(name="Normal scale",min=0,default=1,update=match_normal_scale)
-    Material.msfs_alpha_cutoff = bpy.props.FloatProperty(name="Alpha cutoff",min=0,max=1,default=0.1,update=update_alpha_cutoff)
+    Material.msfs_alpha_cutoff = bpy.props.FloatProperty(name="Alpha cutoff",min=0,max=1,default=0.1,update=match_alpha_cutoff)
     Material.msfs_detail_uv_scale = bpy.props.FloatProperty(name="Detail UV scale",min=0,default=1,update=update_detail_uv_scale)
     Material.msfs_detail_uv_offset_x = bpy.props.FloatProperty(name="X",min=-1,max=1,default=0,update=update_detail_uv_offset)
     Material.msfs_detail_uv_offset_y = bpy.props.FloatProperty(name="Y",min=-1,max=1,default=0,update=update_detail_uv_offset)

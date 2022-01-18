@@ -54,6 +54,8 @@ class MSFS_Standard(MSFS_Material):
         self.material.msfs_albedo_texture = self.material.msfs_albedo_texture
         self.material.msfs_color_albedo_mix = self.material.msfs_color_albedo_mix
 
+    
+
     def createNodetree(self) :
         super().createNodetree()
         # self.node_tree = bpy.data.node_groups.new(name, 'ShaderNodeTree')
@@ -74,10 +76,13 @@ class MSFS_Standard(MSFS_Material):
         self.nodeNormalTex = self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.normalTex.value,'location':(-500,-900.0)})
         self.nodeNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.normalScale.value,'location':(-500,-1000.0)})
 
+
+
         #basecolor operators 
         mulBaseColorRGBNode =self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.baseColorMulRGB.value ,'blend_type':'MULTIPLY', 'location':(0,0.0) })
         mulBaseColorRGBNode.inputs[0].default_value = 1
         mulBaseColorANode =self.addNode('ShaderNodeMath', { 'name':MSFS_ShaderNodes.baseColorMulA.value ,'operation':'MULTIPLY','location':(0,-100.0)})
+        
         
         #emissive operators
         mulEmissiveNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.emissiveMul.value,'location':(0.0,-550.0) })
@@ -90,6 +95,7 @@ class MSFS_Standard(MSFS_Material):
         mulMetalNode.inputs[0].default_value = 1.0
         mulRoughNode = self.addNode('ShaderNodeMath', { 'name':MSFS_ShaderNodes.metallicMul.value ,'operation':'MULTIPLY','location':(0,-400.0)})
         mulRoughNode.inputs[0].default_value = 1.0
+        
         
         #normal operators
         normalMapNode = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.normalMap.value,'location':(0.0,-900.0) })
@@ -126,7 +132,7 @@ class MSFS_Standard(MSFS_Material):
         #PrincipledBSDF connections
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulRGB.value),    'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value),      'nodes["{0}"].inputs[21]'.format(MSFS_ShaderNodes.principledBSDF.value))
-        # self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.occlusionMul.value),       'nodes["{0}"].inputs[21]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.occlusionMul.value),       'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.glTFSettings.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessMul.value),       'nodes["{0}"].inputs[9]'.format(MSFS_ShaderNodes.principledBSDF.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicMul.value),        'nodes["{0}"].inputs[6]'.format(MSFS_ShaderNodes.principledBSDF.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMap.value),          'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))

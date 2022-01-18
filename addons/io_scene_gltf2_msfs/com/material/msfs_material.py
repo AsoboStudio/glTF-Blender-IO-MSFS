@@ -51,9 +51,11 @@ class MSFS_MaterialProperties(Enum):
 class MSFS_ShaderNodes(Enum):
     materialOutput= 'Material Output'
     principledBSDF = 'Principled BSDF'
+    glTFSettings = " "
     baseColorTex = 'Base Color Texture'
     baseColorRGB = 'Base Color RGB'
     baseColorA = 'Base Color A'
+    alphaCutoff = 'Alpha Cutoff'
     baseColorMulRGB = 'Base Color Multiplier RGB'
     baseColorMulA = 'Base Color Multiplier A'
     normalTex = 'Normal Texture'
@@ -149,8 +151,14 @@ class MSFS_Material():
     def createNodetree(self):
         self.nodeOutputMaterial = self.addNode('ShaderNodeOutputMaterial', {'location':(1000.0,0.0),'hide' : False })
         self.nodebsdf = self.addNode('ShaderNodeBsdfPrincipled', {'location':(500.0,0.0), 'hide' : False})
-
+        gltfSettingsNodeTree = bpy.data.node_groups.new('glTF Settings', 'ShaderNodeTree')
+        gltfSettingsNodeTree.nodes.new('NodeGroupInput')
+        gltfSettingsNodeTree.inputs.new('NodeSocketFloat','Occlusion')
+        gltfSettingsNodeTree.inputs[0].default_value = (1.000)
+        self.nodeglTFSettings = self.addNode('ShaderNodeGroup', {'location':(500.0,-800.0), 'hide' : False, 'name': MSFS_ShaderNodes.glTFSettings.value}) #CreateNewNode(Material,'ShaderNodeGroup',location=(offset[0]+1000,offset[1]+50))
+        self.nodeglTFSettings.node_tree = gltfSettingsNodeTree
         self.innerLink('nodes["Principled BSDF"].outputs[0]', 'nodes["Material Output"].inputs[0]')
+        self.makeOpaque()
 
         
 
@@ -217,5 +225,21 @@ class MSFS_Material():
     def free(self):
         if self.node_tree.users==1:
             bpy.data.node_groups.remove(self.node_tree, do_unlink=True)
+    
+    def makeOpaque(self):
+        self.material.blend_method = 'OPAQUE'
+
+    def makeMasked(self):
+        self.material.blend_method = 'CLIP'
+
+    def makeAlphaBlend(self):
+        self.material.blend_method = 'BLEND'
+
+    def makeDither(self):
+        #Since Eevee doesn't provide a dither mode, we'll just use alpha-blend instead.
+        #It sucks, but what else is there to do?
+        self.blend_method = 'BLEND'
+
+    
 
 
