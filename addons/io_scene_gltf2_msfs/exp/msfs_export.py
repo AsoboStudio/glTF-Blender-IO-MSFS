@@ -14,6 +14,7 @@
 
 import bpy
 import math
+import os
 
 class Export:
 
@@ -101,13 +102,16 @@ class Export:
                 required = True
             )
 
-    def gather_gltf_hook(self, gltf2_plan, export_settings):
+    def gather_gltf_hook(self, gltf2, export_settings):
         # Remove all gizmo empties from the glTF export plan
-        for i, node in enumerate(gltf2_plan.nodes):
+        for i, node in enumerate(gltf2.nodes):
             object = bpy.context.scene.objects.get(node.name)
             if object:
                 if object.type == "EMPTY" and object.msfs_gizmo_type != "NONE":
-                    gltf2_plan.nodes.pop(i)
+                    gltf2.nodes.pop(i)
+        
+        for i, image in enumerate(gltf2.images):
+            image.uri =os.path.basename(image.uri)
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if (self.properties.enabled == True and blender_material.msfs_material_mode != None):
@@ -366,5 +370,4 @@ class Export:
                     gltf2_material.extras["ASOBO_material_code"] = "Porthole"
                 elif blender_material.msfs_material_mode == 'msfs_windshield':
                     gltf2_material.extras["ASOBO_material_code"] = "Windshield"
-
 

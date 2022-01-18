@@ -150,7 +150,6 @@ def unregister_panel():
     except Exception:
         pass
 
-
 from .exp.msfs_export import Export
 class glTF2ExportUserExtension(Export):
     def __init__(self):
