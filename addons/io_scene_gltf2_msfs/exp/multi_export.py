@@ -14,7 +14,7 @@ class MultiExportLOD(bpy.types.PropertyGroup):
     file_name: bpy.props.StringProperty(name="", default="")
 
 class MultiExporterPropertyGroup(bpy.types.PropertyGroup):
-    collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
+    collection: bpy.props.StringProperty(name="", default="")
     expanded: bpy.props.BoolProperty(name="", default=True)
     lods: bpy.props.CollectionProperty(type=MultiExportLOD)
     folder_name: bpy.props.StringProperty(name="", default="")
@@ -28,19 +28,6 @@ class MSFSMultiExporterProperties():
 def update_lods(scene):
     property_collection = bpy.context.scene.msfs_multi_exporter_collection
 
-    lod_groups = {} # TODO: actually use this
-    for obj in bpy.data.objects:
-        matches = re.findall("(?i)x\d_|_lod[0-9]+", obj.name)
-        if matches:
-            filtered_string = obj.name
-            for match in matches:
-                filtered_string = filtered_string.replace(match, "")
-            
-            if filtered_string in lod_groups.keys():
-                lod_groups[filtered_string].append(obj)
-            else:
-                lod_groups[filtered_string] = [obj]
-
     # Remove deleted collections and objects
     for i, property_group in enumerate(property_collection):
         if property_group.collection:
@@ -50,19 +37,35 @@ def update_lods(scene):
         else:
             property_collection.remove(i)
 
+    # Search all objects in scene to find LOD groups
+    lod_groups = {}
+    for obj in bpy.context.scene.objects:
+        matches = re.findall("(?i)x\d_|_lod[0-9]+", obj.name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
+        if matches:
+            filtered_string = obj.name
+            for match in matches:
+                filtered_string = filtered_string.replace(match, "")
+            
+            if filtered_string in lod_groups.keys():
+                lod_groups[filtered_string].append(obj)
+            else:
+                lod_groups[filtered_string] = [obj]
+        else:
+            lod_groups[obj.name] = [obj] # If not in a LOD group, just create a "fake" group to add the object to
+
     # Add collection if not already in property group
-    for collection in bpy.data.collections:
+    for _, (collection, objects) in enumerate(lod_groups.values()):
         if not collection in [property_group.collection for property_group in property_collection]:
             collection_prop_group = property_collection.add()
             collection_prop_group.collection = collection
-            collection_prop_group.folder_name = collection.name
+            collection_prop_group.folder_name = collection
         else:
             for property_group in property_collection:
                 if property_group.collection == collection:
                     collection_prop_group = property_group
                     break
         
-        for obj in collection.all_objects:
+        for obj in objects:
             # If the object is at the root level (no parent)
             if obj.parent is None:
                 if not obj in [lod.object for lod in collection_prop_group.lods]:
@@ -99,7 +102,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                 row = layout.row()
                 if len(prop.lods) > 0:
                     box = row.box()
-                    box.prop(prop, "expanded", text=prop.collection.name,
+                    box.prop(prop, "expanded", text=prop.collection,
                              icon="DOWNARROW_HLT" if prop.expanded else "RIGHTARROW", icon_only=True, emboss=False)
                     if prop.expanded:
                         box.prop(prop, "folder_name", text="Folder")
