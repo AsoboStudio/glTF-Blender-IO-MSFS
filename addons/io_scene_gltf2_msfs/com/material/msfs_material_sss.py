@@ -49,3 +49,6 @@ class MSFS_SSS(MSFS_Material):
         #New
         self.material.msfs_show_pearl = False
         self.material.msfs_show_windshield_options = False
+    
+    def customShaderTree(self):
+        super(MSFS_SSS, self).defaultShaderStree()

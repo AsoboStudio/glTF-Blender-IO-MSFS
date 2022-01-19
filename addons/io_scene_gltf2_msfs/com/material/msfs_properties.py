@@ -95,6 +95,8 @@ class MSFS_LI_material():
         nodes = mat.node_tree.nodes
 
         base_color_tex = nodes.get(MSFS_ShaderNodes.baseColorTex.value)
+        if not base_color_tex:
+            return
         base_color_tex.image = mat.msfs_albedo_texture             
 
     def match_comp_tex(self, context):
@@ -102,6 +104,8 @@ class MSFS_LI_material():
         nodes = mat.node_tree.nodes
 
         comp_tex = nodes.get(MSFS_ShaderNodes.compTex.value)
+        if not comp_tex:
+            return
         comp_tex.image = mat.msfs_metallic_texture                
 
     def match_normal_tex(self, context):
@@ -109,6 +113,8 @@ class MSFS_LI_material():
         nodes = mat.node_tree.nodes
 
         normalTex = nodes.get(MSFS_ShaderNodes.normalTex.value)
+        if not normalTex:
+            return
         normalTex.image = mat.msfs_normal_texture                  
 
     def match_emissive_tex(self, context):
@@ -116,116 +122,49 @@ class MSFS_LI_material():
         nodes = mat.node_tree.nodes
 
         emissiveTex = nodes.get(MSFS_ShaderNodes.emissiveTex.value)
+        if not emissiveTex:
+            return
         emissiveTex.image = mat.msfs_emissive_texture                    
 
-    def match_detail_albedo(self, context):
+    def match_detail_color(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        links = mat.node_tree.links
 
-        albedo_detail_mix = nodes.get("albedo_detail_mix")
-        detail_albedo = nodes.get("detail_albedo")
+        detailColorTex = nodes.get(MSFS_ShaderNodes.detailColorTex.value)
+        if not detailColorTex:
+            return
+        detailColorTex.image = mat.msfs_detail_albedo_texture 
 
-        if detail_albedo != None:
-            nodes["detail_albedo"].image = mat.msfs_detail_albedo_texture
-            
-            if mat.msfs_detail_albedo_texture.name != "":
-                # Create the link:
-                if (detail_albedo != None and albedo_detail_mix != None):
-                    links.new(detail_albedo.outputs["Color"], albedo_detail_mix.inputs["Color2"])
-                    albedo_detail_mix.inputs[0].default_value = 0.5
-            else:
-                #unlink the separator:
-                if (detail_albedo != None and albedo_detail_mix != None):
-                    l = albedo_detail_mix.inputs["Color2"].links[0]
-                    links.remove(l)                
-                    albedo_detail_mix.inputs[0].default_value = 0.0
-
-    def match_detail_metallic(self, context):
+    def match_detail_comp(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        links = mat.node_tree.links
 
-        metallic_detail_mix = nodes.get("metallic_detail_mix")
-        detail_metallic = nodes.get("detail_metallic")
-
-        if detail_metallic != None:
-            detail_metallic.image = mat.msfs_detail_metallic_texture
-            detail_metallic.image.colorspace_settings.name = 'Non-Color'
-            if mat.msfs_detail_metallic_texture.name != "":
-                # Create the link:
-                if (detail_metallic != None and metallic_detail_mix != None):
-                    links.new(detail_metallic.outputs["Color"], metallic_detail_mix.inputs["Color2"])
-                    metallic_detail_mix.inputs[0].default_value = 0.5
-            else:
-                #unlink the separator:
-                if (detail_metallic != None and metallic_detail_mix != None):
-                    l = metallic_detail_mix.inputs["Color2"].links[0]
-                    links.remove(l)                
-                    metallic_detail_mix.inputs[0].default_value = 0.0
+        detailCompTex = nodes.get(MSFS_ShaderNodes.detailCompTex.value)
+        if not detailCompTex:
+            return
+        detailCompTex.image = mat.msfs_detail_metallic_texture 
+        
 
     def match_detail_normal(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        links = mat.node_tree.links
 
-        normal_detail_mix = nodes.get("normal_detail_mix")
-        detail_normal = nodes.get("detail_normal")
-
-        if detail_normal != None:
-            detail_normal.image = mat.msfs_detail_normal_texture
-            detail_normal.image.colorspace_settings.name = 'Non-Color'
-            if mat.msfs_detail_normal_texture.name != "":
-                # Create the link:
-                if (detail_normal != None and normal_detail_mix != None):
-                    links.new(detail_normal.outputs["Color"], normal_detail_mix.inputs["Color2"])
-                    normal_detail_mix.inputs[0].default_value = 0.5
-            else:
-                #unlink the separator:
-                if (detail_normal != None and normal_detail_mix != None):
-                    l = normal_detail_mix.inputs["Color2"].links[0]
-                    links.remove(l)                
-                    normal_detail_mix.inputs[0].default_value = 0.0
+        detailNormalTex = nodes.get(MSFS_ShaderNodes.detailNormalTex.value)
+        if not detailNormalTex:
+            return
+        detailNormalTex.image = mat.msfs_detail_normal_texture
 
     def match_blend_mask(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        links = mat.node_tree.links
+        blendTex = nodes.get(MSFS_ShaderNodes.blendMaskTex.value)
+        if not blendTex:
+            return
+        blendTex.image = mat.msfs_blend_mask_texture
+        if mat.msfs_material_mode == 'msfs_standard':
+            msfs_mat = MSFS_Standard(mat)
+            msfs_mat = msfs_mat.toggleVertexBlendMapMask(mat.msfs_blend_mask_texture is None)
 
-        if nodes.get("blend_mask", None) != None:
-            nodes["blend_mask"].image = mat.msfs_blend_mask_texture
-            nodes["blend_mask"].image.colorspace_settings.name = 'Non-Color'
-
-            albedo_detail_mix = nodes.get("albedo_detail_mix")
-            metallic_detail_mix = nodes.get("metallic_detail_mix")
-            normal_detail_mix = nodes.get("normal_detail_mix")
-
-            #link the node, if a texture is set:
-            if mat.msfs_blend_mask_texture.name != "":
-                if mat.msfs_blend_mask_texture.channels > 3:
-                    if albedo_detail_mix != None:
-                        links.new(nodes["blend_mask"].outputs["Alpha"],albedo_detail_mix.inputs["Fac"])
-                    if metallic_detail_mix != None:
-                        links.new(nodes["blend_mask"].outputs["Alpha"],metallic_detail_mix.inputs["Fac"])
-                    if normal_detail_mix != None:
-                        links.new(nodes["blend_mask"].outputs["Alpha"],normal_detail_mix.inputs["Fac"])
-                else:
-                    if albedo_detail_mix != None:
-                        links.new(nodes["blend_mask"].outputs["Color"],albedo_detail_mix.inputs["Fac"])
-                    if metallic_detail_mix != None:
-                        links.new(nodes["blend_mask"].outputs["Color"],metallic_detail_mix.inputs["Fac"])
-                    if normal_detail_mix != None:
-                        links.new(nodes["blend_mask"].outputs["Color"],normal_detail_mix.inputs["Fac"])
-            else:
-                if albedo_detail_mix != None:
-                    l = albedo_detail_mix.inputs["Fac"].links[0]
-                    links.remove(l)                
-                if metallic_detail_mix != None:
-                    l = metallic_detail_mix.inputs["Fac"].links[0]
-                    links.remove(l)                
-                if normal_detail_mix != None:
-                    l = normal_detail_mix.inputs["Fac"].links[0]
-                    links.remove(l)                
 
     def match_anisotropic_direction(self,context):
         mat = context.activate_object.active_material
@@ -297,39 +236,54 @@ class MSFS_LI_material():
     def match_base_color(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        nodeColorRGB = nodes.get(MSFS_ShaderNodes.baseColorRGB.value).outputs[0].default_value
-        nodeColorRGB[0]= mat.msfs_color_albedo_mix[0]
-        nodeColorRGB[1]= mat.msfs_color_albedo_mix[1]
-        nodeColorRGB[2]= mat.msfs_color_albedo_mix[2]
+        nodeColorRGB = nodes.get(MSFS_ShaderNodes.baseColorRGB.value)
+        if not nodeColorRGB:
+            return
+        colorValue=nodeColorRGB.outputs[0].default_value
+        colorValue[0]= mat.msfs_color_albedo_mix[0]
+        colorValue[1]= mat.msfs_color_albedo_mix[1]
+        colorValue[2]= mat.msfs_color_albedo_mix[2]
         nodes.get(MSFS_ShaderNodes.baseColorA.value).outputs[0].default_value =  mat.msfs_color_albedo_mix[3]
 
     def match_emissive_color(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        nodeEmissiveColorRGB = nodes.get(MSFS_ShaderNodes.emissiveColor.value).outputs[0].default_value
-        nodeEmissiveColorRGB[0]= mat.msfs_color_emissive_mix[0]
-        nodeEmissiveColorRGB[1]= mat.msfs_color_emissive_mix[1]
-        nodeEmissiveColorRGB[2]= mat.msfs_color_emissive_mix[2]
+        nodeEmissiveColorRGB = nodes.get(MSFS_ShaderNodes.emissiveColor.value)
+        if not nodeEmissiveColorRGB:
+            return
+        emissiveValue = nodeEmissiveColorRGB.outputs[0].default_value
+        emissiveValue[0]= mat.msfs_color_emissive_mix[0]
+        emissiveValue[1]= mat.msfs_color_emissive_mix[1]
+        emissiveValue[2]= mat.msfs_color_emissive_mix[2]
 
     def match_emissive_scale(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        nodes.get(MSFS_ShaderNodes.emissiveScale.value).outputs[0].default_value =  mat.msfs_emissive_scale
+        emissiveScale =nodes.get(MSFS_ShaderNodes.emissiveScale.value)
+        if not emissiveScale:
+            return
+        emissiveScale.outputs[0].default_value =  mat.msfs_emissive_scale
 
     def match_metallic_scale(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        nodes.get(MSFS_ShaderNodes.emissiveScale.value).outputs[0].default_value =  mat.msfs_metallic_scale
+        node = nodes.get(MSFS_ShaderNodes.emissiveScale.value)
+        if node:
+            node.outputs[0].default_value =  mat.msfs_metallic_scale
 
     def match_roughness_scale(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        nodes.get(MSFS_ShaderNodes.roughnessScale.value).outputs[0].default_value =  mat.msfs_roughness_scale
+        node =nodes.get(MSFS_ShaderNodes.roughnessScale.value)
+        if node:
+            node.outputs[0].default_value =  mat.msfs_roughness_scale
 
     def match_normal_scale(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        nodes.get(MSFS_ShaderNodes.normalScale.value).outputs[0].default_value =  mat.msfs_normal_scale
+        node = nodes.get(MSFS_ShaderNodes.normalScale.value)
+        if node:
+            node.outputs[0].default_value =  mat.msfs_normal_scale
 
     def update_color_sss(self, context):
         mat = context.active_object.active_material
@@ -344,18 +298,19 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         mat.alpha_threshold = mat.msfs_alpha_cutoff
 
-    def update_detail_uv_scale(self,context):
+    def match_detail_uv(self,context):
         mat = context.active_object.active_material
-        if mat.node_tree.nodes.get("detail_uv_scale", None) != None:
-            mat.node_tree.nodes["detail_uv_scale"].inputs["Scale"].default_value[0] = mat.msfs_detail_uv_scale
-            mat.node_tree.nodes["detail_uv_scale"].inputs["Scale"].default_value[1] = mat.msfs_detail_uv_scale
-            mat.node_tree.nodes["detail_uv_scale"].inputs["Scale"].default_value[2] = mat.msfs_detail_uv_scale
-
-    def update_detail_uv_offset(self,context):
-        mat=context.active_object.active_material
-        if mat.node_tree.nodes.get("detail_uv_scale", None) != None:
-            mat.node_tree.nodes["detail_uv_scale"].inputs["Location"].default_value[0] = mat.msfs_detail_uv_offset_x
-            mat.node_tree.nodes["detail_uv_scale"].inputs["Location"].default_value[1] = mat.msfs_detail_uv_offset_y
+        nodes = mat.node_tree.nodes
+        detailUvScaleNode = nodes.get(MSFS_ShaderNodes.detailUVScale.value)
+        detailUvOffsetUNode = nodes.get(MSFS_ShaderNodes.detailUVOffsetU.value)
+        detailUvOffsetVNode = nodes.get(MSFS_ShaderNodes.detailUVOffsetV.value)
+        detailNormalScaleNode = nodes.get(MSFS_ShaderNodes.detailNormalScale.value)
+        if detailUvScaleNode and detailUvOffsetUNode and detailUvOffsetVNode and detailNormalScaleNode:
+            detailUvScaleNode.outputs[0].default_value =  mat.msfs_detail_uv_scale
+            detailUvOffsetUNode.outputs[0].default_value =  mat.msfs_detail_uv_offset_x
+            detailUvOffsetVNode.outputs[0].default_value =  mat.msfs_detail_uv_offset_y
+            detailNormalScaleNode.outputs[0].default_value =  mat.msfs_detail_normal_scale
+        
 
 
     # Main material mode, in accordance with MSFS material shaders:
@@ -523,8 +478,8 @@ class MSFS_LI_material():
     Material.msfs_normal_texture = PointerProperty(type = Image, name = "Normal map", update = match_normal_tex)
     Material.msfs_emissive_texture = PointerProperty(type = Image, name = "Emissive map", update = match_emissive_tex)
 
-    Material.msfs_detail_albedo_texture = PointerProperty(type = Image, name = "Detail Color map", update = match_detail_albedo)
-    Material.msfs_detail_metallic_texture = PointerProperty(type = Image, name = "Detail Metallic map", update = match_detail_metallic)
+    Material.msfs_detail_albedo_texture = PointerProperty(type = Image, name = "Detail Color map", update = match_detail_color)
+    Material.msfs_detail_metallic_texture = PointerProperty(type = Image, name = "Detail Metallic map", update = match_detail_comp)
     Material.msfs_detail_normal_texture = PointerProperty(type = Image, name = "Detail Normal map", update = match_detail_normal)
 
     Material.msfs_blend_mask_texture = PointerProperty(type = Image, name = "Blend mask", update = match_blend_mask)
@@ -595,10 +550,10 @@ class MSFS_LI_material():
     Material.msfs_emissive_scale = bpy.props.FloatProperty(name="Emissive scale",min=0,max=1,default=1, update = match_emissive_scale)
     Material.msfs_normal_scale = bpy.props.FloatProperty(name="Normal scale",min=0,default=1,update=match_normal_scale)
     Material.msfs_alpha_cutoff = bpy.props.FloatProperty(name="Alpha cutoff",min=0,max=1,default=0.1,update=match_alpha_cutoff)
-    Material.msfs_detail_uv_scale = bpy.props.FloatProperty(name="Detail UV scale",min=0,default=1,update=update_detail_uv_scale)
-    Material.msfs_detail_uv_offset_x = bpy.props.FloatProperty(name="X",min=-1,max=1,default=0,update=update_detail_uv_offset)
-    Material.msfs_detail_uv_offset_y = bpy.props.FloatProperty(name="Y",min=-1,max=1,default=0,update=update_detail_uv_offset)
-    Material.msfs_detail_normal_scale = bpy.props.FloatProperty(name="Detail normal scale",min=0,max=1,default=1)
+    Material.msfs_detail_uv_scale = bpy.props.FloatProperty(name="Detail UV scale",min=0,default=1,update=match_detail_uv)
+    Material.msfs_detail_uv_offset_x = bpy.props.FloatProperty(name="X",min=-1,max=1,default=0,update=match_detail_uv)
+    Material.msfs_detail_uv_offset_y = bpy.props.FloatProperty(name="Y",min=-1,max=1,default=0,update=match_detail_uv)
+    Material.msfs_detail_normal_scale = bpy.props.FloatProperty(name="Detail normal scale",min=0,max=1,default=1, update = match_detail_uv)
     Material.msfs_blend_threshold = bpy.props.FloatProperty(name="Blend threshold",min=0,max=1,default=0.1)
 
 

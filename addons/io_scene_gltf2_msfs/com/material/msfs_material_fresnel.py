@@ -49,3 +49,6 @@ class MSFS_Fresnel(MSFS_Material):
         #New
         self.material.msfs_show_pearl = False
         self.material.msfs_show_windshield_options = False
+
+    def customShaderTree(self):
+        super(MSFS_Fresnel, self).defaultShaderStree()
