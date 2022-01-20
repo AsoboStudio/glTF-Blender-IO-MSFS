@@ -37,7 +37,7 @@ def MakeMasked(Material):
     bsdf_node = nodes.get("bsdf")
     alpha_multiply = nodes.get("alpha_multiply")
     if (bsdf_node != None and alpha_multiply != None):
-        links.net(alpha_multiply.outputs["Value"],bsdf_node.inputs["Alpha"])
+        links.new(alpha_multiply.outputs["Value"],bsdf_node.inputs["Alpha"])
 
     Material.blend_method = 'CLIP'
 
