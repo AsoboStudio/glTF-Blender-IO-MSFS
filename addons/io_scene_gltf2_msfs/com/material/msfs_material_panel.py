@@ -56,7 +56,7 @@ class MSFS_PT_material(bpy.types.Panel):
 
             if mat.msfs_show_glass_parameters == True:
                 box = layout.box()
-                box.label(text="Glass parameters:",icon='SHADING_RENDERED')
+                box.label(text="Glass parameters",icon='SHADING_RENDERED')
                 box.prop(mat, 'msfs_glass_reflection_mask_factor')
                 box.prop(mat, 'msfs_glass_deformation_factor')
 
@@ -71,7 +71,7 @@ class MSFS_PT_material(bpy.types.Panel):
 
             if mat.msfs_show_decal_parameters == True:
                 box = layout.box()
-                box.label(text="Decal per component blend factors:", icon='OUTLINER_OB_POINTCLOUD')
+                box.label(text="Decal per component blend factors", icon='OUTLINER_OB_POINTCLOUD')
                 row = box.row()
                 row.prop(mat, 'msfs_decal_blend_factor_color')
                 row.prop(mat, 'msfs_decal_blend_factor_roughness')
@@ -90,7 +90,7 @@ class MSFS_PT_material(bpy.types.Panel):
 
             if mat.msfs_show_parallax_parameters == True:
                 box = layout.box()
-                box.label(text="Parallax parameters:",icon='MATERIAL')
+                box.label(text="Parallax parameters",icon='MATERIAL')
                 box.prop(mat,'msfs_parallax_scale')
                 subbox = box.box()
                 subbox.label(text="Room size")
@@ -101,7 +101,7 @@ class MSFS_PT_material(bpy.types.Panel):
 
             if mat.msfs_show_geo_decal_parameters == True:
                 box = layout.box()
-                box.label(text="Geo Decal Frosted blend factors:", icon='FREEZE')
+                box.label(text="Geo Decal Frosted blend factors", icon='FREEZE')
                 row = box.row()
                 row.prop(mat, 'msfs_geo_decal_blend_factor_color')
                 row.prop(mat, 'msfs_geo_decal_blend_factor_roughness')
@@ -120,7 +120,7 @@ class MSFS_PT_material(bpy.types.Panel):
                 box = layout.box()
                 box.label(text="Render Parameters",icon='NODE_MATERIAL')
                 if mat.msfs_show_blend_mode == True:
-                    box.prop(mat, 'msfs_blend_mode', text="Alpha mode:")
+                    box.prop(mat, 'msfs_blend_mode', text="Alpha mode")
                 if mat.msfs_show_draworder == True:
                     box.prop(mat, 'msfs_draw_order')
                 if mat.msfs_show_no_cast_shadow == True:
@@ -205,25 +205,25 @@ class MSFS_PT_material(bpy.types.Panel):
                 box = layout.box()
                 box.label(text="Texture maps",icon='TEXTURE')
                 if mat.msfs_show_albedo == True:
-                    box.label(text = "Albedo:")
+                    box.label(text = "Albedo")
                     box.template_ID(mat, "msfs_albedo_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_metallic == True:
-                    box.label(text = "Metallic:")
+                    box.label(text = "Metallic")
                     box.label(text="(Occlusion(R),Roughness(G),Metallic(B))")
                     box.template_ID(mat, "msfs_metallic_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_normal == True:
-                    box.label(text = "Normal:")
+                    box.label(text = "Normal")
                     box.template_ID(mat, "msfs_normal_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_emissive == True:
-                    box.label(text = "Emissive:")
+                    box.label(text = "Emissive")
                     box.template_ID(mat, "msfs_emissive_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_albedo == True:
-                    box.label(text = "Detail Albedo:")
+                    box.label(text = "Detail Albedo")
                     if mat.msfs_material_mode == 'windshield':
                         box.label(text="(Scratches (R), Fingerprints(B))")
                     box.template_ID(mat, "msfs_detail_albedo_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_metallic == True:
-                    box.label(text = "Detail Metallic:")
+                    box.label(text = "Detail Metallic")
                     if mat.msfs_material_mode == 'geo_decal':
                         box.label(text="(Melt Pattern(R),Roughness(G),Metallic(B))")
                     else:
@@ -231,24 +231,24 @@ class MSFS_PT_material(bpy.types.Panel):
                     box.template_ID(mat, "msfs_detail_metallic_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_normal == True:
                     if mat.msfs_material_mode == 'windshield':
-                        box.label(text = "Icing Normal:")
+                        box.label(text = "Icing Normal")
                     else:
-                        box.label(text = "Detail Normal:")
+                        box.label(text = "Detail Normal")
                     box.template_ID(mat, "msfs_detail_normal_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_blend_mask == True:
-                    box.label(text = "Blend Mask:")
+                    box.label(text = "Blend Mask")
                     box.template_ID(mat, "msfs_blend_mask_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_anisotropic_direction == True:
-                    box.label(text=  "Anisotropic direction (RG):")
+                    box.label(text=  "Anisotropic direction (RG)")
                     box.template_ID(mat, "msfs_anisotropic_direction_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_clearcoat == True:
-                    box.label(text=  "Clearcoat amount (R), Clearcoat rough(G):")
+                    box.label(text=  "Clearcoat amount (R), Clearcoat rough(G)")
                     box.template_ID(mat, "msfs_clearcoat_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_behind_glass == True:
-                    box.label(text = "Behind glass Albedo:")
+                    box.label(text = "Behind glass Albedo")
                     box.template_ID(mat, "msfs_behind_glass_texture", new="image.new", open = "image.open")
                 if mat.msfs_show_wiper_mask == True:
-                    box.label(text = "Wiper Mask (RG):")
+                    box.label(text = "Wiper Mask (RG)")
                     box.template_ID(mat, "msfs_wiper_mask_texture", new="image.new", open = "image.open")
 
 
