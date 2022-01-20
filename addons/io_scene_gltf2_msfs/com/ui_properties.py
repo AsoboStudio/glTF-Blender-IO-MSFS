@@ -15,14 +15,14 @@
 import bpy
 import os
 
-from .func_properties import *
+# from .func_properties import *
 
-class MSFS_UL_ObjectBehaviorListItem(bpy.types.UIList):
-    bl_idname = "MSFS_UL_object_behaviorListItem"
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
-        split = layout.split(factor=0.65)
-        split.label(text=item.name)
-        split.label(text="(kf:%i-%i)"%(item.kf_start,item.kf_end))
+# class MSFS_UL_ObjectBehaviorListItem(bpy.types.UIList):
+#     bl_idname = "MSFS_UL_object_behaviorListItem"
+#     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
+#         split = layout.split(factor=0.65)
+#         split.label(text=item.name)
+#         split.label(text="(kf:%i-%i)"%(item.kf_start,item.kf_end))
 
 class MSFS_PT_BoneProperties(bpy.types.Panel):
     bl_label = "MSFS Properties"
