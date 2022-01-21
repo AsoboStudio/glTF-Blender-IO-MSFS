@@ -271,7 +271,7 @@ class MSFS_LI_material():
     def match_metallic_scale(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-        node = nodes.get(MSFS_ShaderNodes.emissiveScale.value)
+        node = nodes.get(MSFS_ShaderNodes.metallicScale.value)
         if node:
             node.outputs[0].default_value =  mat.msfs_metallic_scale
 
