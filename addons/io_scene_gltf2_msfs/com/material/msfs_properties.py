@@ -131,28 +131,32 @@ class MSFS_LI_material():
         nodes = mat.node_tree.nodes
 
         detailColorTex = nodes.get(MSFS_ShaderNodes.detailColorTex.value)
-        if not detailColorTex:
+        blendColorMapNode =  nodes.get(MSFS_ShaderNodes.blendColorMap.value)
+        if not detailColorTex or not blendColorMapNode:
             return
-        detailColorTex.image = mat.msfs_detail_albedo_texture 
+        detailColorTex.image = mat.msfs_detail_albedo_texture
+        blendColorMapNode.inputs[0].default_value = 0 if mat.msfs_detail_albedo_texture==None else 1 
 
     def match_detail_comp(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
-
         detailCompTex = nodes.get(MSFS_ShaderNodes.detailCompTex.value)
-        if not detailCompTex:
+        blendCompMapNode =  nodes.get(MSFS_ShaderNodes.blendCompMap.value)  
+        if not detailCompTex or not blendCompMapNode:
             return
-        detailCompTex.image = mat.msfs_detail_metallic_texture 
-        
+        detailCompTex.image = mat.msfs_detail_metallic_texture
+        blendCompMapNode.inputs[0].default_value = 0 if mat.msfs_detail_metallic_texture==None else 1  
 
     def match_detail_normal(self, context):
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
 
         detailNormalTex = nodes.get(MSFS_ShaderNodes.detailNormalTex.value)
+        blendNormalMapNode =  nodes.get(MSFS_ShaderNodes.blendNormalMap.value)
         if not detailNormalTex:
             return
         detailNormalTex.image = mat.msfs_detail_normal_texture
+        blendNormalMapNode.inputs[0].default_value = 0 if mat.msfs_detail_normal_texture==None else 1  
 
     def match_blend_mask(self, context):
         mat = context.active_object.active_material

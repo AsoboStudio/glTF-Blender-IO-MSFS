@@ -275,8 +275,8 @@ class MSFS_Material():
         normalMapNode = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.normalMap.value,'location':(0.0,-900.0) })
 
         #detail color operators
-        blendColorMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendColorMap.value ,'blend_type':'MULTIPLY', 'location':(200,100.0) })
-        blendColorMapNode.inputs[0].default_value = 1.0
+        self.blendColorMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendColorMap.value ,'blend_type':'MULTIPLY', 'location':(200,100.0) })
+        self.blendColorMapNode.inputs[0].default_value = 1.0
 
         #detail comp operators
         blendCompMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendCompMap.value ,'blend_type':'MULTIPLY', 'location':(-500,-325.0) })
@@ -364,6 +364,8 @@ class MSFS_Material():
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveScale.value),      'nodes["{0}"].inputs[20]'.format(MSFS_ShaderNodes.principledBSDF.value))
 
     def toggleVertexBlendMapMask(self, useVertex = True):
+
+        return
         # vertexcolor mask
         if useVertex:
             self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.vertexColor.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.blendColorMap.value))
