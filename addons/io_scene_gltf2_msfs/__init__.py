@@ -92,7 +92,7 @@ def update_class_list():
     classes = []
 
     for module in modules():
-        for name, obj in inspect.getmembers(module):
+        for obj in module.__dict__.values():
             if inspect.isclass(obj) \
                     and module.__name__ in str(obj) \
                     and "bpy" in str(inspect.getmro(obj)[1]):
