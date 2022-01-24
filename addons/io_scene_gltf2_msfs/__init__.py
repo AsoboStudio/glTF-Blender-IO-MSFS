@@ -141,7 +141,10 @@ def register_panel():
 
 def unregister():
     for cls in classes:
-        bpy.utils.unregister_class(cls)
+        try:
+            bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass
 
     for module in modules():
         if hasattr(module, "unregister"):
