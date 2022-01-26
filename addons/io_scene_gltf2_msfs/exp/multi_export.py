@@ -37,7 +37,9 @@ class MultiExporterPropertyGroup(bpy.types.PropertyGroup):
 # Presets
 class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
+    file_name: bpy.props.StringProperty(name="", default="")
 
+    expanded: bpy.props.BoolProperty(name="", default=True)
     enabled: bpy.props.BoolProperty(name="", default=False)
 
 class MultiExporterPreset(bpy.types.PropertyGroup):
@@ -155,29 +157,53 @@ class MultiExportGLTF2(bpy.types.Operator, ExportHelper):
     def execute(self, context):
         folder_path = os.path.dirname(self.filepath)
 
-        property_collection = context.scene.msfs_multi_exporter_collection
+        if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
+            property_collection = context.scene.msfs_multi_exporter_collection
 
-        for collection in property_collection:
-            export_path = os.path.join(folder_path, collection.folder_name)
-            if not os.path.exists(export_path):
-                export_path = os.mkdir(export_path)
-            for lod in collection.lods:
-                for obj in bpy.context.selected_objects:
-                    obj.select_set(False)
+            for collection in property_collection:
+                export_path = os.path.join(folder_path, collection.folder_name)
+                if not os.path.exists(export_path):
+                    export_path = os.mkdir(export_path)
+                for lod in collection.lods:
+                    for obj in bpy.context.selected_objects:
+                        obj.select_set(False)
 
-                def select_recursive(obj):
-                    obj.select_set(True)
-                    for child in obj.children:
-                        select_recursive(child)
+                    def select_recursive(obj):
+                        obj.select_set(True)
+                        for child in obj.children:
+                            select_recursive(child)
 
-                select_recursive(lod.object)
+                    select_recursive(lod.object)
 
-                if lod.enabled:
-                    bpy.ops.export_scene.gltf(
-                        export_format="GLTF_SEPARATE",
-                        export_selected=True,
-                        filepath=os.path.join(export_path, lod.file_name)
-                    )
+                    if lod.enabled:
+                        bpy.ops.export_scene.gltf(
+                            export_format="GLTF_SEPARATE",
+                            export_selected=True,
+                            filepath=os.path.join(export_path, lod.file_name)
+                        )
+
+        elif context.scene.msfs_multi_exporter_current_tab == "PRESETS":
+            presets = bpy.context.scene.msfs_multi_exporter_presets
+            for preset in presets:
+                if preset.enabled:
+                    for layer in preset.layers:
+                        if layer.enabled:
+                            for obj in bpy.context.selected_objects:
+                                obj.select_set(False)
+
+                            for obj in layer.collection.all_objects:
+                                obj.select_set(True)
+
+                            export_path = os.path.join(folder_path, preset.folder_name)
+                            if not os.path.exists(export_path):
+                                export_path = os.mkdir(export_path)
+
+                            bpy.ops.export_scene.gltf(
+                                export_format="GLTF_SEPARATE",
+                                export_selected=True,
+                                filepath=os.path.join(export_path, layer.file_name)
+                            )
+
 
         return {"FINISHED"}
 
@@ -234,10 +260,13 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
         preset = bpy.context.scene.msfs_multi_exporter_presets[self.preset_index]
 
         for layer in preset.layers:
-            box = layout.box()
-            row = box.row()
-            row.label(text=layer.collection.name)
-            row.prop(layer, "enabled", text="Enabled")
+            row = layout.row()
+            box = row.box()
+            box.prop(layer, "expanded", text=layer.collection.name,
+                        icon="DOWNARROW_HLT" if layer.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+            if layer.expanded:
+                box.prop(layer, "enabled", text="Enabled")
+                box.prop(layer, "file_name", text="Name")
 
 
 class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
