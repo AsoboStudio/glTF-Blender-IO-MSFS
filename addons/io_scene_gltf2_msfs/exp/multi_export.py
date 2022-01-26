@@ -236,8 +236,16 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
 
     preset_index: bpy.props.IntProperty()
 
+    collection_tree = {}
+
     def execute(self, context):
         return {"FINISHED"}
+
+    def getChildren(self, collection, children):
+        children[collection] = {}
+        for child in collection.children:
+            children[collection] = self.getChildren(child, children[collection])
+        return children
 
     def invoke(self, context, event):
         preset = bpy.context.scene.msfs_multi_exporter_presets[self.preset_index]
@@ -251,6 +259,9 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
                 layer = preset.layers.add()
                 layer.collection = collection
 
+        # Because it isn't really possible to define children in the layers, we have to generate a "tree" of collections with their children, and use that when rendering.
+        self.collection_tree = self.getChildren(bpy.context.scene.collection, {})
+
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
@@ -259,15 +270,23 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
 
         preset = bpy.context.scene.msfs_multi_exporter_presets[self.preset_index]
 
-        for layer in preset.layers:
-            row = layout.row()
-            box = row.box()
-            box.prop(layer, "expanded", text=layer.collection.name,
-                        icon="DOWNARROW_HLT" if layer.expanded else "RIGHTARROW", icon_only=True, emboss=False)
-            if layer.expanded:
-                box.prop(layer, "enabled", text="Enabled")
-                box.prop(layer, "file_name", text="Name")
+        # Loop through our collection tree and draw layers with respect to children
+        def drawTree(layout_item, tree):
+            for i, (collection, children) in enumerate(tree.items()):
+                for layer in preset.layers:
+                    if layer.collection == collection:
+                        row = layout_item.row()
+                        box = row.box()
+                        box.prop(layer, "expanded", text=layer.collection.name,
+                                    icon="DOWNARROW_HLT" if layer.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+                        if layer.expanded:
+                            box.prop(layer, "enabled", text="Enabled")
+                            box.prop(layer, "file_name", text="Name")
+                            drawTree(box, children)
 
+                        break
+
+        drawTree(layout, self.collection_tree[bpy.context.scene.collection])     
 
 class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
