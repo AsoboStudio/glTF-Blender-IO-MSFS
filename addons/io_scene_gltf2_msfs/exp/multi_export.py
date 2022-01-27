@@ -32,19 +32,28 @@ class MultiExporterPropertyGroup(bpy.types.PropertyGroup):
     collection: bpy.props.StringProperty(name="", default="")
     expanded: bpy.props.BoolProperty(name="", default=True)
     lods: bpy.props.CollectionProperty(type=MultiExportLOD)
-    folder_name: bpy.props.StringProperty(name="", default="")
+    folder_name: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH")
 
 # Presets
 class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
-    file_name: bpy.props.StringProperty(name="", default="")
 
     expanded: bpy.props.BoolProperty(name="", default=True)
     enabled: bpy.props.BoolProperty(name="", default=False)
 
 class MultiExporterPreset(bpy.types.PropertyGroup):
+    def update_file_path(self, context):
+        # Make sure file_path always ends in .gltf
+        if os.path.basename(self.file_path):
+            file_path = bpy.path.ensure_ext(
+                os.path.splitext(self.file_path)[0],
+                ".gltf",
+            )
+            if self.file_path != file_path:
+                self.file_path = file_path
+
     name: bpy.props.StringProperty(name="", default="")
-    folder_name: bpy.props.StringProperty(name="", default="")
+    file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
 
     enabled: bpy.props.BoolProperty(name="", default=False)
     expanded: bpy.props.BoolProperty(name="", default=True)
@@ -56,7 +65,7 @@ class MSFSMultiExporterProperties:
             ("PRESETS", " Presets", "")),
     )
 
-def update_lods():
+def update_lods(scene):
     property_collection = bpy.context.scene.msfs_multi_exporter_collection
 
     # Remove deleted collections and objects
@@ -89,7 +98,6 @@ def update_lods():
         if not collection in [property_group.collection for property_group in property_collection]:
             collection_prop_group = property_collection.add()
             collection_prop_group.collection = collection
-            collection_prop_group.folder_name = collection
         else:
             for property_group in property_collection:
                 if property_group.collection == collection:
@@ -115,18 +123,14 @@ class MSFS_OT_ChangeTab(bpy.types.Operator):
         return {"FINISHED"}
 
 class MSFS_PT_MultiExporter(bpy.types.Panel):
-    bl_space_type = 'FILE_BROWSER'
-    bl_region_type = 'TOOL_PROPS'
-    bl_label = ""
-    bl_parent_id = "FILE_PT_operator"
-    bl_options = {'HIDE_HEADER'}
+    bl_label = "Multi-Export glTF 2.0"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Multi-Export glTF 2.0"
 
     @classmethod
     def poll(cls, context):
-        sfile = context.space_data
-        operator = sfile.active_operator
-
-        return context.scene.msfs_ExtAsoboProperties.enabled and operator.bl_idname == "EXPORT_SCENE_OT_multi_gltf"
+        return context.scene.msfs_ExtAsoboProperties.enabled
 
     def draw(self, context):
         layout = self.layout
@@ -141,29 +145,16 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
         row.operator(MSFS_OT_ChangeTab.bl_idname, text="Presets",
                      depress=(current_tab == "PRESETS")).current_tab = "PRESETS"
 
-class MultiExportGLTF2(bpy.types.Operator, ExportHelper):
+class MultiExportGLTF2(bpy.types.Operator):
     """Export scene as glTF 2.0 file"""
     bl_idname = 'export_scene.multi_gltf'
     bl_label = 'Multi-Export glTF 2.0'
 
-    filename_ext = ''
-
-    filter_glob: bpy.props.StringProperty(default='*.glb;*.gltf', options={'HIDDEN'})
-
-    def invoke(self, context, event):
-        update_lods() # Handle this here instead of using depsgraph_update_post so that we don't have much of a performance hit
-        return ExportHelper.invoke(self, context, event)
-
     def execute(self, context):
-        folder_path = os.path.dirname(self.filepath)
-
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
             property_collection = context.scene.msfs_multi_exporter_collection
 
             for collection in property_collection:
-                export_path = os.path.join(folder_path, collection.folder_name)
-                if not os.path.exists(export_path):
-                    export_path = os.mkdir(export_path)
                 for lod in collection.lods:
                     for obj in bpy.context.selected_objects:
                         obj.select_set(False)
@@ -179,30 +170,27 @@ class MultiExportGLTF2(bpy.types.Operator, ExportHelper):
                         bpy.ops.export_scene.gltf(
                             export_format="GLTF_SEPARATE",
                             export_selected=True,
-                            filepath=os.path.join(export_path, lod.file_name)
+                            filepath=os.path.join(collection.folder_name, lod.file_name)
                         )
 
         elif context.scene.msfs_multi_exporter_current_tab == "PRESETS":
             presets = bpy.context.scene.msfs_multi_exporter_presets
             for preset in presets:
                 if preset.enabled:
+                    # Clear currently selected objects
+                    for obj in bpy.context.selected_objects:
+                                obj.select_set(False)
+                    # Loop through all enabled layers and select all objects
                     for layer in preset.layers:
                         if layer.enabled:
-                            for obj in bpy.context.selected_objects:
-                                obj.select_set(False)
-
                             for obj in layer.collection.all_objects:
                                 obj.select_set(True)
 
-                            export_path = os.path.join(folder_path, preset.folder_name)
-                            if not os.path.exists(export_path):
-                                export_path = os.mkdir(export_path)
-
-                            bpy.ops.export_scene.gltf(
-                                export_format="GLTF_SEPARATE",
-                                export_selected=True,
-                                filepath=os.path.join(export_path, layer.file_name)
-                            )
+                    bpy.ops.export_scene.gltf(
+                        export_format="GLTF_SEPARATE",
+                        export_selected=True,
+                        filepath=os.path.join(preset.file_path)
+                    )
 
 
         return {"FINISHED"}
@@ -275,32 +263,33 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
             for i, (collection, children) in enumerate(tree.items()):
                 for layer in preset.layers:
                     if layer.collection == collection:
-                        row = layout_item.row()
-                        box = row.box()
-                        box.prop(layer, "expanded", text=layer.collection.name,
-                                    icon="DOWNARROW_HLT" if layer.expanded else "RIGHTARROW", icon_only=True, emboss=False)
-                        if layer.expanded:
-                            box.prop(layer, "enabled", text="Enabled")
-                            box.prop(layer, "file_name", text="Name")
-                            drawTree(box, children)
+                        box = layout_item.box()
+                        row = box.row()
+                        if layer.collection.children:
+                            row.prop(layer, "expanded", text=layer.collection.name,
+                                        icon="DOWNARROW_HLT" if layer.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+                            row.prop(layer, "enabled", text="Enabled")
+                            if layer.expanded:
+                                drawTree(box, children)
+                        else:
+                            row.label(text=layer.collection.name)
+                            row.prop(layer, "enabled", text="Enabled")
 
                         break
 
         drawTree(layout, self.collection_tree[bpy.context.scene.collection])     
 
 class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
-    bl_space_type = 'FILE_BROWSER'
-    bl_region_type = 'TOOL_PROPS'
     bl_label = ""
-    bl_parent_id = "FILE_PT_operator"
+    bl_parent_id = "MSFS_PT_MultiExporter"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Multi-Export glTF 2.0"
     bl_options = {'HIDE_HEADER'}
 
     @classmethod
     def poll(cls, context):
-        sfile = context.space_data
-        operator = sfile.active_operator
-
-        return context.scene.msfs_multi_exporter_current_tab == "PRESETS" and operator.bl_idname == "EXPORT_SCENE_OT_multi_gltf"
+        return context.scene.msfs_multi_exporter_current_tab == "PRESETS"
 
     def draw(self, context):
         layout = self.layout
@@ -317,25 +306,26 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
             if preset.expanded:
                 box.prop(preset, "enabled", text="Enabled")
                 box.prop(preset, "name", text="Name")
-                box.prop(preset, "folder_name", text="Folder")
+                box.prop(preset, "file_path", text="Export Path")
 
                 box.operator(MSFS_OT_EditLayers.bl_idname, text="Edit Layers").preset_index = i
 
                 box.operator(MSFS_OT_RemovePreset.bl_idname, text="Remove").preset_index = i
 
+        row = layout.row()
+        row.operator(MultiExportGLTF2.bl_idname, text="Export")
+
 class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
-    bl_space_type = 'FILE_BROWSER'
-    bl_region_type = 'TOOL_PROPS'
     bl_label = ""
-    bl_parent_id = "FILE_PT_operator"
+    bl_parent_id = "MSFS_PT_MultiExporter"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Multi-Export glTF 2.0"
     bl_options = {'HIDE_HEADER'}
 
     @classmethod
     def poll(cls, context):
-        sfile = context.space_data
-        operator = sfile.active_operator
-
-        return context.scene.msfs_multi_exporter_current_tab == "OBJECTS" and operator.bl_idname == "EXPORT_SCENE_OT_multi_gltf"
+        return context.scene.msfs_multi_exporter_current_tab == "OBJECTS"
 
     def draw(self, context):
         layout = self.layout
@@ -365,19 +355,22 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                             subrow.prop(lod, "lod_value", text="LOD Value")
                             subrow.prop(lod, "flatten_on_export", text="Flatten on Export")
                             subrow.prop(lod, "keep_instances", text="Keep Instances")
-                            subrow.prop(lod, "file_name", text="Name")
+                            subrow.prop(lod, "file_name", text="File Name")
 
-def menu_func_export(self, context):
-    self.layout.operator(MultiExportGLTF2.bl_idname, text='Multi-Export glTF 2.0 (.gltf)')
+        row = layout.row()
+        row.operator(MultiExportGLTF2.bl_idname, text="Export")
 
 def register():
     bpy.types.Scene.msfs_multi_exporter_collection = bpy.props.CollectionProperty(type=MultiExporterPropertyGroup)
     bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(type=MultiExporterPreset)
 
-    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
+    bpy.app.handlers.depsgraph_update_post.append(update_lods)
 
-def unregister():
-    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
+def unregsister():
+    try:
+        bpy.app.handlers.depsgraph_update_post.remove(update_lods)
+    except ValueError:
+        pass
 
 def register_panel():
     # Register the panel on demand, we need to be sure to only register it once
