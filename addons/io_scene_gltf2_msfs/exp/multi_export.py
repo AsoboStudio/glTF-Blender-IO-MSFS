@@ -23,7 +23,7 @@ class MultiExportLOD(bpy.types.PropertyGroup):
     object: bpy.props.PointerProperty(name="", type=bpy.types.Object)
     enabled: bpy.props.BoolProperty(name="", default=False)
 
-    lod_value: bpy.props.IntProperty(name="", default=0, min=0)  # TODO: add max
+    lod_value: bpy.props.IntProperty(name="", default=0, min=0, max=1000)
     flatten_on_export: bpy.props.BoolProperty(name="", default=False)
     keep_instances: bpy.props.BoolProperty(name="", default=False)
     file_name: bpy.props.StringProperty(name="", default="")
