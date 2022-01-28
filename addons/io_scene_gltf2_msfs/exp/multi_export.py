@@ -18,29 +18,26 @@ import bpy
 import uuid
 import xml.dom.minidom
 import xml.etree.ElementTree as etree
-from bpy_extras.io_utils import ExportHelper
 
 # Property Groups
 class MultiExporterObjectLOD(bpy.types.PropertyGroup):
     object: bpy.props.PointerProperty(name="", type=bpy.types.Object)
     enabled: bpy.props.BoolProperty(name="", default=False)
-
     lod_value: bpy.props.IntProperty(name="", default=0, min=0, max=1000)
     flatten_on_export: bpy.props.BoolProperty(name="", default=False)
     keep_instances: bpy.props.BoolProperty(name="", default=False)
     file_name: bpy.props.StringProperty(name="", default="")
 
 class MultiExporterObjectGroup(bpy.types.PropertyGroup):
-    collection: bpy.props.StringProperty(name="", default="")
+    group_name: bpy.props.StringProperty(name="", default="")
     expanded: bpy.props.BoolProperty(name="", default=True)
     lods: bpy.props.CollectionProperty(type=MultiExporterObjectLOD)
     folder_name: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH")
 
 class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
-
-    expanded: bpy.props.BoolProperty(name="", default=True)
     enabled: bpy.props.BoolProperty(name="", default=False)
+    expanded: bpy.props.BoolProperty(name="", default=True)
 
 class MultiExporterPreset(bpy.types.PropertyGroup):
     def update_file_path(self, context):
@@ -55,7 +52,6 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
 
     name: bpy.props.StringProperty(name="", default="")
     file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
-
     enabled: bpy.props.BoolProperty(name="", default=False)
     expanded: bpy.props.BoolProperty(name="", default=True)
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
@@ -66,53 +62,6 @@ class MSFSMultiExporterProperties:
             (("OBJECTS", "Objects", ""),
             ("PRESETS", " Presets", "")),
     )
-
-def update_lods(scene):
-    property_collection = bpy.context.scene.msfs_multi_exporter_collection
-
-    # Remove deleted collections and objects
-    for i, property_group in enumerate(property_collection):
-        if property_group.collection:
-            for j, lod in enumerate(property_group.lods):
-                if not lod.object.name in bpy.context.scene.objects:
-                    property_collection[i].lods.remove(j)
-        else:
-            property_collection.remove(i)
-
-    # Search all objects in scene to find LOD groups
-    lod_groups = {}
-    for obj in bpy.context.scene.objects:
-        matches = re.findall("(?i)x\d_|_lod[0-9]+", obj.name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
-        if matches:
-            filtered_string = obj.name
-            for match in matches:
-                filtered_string = filtered_string.replace(match, "")
-            
-            if filtered_string in lod_groups.keys():
-                lod_groups[filtered_string].append(obj)
-            else:
-                lod_groups[filtered_string] = [obj]
-        else:
-            lod_groups[obj.name] = [obj] # If not in a LOD group, just create a "fake" group to add the object to
-
-    # Add collection if not already in property group
-    for _, (collection, objects) in enumerate(lod_groups.items()):
-        if not collection in [property_group.collection for property_group in property_collection]:
-            collection_prop_group = property_collection.add()
-            collection_prop_group.collection = collection
-        else:
-            for property_group in property_collection:
-                if property_group.collection == collection:
-                    collection_prop_group = property_group
-                    break
-        
-        for obj in objects:
-            # If the object is at the root level (no parent)
-            if obj.parent is None:
-                if not obj in [lod.object for lod in collection_prop_group.lods]:
-                    obj_item = collection_prop_group.lods.add()
-                    obj_item.object = obj
-                    obj_item.file_name = obj.name
 
 # Operators
 class MSFS_OT_ChangeTab(bpy.types.Operator):
@@ -126,16 +75,16 @@ class MSFS_OT_ChangeTab(bpy.types.Operator):
         return {"FINISHED"}
 
 class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
-    """Export scene as glTF 2.0 file"""
-    bl_idname = 'export_scene.multi_gltf'
+    bl_idname = 'export_scene.multi_export_gltf'
     bl_label = 'Multi-Export glTF 2.0'
 
     def execute(self, context):
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
-            property_collection = context.scene.msfs_multi_exporter_collection
+            property_collection = context.scene.msfs_multi_exporter_object_groups
 
             for collection in property_collection:
                 for lod in collection.lods:
+                    # Use selected objects in order to specify what to export
                     for obj in bpy.context.selected_objects:
                         obj.select_set(False)
 
@@ -159,7 +108,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                 if preset.enabled:
                     # Clear currently selected objects
                     for obj in bpy.context.selected_objects:
-                                obj.select_set(False)
+                        obj.select_set(False)
+
                     # Loop through all enabled layers and select all objects
                     for layer in preset.layers:
                         if layer.enabled:
@@ -171,7 +121,6 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         export_selected=True,
                         filepath=os.path.join(preset.file_path)
                     )
-
 
         return {"FINISHED"}
 
@@ -264,7 +213,7 @@ class MSFS_OT_GenerateXML(bpy.types.Operator):
     bl_label = "Generate XML"
 
     def execute(self, context):
-        property_collection = context.scene.msfs_multi_exporter_collection
+        property_collection = context.scene.msfs_multi_exporter_object_groups
 
         for collection in property_collection:
             root = etree.Element("ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1")
@@ -332,7 +281,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        property_collection = context.scene.msfs_multi_exporter_collection
+        property_collection = context.scene.msfs_multi_exporter_object_groups
+
         total_lods = 0
         for prop in property_collection:
             total_lods += len(prop.lods)
@@ -344,7 +294,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                 row = layout.row()
                 if len(prop.lods) > 0:
                     box = row.box()
-                    box.prop(prop, "expanded", text=prop.collection,
+                    box.prop(prop, "expanded", text=prop.group_name,
                              icon="DOWNARROW_HLT" if prop.expanded else "RIGHTARROW", icon_only=True, emboss=False)
                     if prop.expanded:
                         box.prop(prop, "folder_name", text="Folder")
@@ -399,16 +349,68 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
         row = layout.row()
         row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
 
+# Functions
+def update_object_groups(scene):
+    object_groups = bpy.context.scene.msfs_multi_exporter_object_groups
+
+    # Remove deleted objects and empty object groups
+    for i, object_group in enumerate(object_groups):
+        for j, lod in enumerate(object_group.lods):
+            if not lod.object.name in bpy.context.scene.objects:
+                object_group[i].lods.remove(j)
+
+        if len(object_groups.lods) == 0:
+            object_group.remove(i)
+
+    # Search all objects in scene to find object groups
+    found_object_groups = {}
+    for obj in bpy.context.scene.objects:
+        matches = re.findall("(?i)x\d_|_lod[0-9]+", obj.name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
+
+        if matches:
+            # Get base object group name from object
+            filtered_string = obj.name
+            for match in matches:
+                filtered_string = filtered_string.replace(match, "")
+            
+            # Set object group or append
+            if filtered_string in found_object_groups.keys():
+                found_object_groups[filtered_string].append(obj)
+            else:
+                found_object_groups[filtered_string] = [obj]
+        else:
+            found_object_groups[obj.name] = [obj] # If not in a object group, just create a "fake" group to add the object to
+
+    # Create object groups and LODs
+    for _, (object_group_name, objects) in enumerate(found_object_groups.items()):
+        # Check if object group already exists, and if it doesn't, create one
+        if not object_group_name in [object_group.group_name for object_group in object_group_name]:
+            object_group = object_groups.add()
+            object_group.group_name = object_group_name
+        else:
+            for object_group in object_groups:
+                if object_group.group_name == object_group_name:
+                    break
+        
+        # Set all LODs in object group
+        for obj in objects:
+            # If the object is at the root level (no parent)
+            if obj.parent is None:
+                if not obj in [lod.object for lod in object_group.lods]:
+                    lod = object_group.lods.add()
+                    lod.object = obj
+                    lod.file_name = obj.name
+
 
 def register():
-    bpy.types.Scene.msfs_multi_exporter_collection = bpy.props.CollectionProperty(type=MultiExporterObjectGroup)
+    bpy.types.Scene.msfs_multi_exporter_object_groups = bpy.props.CollectionProperty(type=MultiExporterObjectGroup)
     bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(type=MultiExporterPreset)
 
-    bpy.app.handlers.depsgraph_update_post.append(update_lods)
+    bpy.app.handlers.depsgraph_update_post.append(update_object_groups)
 
 def unregsister():
     try:
-        bpy.app.handlers.depsgraph_update_post.remove(update_lods)
+        bpy.app.handlers.depsgraph_update_post.remove(update_object_groups)
     except ValueError:
         pass
 
