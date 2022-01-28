@@ -15,6 +15,9 @@
 import os
 import re
 import bpy
+import uuid
+import xml.dom.minidom
+import xml.etree.ElementTree as etree
 from bpy_extras.io_utils import ExportHelper
 
 
@@ -111,6 +114,40 @@ def update_lods(scene):
                     obj_item = collection_prop_group.lods.add()
                     obj_item.object = obj
                     obj_item.file_name = obj.name
+
+class MSFS_OT_GenerateXML(bpy.types.Operator):
+    bl_idname = "msfs.multi_export_generate_xml"
+    bl_label = "Generate XML"
+
+    def execute(self, context):
+        property_collection = context.scene.msfs_multi_exporter_collection
+
+        for collection in property_collection:
+            root = etree.Element("ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1")
+            lods = etree.SubElement(root, "LODS")
+
+            lod_values = []
+
+            for lod in collection.lods:
+                if lod.enabled:
+                    lod_values.append(lod.lod_value)
+
+            lod_values = sorted(lod_values, reverse=True)
+
+            for lod_value in lod_values:
+                etree.SubElement(lods, "LOD", minSize=str(lod_value))
+
+            if lod_values:
+                # Format XML
+                dom = xml.dom.minidom.parseString(etree.tostring(root))
+                xml_string = dom.toprettyxml()
+                part1, part2 = xml_string.split('?>')
+
+                with open(os.path.join(collection.folder_name, collection.collection + ".xml"), 'w') as f:
+                    f.write(part1 + 'encoding="utf-8"?>\n' + part2)
+                    f.close()
+
+        return {"FINISHED"}
 
 class MSFS_OT_ChangeTab(bpy.types.Operator):
     bl_idname = "msfs.multi_export_change_tab"
@@ -357,7 +394,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                             subrow.prop(lod, "keep_instances", text="Keep Instances")
                             subrow.prop(lod, "file_name", text="File Name")
 
-        row = layout.row()
+        row = layout.row(align=True)
+        row.operator(MSFS_OT_GenerateXML.bl_idname, text="Generate XML")
         row.operator(MultiExportGLTF2.bl_idname, text="Export")
 
 def register():
