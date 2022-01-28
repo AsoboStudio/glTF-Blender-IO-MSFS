@@ -20,9 +20,8 @@ import xml.dom.minidom
 import xml.etree.ElementTree as etree
 from bpy_extras.io_utils import ExportHelper
 
-
-# Objects
-class MultiExportLOD(bpy.types.PropertyGroup):
+# Property Groups
+class MultiExporterObjectLOD(bpy.types.PropertyGroup):
     object: bpy.props.PointerProperty(name="", type=bpy.types.Object)
     enabled: bpy.props.BoolProperty(name="", default=False)
 
@@ -31,13 +30,12 @@ class MultiExportLOD(bpy.types.PropertyGroup):
     keep_instances: bpy.props.BoolProperty(name="", default=False)
     file_name: bpy.props.StringProperty(name="", default="")
 
-class MultiExporterPropertyGroup(bpy.types.PropertyGroup):
+class MultiExporterObjectGroup(bpy.types.PropertyGroup):
     collection: bpy.props.StringProperty(name="", default="")
     expanded: bpy.props.BoolProperty(name="", default=True)
-    lods: bpy.props.CollectionProperty(type=MultiExportLOD)
+    lods: bpy.props.CollectionProperty(type=MultiExporterObjectLOD)
     folder_name: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH")
 
-# Presets
 class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
 
@@ -62,6 +60,7 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
     expanded: bpy.props.BoolProperty(name="", default=True)
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
 
+# Scene Properties
 class MSFSMultiExporterProperties:
     bpy.types.Scene.msfs_multi_exporter_current_tab = bpy.props.EnumProperty(items=
             (("OBJECTS", "Objects", ""),
@@ -115,40 +114,7 @@ def update_lods(scene):
                     obj_item.object = obj
                     obj_item.file_name = obj.name
 
-class MSFS_OT_GenerateXML(bpy.types.Operator):
-    bl_idname = "msfs.multi_export_generate_xml"
-    bl_label = "Generate XML"
-
-    def execute(self, context):
-        property_collection = context.scene.msfs_multi_exporter_collection
-
-        for collection in property_collection:
-            root = etree.Element("ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1")
-            lods = etree.SubElement(root, "LODS")
-
-            lod_values = []
-
-            for lod in collection.lods:
-                if lod.enabled:
-                    lod_values.append(lod.lod_value)
-
-            lod_values = sorted(lod_values, reverse=True)
-
-            for lod_value in lod_values:
-                etree.SubElement(lods, "LOD", minSize=str(lod_value))
-
-            if lod_values:
-                # Format XML
-                dom = xml.dom.minidom.parseString(etree.tostring(root))
-                xml_string = dom.toprettyxml()
-                part1, part2 = xml_string.split('?>')
-
-                with open(os.path.join(collection.folder_name, collection.collection + ".xml"), 'w') as f:
-                    f.write(part1 + 'encoding="utf-8"?>\n' + part2)
-                    f.close()
-
-        return {"FINISHED"}
-
+# Operators
 class MSFS_OT_ChangeTab(bpy.types.Operator):
     bl_idname = "msfs.multi_export_change_tab"
     bl_label = "Change tab"
@@ -159,30 +125,7 @@ class MSFS_OT_ChangeTab(bpy.types.Operator):
         context.scene.msfs_multi_exporter_current_tab = self.current_tab
         return {"FINISHED"}
 
-class MSFS_PT_MultiExporter(bpy.types.Panel):
-    bl_label = "Multi-Export glTF 2.0"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = "Multi-Export glTF 2.0"
-
-    @classmethod
-    def poll(cls, context):
-        return context.scene.msfs_ExtAsoboProperties.enabled
-
-    def draw(self, context):
-        layout = self.layout
-        layout.use_property_split = True
-        layout.use_property_decorate = False  # No animation.
-
-        current_tab = context.scene.msfs_multi_exporter_current_tab
-
-        row = layout.row(align=True)
-        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Objects",
-                     depress=(current_tab == "OBJECTS")).current_tab = "OBJECTS"
-        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Presets",
-                     depress=(current_tab == "PRESETS")).current_tab = "PRESETS"
-
-class MultiExportGLTF2(bpy.types.Operator):
+class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
     """Export scene as glTF 2.0 file"""
     bl_idname = 'export_scene.multi_gltf'
     bl_label = 'Multi-Export glTF 2.0'
@@ -232,6 +175,17 @@ class MultiExportGLTF2(bpy.types.Operator):
 
         return {"FINISHED"}
 
+class MSFS_OT_AddPreset(bpy.types.Operator):
+    bl_idname = "msfs.multi_export_add_preset"
+    bl_label = "Add preset"
+
+    def execute(self, context):
+        presets = bpy.context.scene.msfs_multi_exporter_presets
+        preset = presets.add()
+        preset.name = f"Preset {len(presets)}"
+
+        return {"FINISHED"}
+
 class MSFS_OT_RemovePreset(bpy.types.Operator):
     bl_idname = "msfs.multi_export_remove_preset"
     bl_label = "Remove preset"
@@ -241,17 +195,6 @@ class MSFS_OT_RemovePreset(bpy.types.Operator):
     def execute(self, context):
         presets = bpy.context.scene.msfs_multi_exporter_presets
         presets.remove(self.preset_index)
-
-        return {"FINISHED"}
-
-class MSFS_OT_AddPreset(bpy.types.Operator):
-    bl_idname = "msfs.multi_export_add_preset"
-    bl_label = "Add preset"
-
-    def execute(self, context):
-        presets = bpy.context.scene.msfs_multi_exporter_presets
-        preset = presets.add()
-        preset.name = f"Preset {len(presets)}"
 
         return {"FINISHED"}
 
@@ -314,43 +257,65 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
 
                         break
 
-        drawTree(layout, self.collection_tree[bpy.context.scene.collection])     
+        drawTree(layout, self.collection_tree[bpy.context.scene.collection])
 
-class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
-    bl_label = ""
-    bl_parent_id = "MSFS_PT_MultiExporter"
+class MSFS_OT_GenerateXML(bpy.types.Operator):
+    bl_idname = "msfs.multi_export_generate_xml"
+    bl_label = "Generate XML"
+
+    def execute(self, context):
+        property_collection = context.scene.msfs_multi_exporter_collection
+
+        for collection in property_collection:
+            root = etree.Element("ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1")
+            lods = etree.SubElement(root, "LODS")
+
+            lod_values = []
+
+            for lod in collection.lods:
+                if lod.enabled:
+                    lod_values.append(lod.lod_value)
+
+            lod_values = sorted(lod_values, reverse=True)
+
+            for lod_value in lod_values:
+                etree.SubElement(lods, "LOD", minSize=str(lod_value))
+
+            if lod_values:
+                # Format XML
+                dom = xml.dom.minidom.parseString(etree.tostring(root))
+                xml_string = dom.toprettyxml()
+                part1, part2 = xml_string.split('?>')
+
+                with open(os.path.join(collection.folder_name, collection.collection + ".xml"), 'w') as f:
+                    f.write(part1 + 'encoding="utf-8"?>\n' + part2)
+                    f.close()
+
+        return {"FINISHED"}
+
+# Panels
+class MSFS_PT_MultiExporter(bpy.types.Panel):
+    bl_label = "Multi-Export glTF 2.0"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "Multi-Export glTF 2.0"
-    bl_options = {'HIDE_HEADER'}
 
     @classmethod
     def poll(cls, context):
-        return context.scene.msfs_multi_exporter_current_tab == "PRESETS"
+        return context.scene.msfs_ExtAsoboProperties.enabled
 
     def draw(self, context):
         layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
 
-        layout.operator(MSFS_OT_AddPreset.bl_idname, text="Add Preset")
+        current_tab = context.scene.msfs_multi_exporter_current_tab
 
-        presets = bpy.context.scene.msfs_multi_exporter_presets
-        for i, preset in enumerate(presets):
-            row = layout.row()
-            box = row.box()
-            box.prop(preset, "expanded", text=preset.name,
-                        icon="DOWNARROW_HLT" if preset.expanded else "RIGHTARROW", icon_only=True, emboss=False)
-
-            if preset.expanded:
-                box.prop(preset, "enabled", text="Enabled")
-                box.prop(preset, "name", text="Name")
-                box.prop(preset, "file_path", text="Export Path")
-
-                box.operator(MSFS_OT_EditLayers.bl_idname, text="Edit Layers").preset_index = i
-
-                box.operator(MSFS_OT_RemovePreset.bl_idname, text="Remove").preset_index = i
-
-        row = layout.row()
-        row.operator(MultiExportGLTF2.bl_idname, text="Export")
+        row = layout.row(align=True)
+        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Objects",
+                     depress=(current_tab == "OBJECTS")).current_tab = "OBJECTS"
+        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Presets",
+                     depress=(current_tab == "PRESETS")).current_tab = "PRESETS"
 
 class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
     bl_label = ""
@@ -396,10 +361,47 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
 
         row = layout.row(align=True)
         row.operator(MSFS_OT_GenerateXML.bl_idname, text="Generate XML")
-        row.operator(MultiExportGLTF2.bl_idname, text="Export")
+        row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
+
+class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
+    bl_label = ""
+    bl_parent_id = "MSFS_PT_MultiExporter"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Multi-Export glTF 2.0"
+    bl_options = {'HIDE_HEADER'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene.msfs_multi_exporter_current_tab == "PRESETS"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.operator(MSFS_OT_AddPreset.bl_idname, text="Add Preset")
+
+        presets = bpy.context.scene.msfs_multi_exporter_presets
+        for i, preset in enumerate(presets):
+            row = layout.row()
+            box = row.box()
+            box.prop(preset, "expanded", text=preset.name,
+                        icon="DOWNARROW_HLT" if preset.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+
+            if preset.expanded:
+                box.prop(preset, "enabled", text="Enabled")
+                box.prop(preset, "name", text="Name")
+                box.prop(preset, "file_path", text="Export Path")
+
+                box.operator(MSFS_OT_EditLayers.bl_idname, text="Edit Layers").preset_index = i
+
+                box.operator(MSFS_OT_RemovePreset.bl_idname, text="Remove").preset_index = i
+
+        row = layout.row()
+        row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
+
 
 def register():
-    bpy.types.Scene.msfs_multi_exporter_collection = bpy.props.CollectionProperty(type=MultiExporterPropertyGroup)
+    bpy.types.Scene.msfs_multi_exporter_collection = bpy.props.CollectionProperty(type=MultiExporterObjectGroup)
     bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(type=MultiExporterPreset)
 
     bpy.app.handlers.depsgraph_update_post.append(update_lods)
