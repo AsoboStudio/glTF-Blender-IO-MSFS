@@ -33,6 +33,7 @@ class MultiExporterObjectGroup(bpy.types.PropertyGroup):
     expanded: bpy.props.BoolProperty(name="", default=True)
     lods: bpy.props.CollectionProperty(type=MultiExporterObjectLOD)
     folder_name: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH")
+    generate_xml: bpy.props.BoolProperty(name="", default=True)
 
 class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
@@ -80,10 +81,36 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
     def execute(self, context):
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
-            property_collection = context.scene.msfs_multi_exporter_object_groups
+            object_groups = context.scene.msfs_multi_exporter_object_groups
 
-            for collection in property_collection:
-                for lod in collection.lods:
+            for object_group in object_groups:
+                # Generate XML if needed
+                if object_group.generate_xml:
+                    root = etree.Element("ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1")
+                    lods = etree.SubElement(root, "LODS")
+
+                    lod_values = []
+
+                    for lod in object_group.lods:
+                        if lod.enabled:
+                            lod_values.append(lod.lod_value)
+
+                    lod_values = sorted(lod_values, reverse=True)
+
+                    for lod_value in lod_values:
+                        etree.SubElement(lods, "LOD", minSize=str(lod_value))
+
+                    if lod_values:
+                        # Format XML
+                        dom = xml.dom.minidom.parseString(etree.tostring(root))
+                        xml_string = dom.toprettyxml(encoding='utf-8')
+
+                        with open(os.path.join(object_group.folder_name, object_group.group_name + ".xml"), 'wb') as f:
+                            f.write(xml_string)
+                            f.close()
+                
+                # Export glTF
+                for lod in object_group.lods:
                     # Use selected objects in order to specify what to export
                     for obj in bpy.context.selected_objects:
                         obj.select_set(False)
@@ -99,7 +126,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         bpy.ops.export_scene.gltf(
                             export_format="GLTF_SEPARATE",
                             export_selected=True,
-                            filepath=os.path.join(collection.folder_name, lod.file_name)
+                            filepath=os.path.join(object_group.folder_name, lod.file_name)
                         )
 
         elif context.scene.msfs_multi_exporter_current_tab == "PRESETS":
@@ -208,40 +235,6 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
 
         drawTree(layout, self.collection_tree[bpy.context.scene.collection])
 
-class MSFS_OT_GenerateXML(bpy.types.Operator):
-    bl_idname = "msfs.multi_export_generate_xml"
-    bl_label = "Generate XML"
-
-    def execute(self, context):
-        property_collection = context.scene.msfs_multi_exporter_object_groups
-
-        for collection in property_collection:
-            root = etree.Element("ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1")
-            lods = etree.SubElement(root, "LODS")
-
-            lod_values = []
-
-            for lod in collection.lods:
-                if lod.enabled:
-                    lod_values.append(lod.lod_value)
-
-            lod_values = sorted(lod_values, reverse=True)
-
-            for lod_value in lod_values:
-                etree.SubElement(lods, "LOD", minSize=str(lod_value))
-
-            if lod_values:
-                # Format XML
-                dom = xml.dom.minidom.parseString(etree.tostring(root))
-                xml_string = dom.toprettyxml()
-                part1, part2 = xml_string.split('?>')
-
-                with open(os.path.join(collection.folder_name, collection.collection + ".xml"), 'w') as f:
-                    f.write(part1 + 'encoding="utf-8"?>\n' + part2)
-                    f.close()
-
-        return {"FINISHED"}
-
 # Panels
 class MSFS_PT_MultiExporter(bpy.types.Panel):
     bl_label = "Multi-Export glTF 2.0"
@@ -281,26 +274,27 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        property_collection = context.scene.msfs_multi_exporter_object_groups
+        object_groups = context.scene.msfs_multi_exporter_object_groups
 
         total_lods = 0
-        for prop in property_collection:
-            total_lods += len(prop.lods)
+        for object_group in object_groups:
+            total_lods += len(object_group.lods)
         if total_lods == 0:
             box = layout.box()
             box.label(text="No LODs found in scene")
         else:
-            for prop in property_collection:
+            for object_group in object_groups:
                 row = layout.row()
-                if len(prop.lods) > 0:
+                if len(object_group.lods) > 0:
                     box = row.box()
-                    box.prop(prop, "expanded", text=prop.group_name,
-                             icon="DOWNARROW_HLT" if prop.expanded else "RIGHTARROW", icon_only=True, emboss=False)
-                    if prop.expanded:
-                        box.prop(prop, "folder_name", text="Folder")
+                    box.prop(object_group, "expanded", text=object_group.group_name,
+                             icon="DOWNARROW_HLT" if object_group.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+                    if object_group.expanded:
+                        box.prop(object_group, "generate_xml", text="Generate XML")
+                        box.prop(object_group, "folder_name", text="Folder")
 
                         col = box.column()
-                        for lod in prop.lods:
+                        for lod in object_group.lods:
                             row = col.row()
                             row.prop(lod, "enabled", text=lod.object.name)
                             subrow = row.column()
@@ -310,7 +304,6 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                             subrow.prop(lod, "file_name", text="File Name")
 
         row = layout.row(align=True)
-        row.operator(MSFS_OT_GenerateXML.bl_idname, text="Generate XML")
         row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
 
 class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
