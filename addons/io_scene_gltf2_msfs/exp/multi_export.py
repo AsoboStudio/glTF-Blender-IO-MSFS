@@ -359,7 +359,7 @@ def update_object_groups(scene):
             if not lod.object.name in bpy.context.scene.objects:
                 object_group[i].lods.remove(j)
 
-        if len(object_groups.lods) == 0:
+        if len(object_group.lods) == 0:
             object_group.remove(i)
 
     # Search all objects in scene to find object groups
@@ -384,7 +384,7 @@ def update_object_groups(scene):
     # Create object groups and LODs
     for _, (object_group_name, objects) in enumerate(found_object_groups.items()):
         # Check if object group already exists, and if it doesn't, create one
-        if not object_group_name in [object_group.group_name for object_group in object_group_name]:
+        if not object_group_name in [object_group.group_name for object_group in object_groups]:
             object_group = object_groups.add()
             object_group.group_name = object_group_name
         else:
