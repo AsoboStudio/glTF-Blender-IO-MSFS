@@ -305,8 +305,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                             row.prop(lod, "enabled", text=lod.object.name)
                             subrow = row.column()
                             subrow.prop(lod, "lod_value", text="LOD Value")
-                            subrow.prop(lod, "flatten_on_export", text="Flatten on Export")
-                            subrow.prop(lod, "keep_instances", text="Keep Instances")
+                            # subrow.prop(lod, "flatten_on_export", text="Flatten on Export") # Disable these two options for now as there's not a great way to implement them
+                            # subrow.prop(lod, "keep_instances", text="Keep Instances")
                             subrow.prop(lod, "file_name", text="File Name")
 
         row = layout.row(align=True)
