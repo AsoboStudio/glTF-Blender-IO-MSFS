@@ -343,6 +343,17 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
         row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
 
 # Functions
+def get_group_from_object_name(object_name):
+    matches = re.findall("(?i)x\d_|_lod[0-9]+", object_name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
+    if matches:
+        # Get base object group name from object
+        for match in matches:
+            filtered_string = object_name.replace(match, "")
+        return filtered_string
+    else:
+        # If prefix or suffix isn't found, use the object name as the group
+        return object_name
+
 def update_object_groups(scene):
     object_groups = bpy.context.scene.msfs_multi_exporter_object_groups
 
@@ -350,29 +361,26 @@ def update_object_groups(scene):
     for i, object_group in enumerate(object_groups):
         for j, lod in enumerate(object_group.lods):
             if not lod.object.name in bpy.context.scene.objects:
-                object_group[i].lods.remove(j)
+                object_groups[i].lods.remove(j)
+
+            # Make sure object still matches group name
+            if not get_group_from_object_name(lod.object.name) == object_group.group_name:
+                object_groups[i].lods.remove(j)
 
         if len(object_group.lods) == 0:
-            object_group.remove(i)
+            object_groups.remove(i)
 
     # Search all objects in scene to find object groups
     found_object_groups = {}
     for obj in bpy.context.scene.objects:
-        matches = re.findall("(?i)x\d_|_lod[0-9]+", obj.name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
+        if obj.parent is None: # Only search "root" objects
+            group_name = get_group_from_object_name(obj.name)
 
-        if matches:
-            # Get base object group name from object
-            filtered_string = obj.name
-            for match in matches:
-                filtered_string = filtered_string.replace(match, "")
-            
             # Set object group or append
-            if filtered_string in found_object_groups.keys():
-                found_object_groups[filtered_string].append(obj)
+            if group_name in found_object_groups.keys():
+                found_object_groups[group_name].append(obj)
             else:
-                found_object_groups[filtered_string] = [obj]
-        else:
-            found_object_groups[obj.name] = [obj] # If not in a object group, just create a "fake" group to add the object to
+                found_object_groups[group_name] = [obj]
 
     # Create object groups and LODs
     for _, (object_group_name, objects) in enumerate(found_object_groups.items()):
