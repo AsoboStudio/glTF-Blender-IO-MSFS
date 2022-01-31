@@ -65,16 +65,6 @@ class MSFSMultiExporterProperties:
     )
 
 # Operators
-class MSFS_OT_ChangeTab(bpy.types.Operator):
-    bl_idname = "msfs.multi_export_change_tab"
-    bl_label = "Change tab"
-
-    current_tab: bpy.types.Scene.msfs_multi_exporter_current_tab
-
-    def execute(self, context):
-        context.scene.msfs_multi_exporter_current_tab = self.current_tab
-        return {"FINISHED"}
-
 class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
     bl_idname = 'export_scene.multi_export_gltf'
     bl_label = 'Multi-Export glTF 2.0'
@@ -149,6 +139,81 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         filepath=os.path.join(preset.file_path)
                     )
 
+        return {"FINISHED"}
+
+class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
+    bl_idname = "msfs.reload_object_groups"
+    bl_label = "Reload object groups"
+
+    def get_group_from_object_name(self, object_name):
+        matches = re.findall("(?i)x\d_|_lod[0-9]+", object_name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
+        if matches:
+            # Get base object group name from object
+            for match in matches:
+                filtered_string = object_name.replace(match, "")
+            return filtered_string
+        else:
+            # If prefix or suffix isn't found, use the object name as the group
+            return object_name
+
+    def execute(self, context):
+        object_groups = bpy.context.scene.msfs_multi_exporter_object_groups
+
+        # Remove deleted objects and empty object groups
+        for i, object_group in enumerate(object_groups):
+            for j, lod in enumerate(object_group.lods):
+                if not lod.object.name in bpy.context.scene.objects:
+                    object_groups[i].lods.remove(j)
+
+                # Make sure object still matches group name
+                if not self.get_group_from_object_name(lod.object.name) == object_group.group_name:
+                    object_groups[i].lods.remove(j)
+
+            if len(object_group.lods) == 0:
+                object_groups.remove(i)
+
+        # Search all objects in scene to find object groups
+        found_object_groups = {}
+        for obj in bpy.context.scene.objects:
+            if obj.parent is None: # Only search "root" objects
+                group_name = self.get_group_from_object_name(obj.name)
+
+                # Set object group or append
+                if group_name in found_object_groups.keys():
+                    found_object_groups[group_name].append(obj)
+                else:
+                    found_object_groups[group_name] = [obj]
+
+        # Create object groups and LODs
+        for _, (object_group_name, objects) in enumerate(found_object_groups.items()):
+            # Check if object group already exists, and if it doesn't, create one
+            if not object_group_name in [object_group.group_name for object_group in object_groups]:
+                object_group = object_groups.add()
+                object_group.group_name = object_group_name
+            else:
+                for object_group in object_groups:
+                    if object_group.group_name == object_group_name:
+                        break
+            
+            # Set all LODs in object group
+            for obj in objects:
+                # If the object is at the root level (no parent)
+                if obj.parent is None:
+                    if not obj in [lod.object for lod in object_group.lods]:
+                        lod = object_group.lods.add()
+                        lod.object = obj
+                        lod.file_name = obj.name
+
+        return {"FINISHED"}
+
+class MSFS_OT_ChangeTab(bpy.types.Operator):
+    bl_idname = "msfs.multi_export_change_tab"
+    bl_label = "Change tab"
+
+    current_tab: bpy.types.Scene.msfs_multi_exporter_current_tab
+
+    def execute(self, context):
+        context.scene.msfs_multi_exporter_current_tab = self.current_tab
         return {"FINISHED"}
 
 class MSFS_OT_AddPreset(bpy.types.Operator):
@@ -274,6 +339,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
+        layout.operator(MSFS_OT_ReloadObjectGroups.bl_idname, text="Reload LODs")
+
         object_groups = context.scene.msfs_multi_exporter_object_groups
 
         total_lods = 0
@@ -342,78 +409,10 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
         row = layout.row()
         row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
 
-# Functions
-def get_group_from_object_name(object_name):
-    matches = re.findall("(?i)x\d_|_lod[0-9]+", object_name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
-    if matches:
-        # Get base object group name from object
-        for match in matches:
-            filtered_string = object_name.replace(match, "")
-        return filtered_string
-    else:
-        # If prefix or suffix isn't found, use the object name as the group
-        return object_name
-
-def update_object_groups(scene):
-    object_groups = bpy.context.scene.msfs_multi_exporter_object_groups
-
-    # Remove deleted objects and empty object groups
-    for i, object_group in enumerate(object_groups):
-        for j, lod in enumerate(object_group.lods):
-            if not lod.object.name in bpy.context.scene.objects:
-                object_groups[i].lods.remove(j)
-
-            # Make sure object still matches group name
-            if not get_group_from_object_name(lod.object.name) == object_group.group_name:
-                object_groups[i].lods.remove(j)
-
-        if len(object_group.lods) == 0:
-            object_groups.remove(i)
-
-    # Search all objects in scene to find object groups
-    found_object_groups = {}
-    for obj in bpy.context.scene.objects:
-        if obj.parent is None: # Only search "root" objects
-            group_name = get_group_from_object_name(obj.name)
-
-            # Set object group or append
-            if group_name in found_object_groups.keys():
-                found_object_groups[group_name].append(obj)
-            else:
-                found_object_groups[group_name] = [obj]
-
-    # Create object groups and LODs
-    for _, (object_group_name, objects) in enumerate(found_object_groups.items()):
-        # Check if object group already exists, and if it doesn't, create one
-        if not object_group_name in [object_group.group_name for object_group in object_groups]:
-            object_group = object_groups.add()
-            object_group.group_name = object_group_name
-        else:
-            for object_group in object_groups:
-                if object_group.group_name == object_group_name:
-                    break
-        
-        # Set all LODs in object group
-        for obj in objects:
-            # If the object is at the root level (no parent)
-            if obj.parent is None:
-                if not obj in [lod.object for lod in object_group.lods]:
-                    lod = object_group.lods.add()
-                    lod.object = obj
-                    lod.file_name = obj.name
-
 
 def register():
     bpy.types.Scene.msfs_multi_exporter_object_groups = bpy.props.CollectionProperty(type=MultiExporterObjectGroup)
     bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(type=MultiExporterPreset)
-
-    bpy.app.handlers.depsgraph_update_post.append(update_object_groups)
-
-def unregsister():
-    try:
-        bpy.app.handlers.depsgraph_update_post.remove(update_object_groups)
-    except ValueError:
-        pass
 
 def register_panel():
     # Register the panel on demand, we need to be sure to only register it once
