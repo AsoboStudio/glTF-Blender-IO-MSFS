@@ -32,45 +32,12 @@ bl_info = {
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
 }
 
-class MSFS_ImporterProperties(bpy.types.PropertyGroup):
-    enabled: bpy.props.BoolProperty(
-        name='Microsoft Flight Simulator Extensions',
-        description='Enable MSFS glTF import extensions',
-        default=True
-    )
-
 class MSFS_ExporterProperties(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(
         name='Microsoft Flight Simulator Extensions',
         description='Enable MSFS glTF export extensions',
         default=True
     )
-
-class GLTF_PT_MSFSImporterExtensionPanel(bpy.types.Panel):
-    bl_space_type = 'FILE_BROWSER'
-    bl_region_type = 'TOOL_PROPS'
-    bl_label = ""
-    bl_parent_id = "GLTF_PT_import_user_extensions"
-    bl_location = "File > Import > glTF 2.0"
-
-    @classmethod
-    def poll(cls, context):
-        sfile = context.space_data
-        operator = sfile.active_operator
-        return operator.bl_idname == "IMPORT_SCENE_OT_gltf"
-
-    def draw_header(self, context):
-        layout = self.layout
-        layout.label(text="MSFS Extensions", icon='TOOL_SETTINGS')
-
-    def draw(self, context):
-        props = bpy.context.scene.msfs_importer_properties
-
-        layout = self.layout
-        layout.use_property_split = True
-        layout.use_property_decorate = False  # No animation.
-
-        layout.prop(props, 'enabled', text="Enabled")
 
 class GLTF_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
@@ -116,8 +83,8 @@ def modules():
 
 
 classes = []
-extension_classes = [MSFS_ImporterProperties, MSFS_ExporterProperties]
-extension_panels = [GLTF_PT_MSFSImporterExtensionPanel, GLTF_PT_MSFSExporterExtensionPanel]
+extension_classes = [MSFS_ExporterProperties]
+extension_panels = [GLTF_PT_MSFSExporterExtensionPanel]
 
 # Refresh the list of classes
 def update_class_list():
@@ -153,7 +120,6 @@ def register():
         except Exception:
             pass
 
-    bpy.types.Scene.msfs_importer_properties = bpy.props.PointerProperty(type=MSFS_ImporterProperties)
     bpy.types.Scene.msfs_exporter_properties = bpy.props.PointerProperty(type=MSFS_ExporterProperties)
 
 
@@ -190,11 +156,6 @@ def unregister_panel():
             bpy.utils.unregister_class(panel)
         except Exception:
             pass
-
-from .io.msfs_import import Import
-class glTF2ImportUserExtension(Import):
-    def __init__(self):
-        self.properties = bpy.context.scene.msfs_importer_properties
 
 from .io.msfs_export import Export
 class glTF2ExportUserExtension(Export):
