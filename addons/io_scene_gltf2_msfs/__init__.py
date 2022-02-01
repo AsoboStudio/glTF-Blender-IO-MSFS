@@ -93,7 +93,7 @@ def update_class_list():
     classes = []
 
     for module in modules():
-        for name, obj in inspect.getmembers(module):
+        for obj in module.__dict__.values():
             if inspect.isclass(obj) \
                     and module.__name__ in str(obj) \
                     and "bpy" in str(inspect.getmro(obj)[1]):
@@ -133,6 +133,10 @@ def register_panel():
         except Exception:
             pass
 
+    for module in modules():
+        if hasattr(module, "register_panel"):
+            module.register_panel()
+
     # If the glTF exporter is disabled, we need to unregister the extension panel
     # Just return a function to the exporter so it can unregister the panel
     return unregister_panel
@@ -140,7 +144,10 @@ def register_panel():
 
 def unregister():
     for cls in classes:
-        bpy.utils.unregister_class(cls)
+        try:
+            bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass
 
     for module in modules():
         if hasattr(module, "unregister"):
@@ -157,7 +164,11 @@ def unregister_panel():
         except Exception:
             pass
 
-from .io.msfs_export import Export
+    for module in modules():
+        if hasattr(module, "unregister_panel"):
+            module.unregister_panel()
+
+from .exp.msfs_export import Export
 class glTF2ExportUserExtension(Export):
     def __init__(self):
         # We need to wait until we create the gltf2UserExtension to import the gltf2 modules
