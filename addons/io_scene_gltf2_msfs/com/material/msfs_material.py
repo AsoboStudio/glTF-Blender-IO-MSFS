@@ -113,7 +113,7 @@ class MSFS_Material():
 
     bl_icon = 'SOUND'
 
-    def __init__(self,material):
+    def __init__(self, material):
         self.material = material
         self.node_tree = self.material.node_tree
         self.nodes = self.material.node_tree.nodes
@@ -135,18 +135,18 @@ class MSFS_Material():
             nodes.remove(node)
 
     def refresh(self):
-        self.material.msfs_blend_mode = self.material.msfs_blend_mode
-        self.material.msfs_color_albedo_mix = self.material.msfs_color_albedo_mix
-        self.material.msfs_color_emissive_mix = self.material.msfs_color_emissive_mix
-        self.material.msfs_roughness_scale = self.material.msfs_roughness_scale
-        self.material.msfs_metallic_scale = self.material.msfs_metallic_scale
-        self.material.msfs_normal_scale = self.material.msfs_normal_scale
-        self.material.msfs_alpha_cutoff = self.material.msfs_alpha_cutoff
-        self.material.msfs_detail_uv_scale = self.material.msfs_detail_uv_scale
-        self.material.msfs_detail_uv_offset_x = self.material.msfs_detail_uv_offset_x
-        self.material.msfs_detail_uv_offset_y = self.material.msfs_detail_uv_offset_y
-        self.material.msfs_detail_normal_scale = self.material.msfs_detail_normal_scale
-        self.material.msfs_blend_threshold = self.material.msfs_blend_threshold
+        self.material.msfs_blend_mode.value = self.material.msfs_blend_mode.value
+        self.material.msfs_color_albedo_mix.value = self.material.msfs_color_albedo_mix.value
+        self.material.msfs_color_emissive_mix.value = self.material.msfs_color_emissive_mix.value
+        self.material.msfs_roughness_scale.value = self.material.msfs_roughness_scale.value
+        self.material.msfs_metallic_scale.value = self.material.msfs_metallic_scale.value
+        self.material.msfs_normal_scale.value = self.material.msfs_normal_scale.value
+        self.material.msfs_alpha_cutoff.value = self.material.msfs_alpha_cutoff.value
+        self.material.msfs_detail_uv_scale.value = self.material.msfs_detail_uv_scale.value
+        self.material.msfs_detail_uv_offset_x.value = self.material.msfs_detail_uv_offset_x.value
+        self.material.msfs_detail_uv_offset_y.value = self.material.msfs_detail_uv_offset_y.value
+        self.material.msfs_detail_normal_scale.value = self.material.msfs_detail_normal_scale.value
+        self.material.msfs_blend_threshold.value = self.material.msfs_blend_threshold.value
         
         self.material.msfs_albedo_texture = self.material.msfs_albedo_texture
         self.material.msfs_metallic_texture = self.material.msfs_metallic_texture
@@ -457,7 +457,3 @@ class MSFS_Material():
         #Since Eevee doesn't provide a dither mode, we'll just use alpha-blend instead.
         #It sucks, but what else is there to do?
         self.blend_method = 'BLEND'
-
-    
-
-

@@ -55,7 +55,7 @@ class MSFSMaterial:
     def export(gltf2_material, blender_material, export_settings):
         # Set material type and related properties
         # Anisotropic
-        if blender_material.msfs_material_mode == "msfs_anisotropic":
+        if blender_material.msfs_material_mode.value == "msfs_anisotropic":
             gltf2_material.extensions["ASOBO_material_anisotropic"] = Extension(
                 name="ASOBO_material_anisotropic",
                 extension={
@@ -65,54 +65,54 @@ class MSFSMaterial:
             )
 
         # SSS, Hair
-        elif blender_material.msfs_material_mode in ["msfs_sss", "msfs_hair"]:
+        elif blender_material.msfs_material_mode.value in ["msfs_sss", "msfs_hair"]:
             gltf2_material.extensions["ASOBO_material_SSS"] = Extension(
                 name="ASOBO_material_SSS",
                 extension={
-                    "SSSColor": list(blender_material.msfs_color_sss)
+                    "SSSColor": list(blender_material.msfs_color_sss.value)
                 },
                 required=False
             )
 
         # Hair
-        elif blender_material.msfs_material_mode == "msfs_glass":
+        elif blender_material.msfs_material_mode.value == "msfs_glass":
             gltf2_material.extensions["ASOBO_material_glass"] = Extension(
                 name="ASOBO_material_glass",
                 extension={
-                    "glassReflectionMaskFactor": blender_material.msfs_glass_reflection_mask_factor,
-                    "glassDeformationFactor": blender_material.msfs_glass_deformation_factor
+                    "glassReflectionMaskFactor": blender_material.msfs_glass_reflection_mask_factor.value,
+                    "glassDeformationFactor": blender_material.msfs_glass_deformation_factor.value
                 },
                 required=False
             )
 
         # Decal
-        elif blender_material.msfs_material_mode == "msfs_decal":
+        elif blender_material.msfs_material_mode.value == "msfs_decal":
             gltf2_material.extensions["ASOBO_material_blend_gbuffer"] = Extension(
                 name="ASOBO_material_blend_gbuffer",
                 extension={
                     "enabled": True,
-                    "baseColorBlendFactor": blender_material.msfs_decal_blend_factor_color,
-                    "metallicBlendFactor": blender_material.msfs_decal_blend_factor_metal,
-                    "roughnessBlendFactor": blender_material.msfs_decal_blend_factor_roughness,
-                    "normalBlendFactor": blender_material.msfs_decal_blend_factor_normal,
-                    "emissiveBlendFactor": blender_material.msfs_decal_blend_factor_emissive,
-                    "occlusionBlendFactor": blender_material.msfs_decal_blend_factor_occlusion,
+                    "baseColorBlendFactor": blender_material.msfs_decal_blend_factor_color.value,
+                    "metallicBlendFactor": blender_material.msfs_decal_blend_factor_metal.value,
+                    "roughnessBlendFactor": blender_material.msfs_decal_blend_factor_roughness.value,
+                    "normalBlendFactor": blender_material.msfs_decal_blend_factor_normal.value,
+                    "emissiveBlendFactor": blender_material.msfs_decal_blend_factor_emissive.value,
+                    "occlusionBlendFactor": blender_material.msfs_decal_blend_factor_occlusion.value,
                 },
                 required=False
             )
 
         # Clearcoat
-        elif blender_material.msfs_material_mode == "msfs_clearcoat":
+        elif blender_material.msfs_material_mode.value == "msfs_clearcoat":
             gltf2_material.extensions["ASOBO_material_clear_coat"] = Extension(
                 name="ASOBO_material_clear_coat",
                 extension={
-                    "dirtTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_clearcoat_texture, export_settings)
+                    "dirtTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_clearcoat_texture.value, export_settings)
                 },
                 required=False
             )
 
         # Environment occluder
-        elif blender_material.msfs_material_mode == "msfs_env_occluder":
+        elif blender_material.msfs_material_mode.value == "msfs_env_occluder":
             gltf2_material.extensions["ASOBO_material_environment_occluder"] = Extension(
                 name="ASOBO_material_environment_occluder",
                 extension={
@@ -122,7 +122,7 @@ class MSFSMaterial:
             )
 
         # Fake terrain
-        elif blender_material.msfs_material_mode == "msfs_fake_terrain":
+        elif blender_material.msfs_material_mode.value == "msfs_fake_terrain":
             gltf2_material.extensions["ASOBO_material_fake_terrain"] = Extension(
                 name="ASOBO_material_fake_terrain",
                 extension={
@@ -132,27 +132,27 @@ class MSFSMaterial:
             )
 
         # Fresnel
-        elif blender_material.msfs_material_mode == "msfs_fresnel":
+        elif blender_material.msfs_material_mode.value == "msfs_fresnel":
             gltf2_material.extensions["ASOBO_material_fresnel_fade"] = Extension(
                 name="ASOBO_material_fresnel_fade",
                 extension={
-                    "fresnelFactor": blender_material.msfs_fresnel_factor,
-                    "fresnelOpacityOffset": blender_material.msfs_fresnel_opacity_bias
+                    "fresnelFactor": blender_material.msfs_fresnel_factor.value,
+                    "fresnelOpacityOffset": blender_material.msfs_fresnel_opacity_bias.value
                 },
                 required=False
             )
 
         # Windshield
-        elif blender_material.msfs_material_mode == "msfs_windshield":
-            if blender_material.msfs_rain_drop_scale > 0:
+        elif blender_material.msfs_material_mode.value == "msfs_windshield":
+            if blender_material.msfs_rain_drop_scale.value > 0:
                 gltf2_material.extensions["ASOBO_material_windshield_v2"] = Extension(
                     name="ASOBO_material_windshield_v2",
                     extension={
-                        "rainDropScale": blender_material.msfs_rain_drop_scale,
-                        "wiper1State": blender_material.msfs_wiper_1_state,
-                        "wiper2State": blender_material.msfs_wiper_2_state,
-                        "wiper3State": blender_material.msfs_wiper_3_state,
-                        "wiper4State": blender_material.msfs_wiper_4_state
+                        "rainDropScale": blender_material.msfs_rain_drop_scale.value,
+                        "wiper1State": blender_material.msfs_wiper_1_state.value,
+                        "wiper2State": blender_material.msfs_wiper_2_state.value,
+                        "wiper3State": blender_material.msfs_wiper_3_state.value,
+                        "wiper4State": blender_material.msfs_wiper_4_state.value
                     },
                     required=False
                 )
@@ -160,42 +160,42 @@ class MSFSMaterial:
             gltf2_material.extras["ASOBO_material_code"] = "Windshield"
 
         # Porthole
-        elif blender_material.msfs_material_mode == "msfs_porthole":
+        elif blender_material.msfs_material_mode.value == "msfs_porthole":
             gltf2_material.extras["ASOBO_material_code"] = "Porthole"
 
         # Parallax
-        elif blender_material.msfs_material_mode == "msfs_parallax":
+        elif blender_material.msfs_material_mode.value == "msfs_parallax":
             gltf2_material.extensions["ASOBO_material_parallax_window"] = Extension(
                 name="ASOBO_material_parallax_window",
                 extension={
-                    "parallaxScale": blender_material.msfs_parallax_scale,
-                    "roomSizeXScale": blender_material.msfs_parallax_room_size_x,
-                    "roomSizeYScale": blender_material.msfs_parallax_room_size_y,
-                    "roomNumberXY": blender_material.msfs_parallax_room_number,
-                    "corridor": blender_material.msfs_parallax_corridor,
+                    "parallaxScale": blender_material.msfs_parallax_scale.value,
+                    "roomSizeXScale": blender_material.msfs_parallax_room_size_x.value,
+                    "roomSizeYScale": blender_material.msfs_parallax_room_size_y.value,
+                    "roomNumberXY": blender_material.msfs_parallax_room_number.value,
+                    "corridor": blender_material.msfs_parallax_corridor.value,
                     "behindWindowMapTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_behind_glass_texture, export_settings)
                 },
                 required=False
             )
 
         # Geo decal
-        elif blender_material.msfs_material_mode == "msfs_geo_decal":
+        elif blender_material.msfs_material_mode.value == "msfs_geo_decal":
             gltf2_material.extensions["ASOBO_material_blend_gbuffer"] = Extension(
                 name="ASOBO_material_blend_gbuffer",
                 extension={
-                    "baseColorBlendFactor": blender_material.msfs_geo_decal_blend_factor_color,
-                    "metallicBlendFactor": blender_material.msfs_geo_decal_blend_factor_metal,
-                    "roughnessBlendFactor": blender_material.msfs_geo_decal_blend_factor_roughness,
-                    "normalBlendFactor": blender_material.msfs_geo_decal_blend_factor_normal,
-                    "emissiveBlendFactor": blender_material.msfs_geo_decal_blend_factor_melt_sys,
-                    "occlusionBlendFactor": blender_material.msfs_geo_decal_blend_factor_blast_sys,
+                    "baseColorBlendFactor": blender_material.msfs_geo_decal_blend_factor_color.value,
+                    "metallicBlendFactor": blender_material.msfs_geo_decal_blend_factor_metal.value,
+                    "roughnessBlendFactor": blender_material.msfs_geo_decal_blend_factor_roughness.value,
+                    "normalBlendFactor": blender_material.msfs_geo_decal_blend_factor_normal.value,
+                    "emissiveBlendFactor": blender_material.msfs_geo_decal_blend_factor_melt_sys.value,
+                    "occlusionBlendFactor": blender_material.msfs_geo_decal_blend_factor_blast_sys.value,
                 },
                 required=False
             )
             gltf2_material.extras["ASOBO_material_code"] = "GeoDecalFrosted"
 
         # Invisible
-        elif blender_material.msfs_material_mode == "msfs_invisible":
+        elif blender_material.msfs_material_mode.value == "msfs_invisible":
             gltf2_material.extensions["ASOBO_material_invisible"] = Extension(
                 name="ASOBO_material_invisible",
                 extension={
@@ -206,7 +206,7 @@ class MSFSMaterial:
 
 
         # Set blendmode
-        if blender_material.msfs_show_blend_mode and blender_material.msfs_blend_mode == 'DITHER':
+        if blender_material.msfs_show_blend_mode and blender_material.msfs_blend_mode.value == 'DITHER':
             gltf2_material.extensions["ASOBO_material_alphamode_dither"] = Extension(
                 name="ASOBO_material_alphamode_dither",
                 extension={
@@ -218,9 +218,9 @@ class MSFSMaterial:
         # Set Asobo tags
         if blender_material.msfs_show_road_material or blender_material.msfs_show_collision_material:
             tags = []
-            if blender_material.msfs_road_material == True:
+            if blender_material.msfs_road_material.value == True:
                 tags.append("Road")
-            if blender_material.msfs_collision_material == True:
+            if blender_material.msfs_collision_material.value == True:
                 tags.append("Collision")
 
             if tags:
@@ -233,7 +233,7 @@ class MSFSMaterial:
                 )
 
         # Day/Night cycle
-        if blender_material.msfs_show_day_night_cycle and blender_material.msfs_day_night_cycle:
+        if blender_material.msfs_show_day_night_cycle and blender_material.msfs_day_night_cycle.value:
             gltf2_material.extensions["ASOBO_material_day_night_switch"] = Extension(
                 name="ASOBO_material_day_night_switch",
                 extension={
@@ -243,48 +243,48 @@ class MSFSMaterial:
             )
 
         # Draw order
-        if blender_material.msfs_show_draworder and blender_material.msfs_draw_order > 0:
+        if blender_material.msfs_show_draworder and blender_material.msfs_draw_order.value > 0:
             gltf2_material.extensions["ASOBO_material_draw_order"] = Extension(
                 name="ASOBO_material_draw_order",
                 extension={
-                    "drawOrderOffset": blender_material.msfs_draw_order
+                    "drawOrderOffset": blender_material.msfs_draw_order.value
                 },
                 required=False
             )
 
         # Cast shadow
-        if blender_material.msfs_show_no_cast_shadow and blender_material.msfs_no_cast_shadow:
+        if blender_material.msfs_show_no_cast_shadow and blender_material.msfs_no_cast_shadow.value:
             gltf2_material.extensions["ASOBO_material_shadow_options"] = Extension(
                 name="ASOBO_material_shadow_options",
                 extension={
-                    "noCastShadow": blender_material.msfs_no_cast_shadow
+                    "noCastShadow": blender_material.msfs_no_cast_shadow.value
                 },
                 required=False
             )
 
         # Pearlescent
-        if blender_material.msfs_show_pearl and blender_material.msfs_use_pearl_effect:
+        if blender_material.msfs_show_pearl and blender_material.msfs_use_pearl_effect.value:
             gltf2_material.extensions["ASOBO_material_pearlescent"] = Extension(
                 name="ASOBO_material_pearlescent",
                 extension={
-                    "pearlShift": blender_material.msfs_pearl_shift,
-                    "pearlRange": blender_material.msfs_pearl_range,
-                    "pearlBrightness": blender_material.msfs_pearl_brightness
+                    "pearlShift": blender_material.msfs_pearl_shift.value,
+                    "pearlRange": blender_material.msfs_pearl_range.value,
+                    "pearlBrightness": blender_material.msfs_pearl_brightness.value
                 },
                 required=False
             )
 
         # UV Options
         if blender_material.msfs_show_ao_use_uv2 or blender_material.msfs_show_uv_clamp:
-            if (blender_material.msfs_ao_use_uv2 or blender_material.msfs_uv_clamp_x or \
-                    blender_material.msfs_uv_clamp_y or blender_material.msfs_uv_clamp_z):
+            if (blender_material.msfs_ao_use_uv2.value or blender_material.msfs_uv_clamp_x.value or \
+                    blender_material.msfs_uv_clamp_y.value or blender_material.msfs_uv_clamp_z.value):
                 gltf2_material.extensions["ASOBO_material_UV_options"] = Extension(
                     name="ASOBO_material_UV_options",
                     extension={
-                        "AOUseUV2": blender_material.msfs_ao_use_uv2,
-                        "clampUVX": blender_material.msfs_uv_clamp_x,
-                        "clampUVY": blender_material.msfs_uv_clamp_y,
-                        "clampUVZ": blender_material.msfs_uv_clamp_z
+                        "AOUseUV2": blender_material.msfs_ao_use_uv2.value,
+                        "clampUVX": blender_material.msfs_uv_clamp_x.value,
+                        "clampUVY": blender_material.msfs_uv_clamp_y.value,
+                        "clampUVZ": blender_material.msfs_uv_clamp_z.value
                     },
                     required=False
                 )
@@ -298,9 +298,9 @@ class MSFSMaterial:
                         "detailColorTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings),
                         "detailMetalRoughAOTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings),
                         "detailNormalTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings),
-                        "UVScale": blender_material.msfs_detail_uv_scale,
-                        "UVOffset": (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y),
-                        "blendThreshold": blender_material.msfs_blend_threshold
+                        "UVScale": blender_material.msfs_detail_uv_scale.value,
+                        "UVOffset": (blender_material.msfs_detail_uv_offset_x.value, blender_material.msfs_detail_uv_offset_y.value),
+                        "blendThreshold": blender_material.msfs_blend_threshold.value
                     },
                     required=False
                 )
