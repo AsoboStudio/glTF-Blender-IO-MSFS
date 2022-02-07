@@ -15,19 +15,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import bpy
-from bpy.types import Material
-#from bpy.props import IntProperty, BoolProperty, StringProperty, FloatProperty, EnumProperty, FloatVectorProperty
-#import os
-from .msfs_properties import *
 
+# TODO: centralize these
 animated_properties = [
-        "msfs_color_albedo_mix",
-        "msfs_uv_offset_u",
-        "msfs_uv_offset_v",
-        "msfs_uv_tiling_u",
-        "msfs_uv_tiling_v",
-        "msfs_uv_rotation"
-    ]
+    "msfs_color_albedo_mix",
+    "msfs_uv_offset_u",
+    "msfs_uv_offset_v",
+    "msfs_uv_tiling_u",
+    "msfs_uv_tiling_v",
+    "msfs_uv_rotation"
+]
 
 class MSFS_PT_material(bpy.types.Panel):
     bl_label = "MSFS Material Params"
@@ -41,7 +38,8 @@ class MSFS_PT_material(bpy.types.Panel):
     def poll(cls, context):
         return context.active_object.active_material is not None
 
-    def draw_prop(self, ui_parent, data, prop, text=None, icon=None): # Extracted function to draw a prop, and if it's animated display keframe
+    def draw_prop(self, ui_parent, data, prop, text=None, icon=None): 
+        # Due to how values are enabled to have a keyframe, we have to toggle the use_property_decorate to True and then change it back once we're done
         if prop in animated_properties:
             ui_parent.use_property_decorate = True
 
