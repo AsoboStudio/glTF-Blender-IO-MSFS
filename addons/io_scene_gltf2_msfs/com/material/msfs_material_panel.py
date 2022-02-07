@@ -19,6 +19,9 @@ import bpy
 # TODO: centralize these
 animated_properties = [
     "msfs_color_albedo_mix",
+    "msfs_metallic_scale",
+    "msfs_roughness_scale",
+    "msfs_color_emissive_mix",
     "msfs_uv_offset_u",
     "msfs_uv_offset_v",
     "msfs_uv_tiling_u",
