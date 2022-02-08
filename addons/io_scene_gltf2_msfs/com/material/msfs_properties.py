@@ -240,28 +240,38 @@ class MSFS_LI_material():
             msfs_mat.makeOpaque()
 
     #Update functions for the "tint" parameters:
-    def match_base_color(self, context):
-        mat = context.active_object.active_material
+    def set_base_color(self, value):
+        mat = self.id_data
         nodes = mat.node_tree.nodes
         nodeColorRGB = nodes.get(MSFS_ShaderNodes.baseColorRGB.value)
         if not nodeColorRGB:
             return
         colorValue=nodeColorRGB.outputs[0].default_value
-        colorValue[0] = mat.msfs_color_albedo_mix.value[0]
-        colorValue[1] = mat.msfs_color_albedo_mix.value[1]
-        colorValue[2] = mat.msfs_color_albedo_mix.value[2]
-        nodes.get(MSFS_ShaderNodes.baseColorA.value).outputs[0].default_value =  mat.msfs_color_albedo_mix.value[3]
+        colorValue[0] = value[0]
+        colorValue[1] = value[1]
+        colorValue[2] = value[2]
+        nodes.get(MSFS_ShaderNodes.baseColorA.value).outputs[0].default_value = value[3]
 
-    def match_emissive_color(self, context):
-        mat = context.active_object.active_material
+        self["value"] = value
+
+    def get_base_color(self):
+        return self["value"]
+
+    def set_emissive_color(self, value):
+        mat = self.id_data
         nodes = mat.node_tree.nodes
         nodeEmissiveColorRGB = nodes.get(MSFS_ShaderNodes.emissiveColor.value)
         if not nodeEmissiveColorRGB:
             return
         emissiveValue = nodeEmissiveColorRGB.outputs[0].default_value
-        emissiveValue[0] = mat.msfs_color_emissive_mix.value[0]
-        emissiveValue[1] = mat.msfs_color_emissive_mix.value[1]
-        emissiveValue[2] = mat.msfs_color_emissive_mix.value[2]
+        emissiveValue[0] = value[0]
+        emissiveValue[1] = value[1]
+        emissiveValue[2] = value[2]
+
+        self["value"] = value
+
+    def get_emissive_color(self):
+        return self["value"]
 
     def match_emissive_scale(self, context):
         mat = context.active_object.active_material
@@ -419,7 +429,8 @@ class MSFS_LI_material():
             size=4,
             default=[1.0, 1.0, 1.0, 1.0],
             description="The color value set here will be mixed in with the albedo value of the material.",
-            update=match_base_color,
+            set=set_base_color,
+            get=get_base_color,
         ), animated=True
     )
     Material.msfs_color_emissive_mix = create_material_property_group(
@@ -431,7 +442,8 @@ class MSFS_LI_material():
             size=4,
             default=[0.0, 0.0, 0.0, 0.0],
             description="The color value set here will be mixed in with the emissive value of the material.",
-            update=match_emissive_color,
+            set=set_emissive_color,
+            get=get_emissive_color,
         ), animated=True
     )
     Material.msfs_color_sss = create_material_property_group(
