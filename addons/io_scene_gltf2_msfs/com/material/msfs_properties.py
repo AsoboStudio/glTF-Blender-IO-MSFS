@@ -255,7 +255,7 @@ class MSFS_LI_material():
         self["value"] = value
 
     def get_base_color(self):
-        return self["value"]
+        return self.get("value", [1.0, 1.0, 1.0, 1.0])
 
     def set_emissive_color(self, value):
         mat = self.id_data
@@ -271,7 +271,7 @@ class MSFS_LI_material():
         self["value"] = value
 
     def get_emissive_color(self):
-        return self["value"]
+        return self.get("value", [0.0, 0.0, 0.0, 0.0])
 
     def match_emissive_scale(self, context):
         mat = context.active_object.active_material

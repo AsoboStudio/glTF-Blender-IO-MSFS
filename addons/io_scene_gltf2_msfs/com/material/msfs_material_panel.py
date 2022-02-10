@@ -28,15 +28,15 @@ class MSFS_PT_material(bpy.types.Panel):
     def poll(cls, context):
         return context.active_object.active_material is not None
 
-    def draw_prop(self, ui_parent, data, text=None, icon=None): 
+    def draw_prop(self, ui_parent, prop, text=None, icon=None): 
         # Due to how values are enabled to have a keyframe, we have to toggle the use_property_decorate to True and then change it back once we're done
-        if data.animated:
+        if prop.animated:
             ui_parent.use_property_decorate = True
 
         if icon:
-            ui_parent.prop(data, "value", text=text, icon=icon)
+            ui_parent.prop(prop, "value", text=text, icon=icon)
         else:
-            ui_parent.prop(data, "value", text=text)
+            ui_parent.prop(prop, "value", text=text)
 
         ui_parent.use_property_decorate = False
 
