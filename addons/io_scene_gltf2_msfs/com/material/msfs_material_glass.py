@@ -18,8 +18,8 @@ from .msfs_material import *
 
 class MSFS_Glass(MSFS_Material):
 
-    def __init__(self, material):
-        super(MSFS_Glass, self).__init__(material)
+    def __init__(self, material, buildTree = False):
+        super().__init__(material,buildTree)
 
     def displayParams(self):
         self.material.msfs_show_tint = True

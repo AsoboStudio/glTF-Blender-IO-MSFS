@@ -19,8 +19,8 @@ from .msfs_material import *
 
 class MSFS_Invisible(MSFS_Material):
 
-    def __init__(self, material):
-        super(MSFS_Invisible, self).__init__(material)
+    def __init__(self, material, buildTree= False):
+        super().__init__(material,buildTree)
 
     def displayParams(self):
 
