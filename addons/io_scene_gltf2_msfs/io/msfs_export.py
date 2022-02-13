@@ -38,7 +38,7 @@ class Export:
             image.uri = os.path.basename(image.uri)
 
         for animation in gltf2_plan.animations:
-            MSFSMaterialAnimation.finalize_animation(animation, gltf2_plan)
+            MSFSMaterialAnimation.finalize_target(animation, gltf2_plan)
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         if self.properties.enabled == True:
@@ -87,3 +87,6 @@ class Export:
 
     def gather_animation_channel_hook(self, gltf2_animation_channel, channels, blender_object, bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, export_settings):
         MSFSMaterialAnimation.replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name)
+
+    def gather_animation_hook(self, gltf2_animation, blender_action, blender_object, export_settings):
+        MSFSMaterialAnimation.finalize_animation(gltf2_animation)
