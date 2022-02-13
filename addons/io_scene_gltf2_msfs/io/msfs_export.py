@@ -20,6 +20,7 @@ import bpy
 from .msfs_light import MSFSLight
 from .msfs_gizmo import MSFSGizmo
 from .msfs_material import MSFSMaterial
+from .msfs_material_animation import MSFSMaterialAnimation
 
 class Export:
     def gather_asset_hook(self, gltf2_asset, export_settings):
@@ -34,7 +35,10 @@ class Export:
 
     def gather_gltf_hook(self, gltf2_plan, export_settings):
         for i, image in enumerate(gltf2_plan.images):
-            image.uri =os.path.basename(image.uri)
+            image.uri = os.path.basename(image.uri)
+
+        for animation in gltf2_plan.animations:
+            MSFSMaterialAnimation.finalize_animation(animation, gltf2_plan)
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         if self.properties.enabled == True:
@@ -77,3 +81,9 @@ class Export:
                     gltf2_material.extras = {}
 
                 MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+
+    def gather_actions_hook(self, blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
+        MSFSMaterialAnimation.gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings)
+
+    def gather_animation_channel_hook(self, gltf2_animation_channel, channels, blender_object, bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, export_settings):
+        MSFSMaterialAnimation.replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name)
