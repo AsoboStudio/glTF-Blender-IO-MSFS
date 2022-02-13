@@ -140,6 +140,25 @@ class MSFSMaterialAnimation:
             if material_index is None:
                 continue
 
-            target_property = channel["target"].path_from_id().split(".")[0]
-            if target_property == "msfs_color_albedo_mix": # TODO: add all possible targets
-                channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/baseColorFactor"
+            blender_material = channel["target"]
+            target_property = blender_material.path_from_id().split(".")[0]
+            if blender_material.msfs_material_mode == "msfs_standard":
+                if target_property == "msfs_color_albedo_mix":
+                    channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/baseColorFactor"
+                elif target_property == "msfs_color_emissive_mix":
+                    channel["target"] = f"materials/{material_index}/emissiveFactor"
+                elif target_property == "msfs_metallic_scale":
+                    channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/metallicFactor"
+                elif target_property == "msfs_roughness_scale":
+                    channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/roughnessFactor"
+            elif blender_material.msfs_material_mode == "msfs_env_occluder":
+                if target_property == "msfs_uv_offset_u":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVOffsetU"
+                elif target_property == "msfs_uv_offset_v":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVOffsetV"
+                elif target_property == "msfs_uv_tiling_u":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVTilingU"
+                elif target_property == "msfs_uv_tiling_v":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVTilingV"
+                elif target_property == "msfs_uv_rotation":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVRotation"
