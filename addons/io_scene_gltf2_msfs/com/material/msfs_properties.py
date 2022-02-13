@@ -417,7 +417,7 @@ class MSFS_LI_material():
             ),
             default="NONE",
             update=switch_msfs_material,
-        ), animated=False
+        )
     )
 
     # Color blends:
@@ -457,30 +457,30 @@ class MSFS_LI_material():
             default=[1.0, 1.0, 1.0, 1.0],
             description="Use the color picker to set the color of the subsurface scattering.",
             update=update_color_sss,
-        ), animated=False
+        )
     )
 
     # Windshield
     Material.msfs_rain_drop_scale = create_material_property_group(
         FloatProperty(
             name="Rain Drop Scale", min=0.0, max=100.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_wiper_1_state = create_material_property_group(
         FloatProperty(
             name="Wiper 1 State", min=0.0, max=1.0, default=0.0
-        ), animated=False
+        )
     )
     Material.msfs_wiper_2_state = create_material_property_group(
         FloatProperty(
             name="Wiper 2 State", min=0.0, max=1.0, default=0.0
-        ), animated=False
+        )
     )  
     # The 3DS Max plugin has up to 4 states, but the last 2 aren't visible
     Material.msfs_wiper_3_state = create_material_property_group(
         FloatProperty(
             name="Wiper 1 State", min=0.0, max=1.0, default=0.0
-        ), animated=False
+        )
     )
     Material.msfs_wiper_4_state = create_material_property_group(
         FloatProperty(
@@ -492,12 +492,12 @@ class MSFS_LI_material():
     Material.msfs_glass_reflection_mask_factor = create_material_property_group(
         FloatProperty(
             name="Reflection mask factor", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_glass_deformation_factor = create_material_property_group(
         FloatProperty(
             name="Deformation factor", min=0.0, max=1.0, default=0.0
-        ), animated=False
+        )
     )
 
     # Pearl
@@ -505,125 +505,125 @@ class MSFS_LI_material():
     Material.msfs_use_pearl_effect = create_material_property_group(
         BoolProperty(
             name="Use Pearl Effect", default=False
-        ), animated=False
+        )
     )
     Material.msfs_pearl_shift = create_material_property_group(
         FloatProperty(
             name="Color Shift", min=-999.0, max=999.0, default=0.0
-        ), animated=False
+        )
     )
     Material.msfs_pearl_range = create_material_property_group(
         FloatProperty(
             name="Color Range", min=-999.0, max=999.0, default=0.0
-        ), animated=False
+        )
     )
     Material.msfs_pearl_brightness = create_material_property_group(
         FloatProperty(
             name="Color Brightness", min=-1.0, max=1.0, default=0.0
-        ), animated=False
+        )
     )
 
     # Decal parameters:
     Material.msfs_decal_blend_factor_color = create_material_property_group(
         FloatProperty(
             name="Color", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_decal_blend_factor_metal = create_material_property_group(
         FloatProperty(
             name="Metal", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_decal_blend_factor_normal = create_material_property_group(
         FloatProperty(
             name="Normal", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_decal_blend_factor_roughness = create_material_property_group(
         FloatProperty(
             name="Roughness", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_decal_blend_factor_occlusion = create_material_property_group(
         FloatProperty(
             name="Occlusion", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_decal_blend_factor_emissive = create_material_property_group(
         FloatProperty(
             name="Emissive", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
 
     # Fresnel parameters:
     Material.msfs_fresnel_factor = create_material_property_group(
         FloatProperty(
             name="Fresnel factor", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_fresnel_opacity_bias = create_material_property_group(
         FloatProperty(
             name="Fresnel opacity bias", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
 
     # Parallax parameters:
     Material.msfs_parallax_scale = create_material_property_group(
         FloatProperty(
             name="Scale", min=0.0, max=1.0, default=0.0
-        ), animated=False
+        )
     )
     Material.msfs_parallax_room_size_x = create_material_property_group(
         FloatProperty(
             name="X", min=0.0, default=0.5
-        ), animated=False
+        )
     )
     Material.msfs_parallax_room_size_y = create_material_property_group(
         FloatProperty(
             name="Y", min=0.0, default=0.5
-        ), animated=False
+        )
     )
     Material.msfs_parallax_room_number = create_material_property_group(
         FloatProperty(
             name="Rm number XY", min=0.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_parallax_corridor = create_material_property_group(
         BoolProperty(
             name="Corridor", default=False
-        ), animated=False
+        )
     )
 
     # Geo Decal Frosted parameters:
     Material.msfs_geo_decal_blend_factor_color = create_material_property_group(
         FloatProperty(
             name="Color", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_geo_decal_blend_factor_metal = create_material_property_group(
         FloatProperty(
             name="Metal", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_geo_decal_blend_factor_normal = create_material_property_group(
         FloatProperty(
             name="Normal", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_geo_decal_blend_factor_roughness = create_material_property_group(
         FloatProperty(
             name="Roughness", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_geo_decal_blend_factor_blast_sys = create_material_property_group(
         FloatProperty(
             name="Blast Sys.", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
     Material.msfs_geo_decal_blend_factor_melt_sys = create_material_property_group(
         FloatProperty(
             name="Melt Sys", min=0.0, max=1.0, default=1.0
-        ), animated=False
+        )
     )
 
     # Textures:
@@ -667,46 +667,46 @@ class MSFS_LI_material():
             ),
             default="OPAQUE",
             update=switch_msfs_blendmode,
-        ), animated=False
+        )
     )
 
     # Render parameters:
     Material.msfs_draw_order = create_material_property_group(
         IntProperty(
             name="Draw order", default=0, min=0
-        ), animated=False
+        )
     )
     Material.msfs_no_cast_shadow = create_material_property_group(
         BoolProperty(
             name="No cast shadow", default=False
-        ), animated=False
+        )
     )
     Material.msfs_double_sided = create_material_property_group(
         BoolProperty(
             name="Double sided", default=False, update=update_double_sided
-        ), animated=False
+        )
     )
     Material.msfs_responsive_aa = create_material_property_group(
         BoolProperty(
             name="Responsive AA", default=False, description=""
-        ), animated=False
+        )
     )
     Material.msfs_day_night_cycle = create_material_property_group(
         BoolProperty(
             name="Day/Night cycle", default=False
-        ), animated=False
+        )
     )
 
     # Gameplay parameters:
     Material.msfs_collision_material = create_material_property_group(
         BoolProperty(
             name="Collision material", default=False
-        ), animated=False
+        )
     )
     Material.msfs_road_material = create_material_property_group(
         BoolProperty(
             name="Road material", default=False
-        ), animated=False
+        )
     )
 
     # UV options:
@@ -739,22 +739,22 @@ class MSFS_LI_material():
     Material.msfs_ao_use_uv2 = create_material_property_group(
         BoolProperty(
             name="AO use UV2", default=False
-        ), animated=False
+        )
     )
     Material.msfs_uv_clamp_x = create_material_property_group(
         BoolProperty(
             name="X", default=False
-        ), animated=False
+        )
     )
     Material.msfs_uv_clamp_y = create_material_property_group(
         BoolProperty(
             name="Y", default=False
-        ), animated=False
+        )
     )
     Material.msfs_uv_clamp_z = create_material_property_group(
         BoolProperty(
             name="Z", default=False
-        ), animated=False
+        )
     )
 
     # Material parameters
@@ -771,40 +771,40 @@ class MSFS_LI_material():
     Material.msfs_emissive_scale = create_material_property_group(
         FloatProperty(
             name="Emissive scale", min=0, max=1, default=1, update=match_emissive_scale
-        ), animated=False
+        )
     )
     Material.msfs_normal_scale = create_material_property_group(
         FloatProperty(
             name="Normal scale", min=0, default=1, update=match_normal_scale
-        ), animated=False
+        )
     )
     Material.msfs_alpha_cutoff = create_material_property_group(
         FloatProperty(
             name="Alpha cutoff", min=0, max=1, default=0.1, update=match_alpha_cutoff
-        ), animated=False
+        )
     )
     Material.msfs_detail_uv_scale = create_material_property_group(
         FloatProperty(
             name="Detail UV scale", min=0, default=1, update=match_detail_uv
-        ), animated=False
+        )
     )
     Material.msfs_detail_uv_offset_x = create_material_property_group(
         FloatProperty(
             name="X", min=-1, max=1, default=0, update=match_detail_uv
-        ), animated=False
+        )
     )
     Material.msfs_detail_uv_offset_y = create_material_property_group(
         FloatProperty(
             name="Y", min=-1, max=1, default=0, update=match_detail_uv
-        ), animated=False
+        )
     )
     Material.msfs_detail_normal_scale = create_material_property_group(
         FloatProperty(
             name="Detail normal scale", min=0, max=1, default=1, update=match_detail_uv
-        ), animated=False
+        )
     )
     Material.msfs_blend_threshold = create_material_property_group(
         FloatProperty(
             name="Blend threshold", min=0, max=1, default=0.1
-        ), animated=False
+        )
     )
