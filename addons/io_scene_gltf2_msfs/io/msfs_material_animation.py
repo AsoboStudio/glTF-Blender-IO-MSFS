@@ -158,3 +158,12 @@ class MSFSMaterialAnimation:
                     channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVTilingV"
                 elif target_property == "msfs_uv_rotation":
                     channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVRotation"
+            elif blender_material.msfs_material_mode.value == "msfs_windshield":
+                if target_property == "msfs_wiper_1_state":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_windshield_v2/wiper1State"
+                elif target_property == "msfs_wiper_2_state":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_windshield_v2/wiper2State"
+                elif target_property == "msfs_wiper_3_state":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_windshield_v2/wiper3State"
+                elif target_property == "msfs_wiper_4_state":
+                    channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_windshield_v2/wiper4State"

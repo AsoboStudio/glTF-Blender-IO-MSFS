@@ -469,23 +469,23 @@ class MSFS_LI_material():
     Material.msfs_wiper_1_state = create_material_property_group(
         FloatProperty(
             name="Wiper 1 State", min=0.0, max=1.0, default=0.0
-        )
+        ), animated=True, animated_on_type="msfs_windshield"
     )
     Material.msfs_wiper_2_state = create_material_property_group(
         FloatProperty(
             name="Wiper 2 State", min=0.0, max=1.0, default=0.0
-        )
+        ), animated=True, animated_on_type="msfs_windshield"
     )  
     # The 3DS Max plugin has up to 4 states, but the last 2 aren't visible
     Material.msfs_wiper_3_state = create_material_property_group(
         FloatProperty(
             name="Wiper 1 State", min=0.0, max=1.0, default=0.0
-        )
+        ), animated=True, animated_on_type="msfs_windshield"
     )
     Material.msfs_wiper_4_state = create_material_property_group(
         FloatProperty(
             name="Wiper 1 State", min=0.0, max=1.0, default=0.0
-        ), animated= False
+        ), animated=True, animated_on_type="msfs_windshield"
     )
 
     # Glass parameters:
