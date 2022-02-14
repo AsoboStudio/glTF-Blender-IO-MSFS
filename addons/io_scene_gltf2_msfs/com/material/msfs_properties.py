@@ -17,7 +17,7 @@
 
 import bpy
 from bpy.types import Material, Image
-from bpy.props import IntProperty, BoolProperty, StringProperty, FloatProperty, EnumProperty, FloatVectorProperty, PointerProperty
+from bpy.props import IntProperty, BoolProperty, FloatProperty, EnumProperty, FloatVectorProperty, PointerProperty
 
 from .msfs_material import *
 from .msfs_material_standard import *
@@ -328,7 +328,7 @@ class MSFS_LI_material():
             detailUvOffsetVNode.outputs[0].default_value = mat.msfs_detail_uv_offset_y.value
             detailNormalScaleNode.outputs[0].default_value = mat.msfs_detail_normal_scale.value
 
-    def create_material_property_group(value, animated=False, animated_on_type=""):
+    def create_material_property_group(value, animated=False):
         # To make it easier to enable certain material properties to be animated, we need to create a custom property group class with the value and animated property
         property_group = type(
             "MaterialPropertyGroup",
@@ -336,8 +336,7 @@ class MSFS_LI_material():
             {
                 "__annotations__": {
                     "value": value,
-                    "animated": BoolProperty(default=animated),
-                    "animated_on_type": StringProperty(default=animated_on_type)
+                    "animated": BoolProperty(default=animated)
                 }
             }
         )
@@ -432,7 +431,7 @@ class MSFS_LI_material():
             description="The color value set here will be mixed in with the albedo value of the material.",
             set=set_base_color,
             get=get_base_color,
-        ), animated=True, animated_on_type="msfs_standard"
+        ), animated=True
     )
     Material.msfs_color_emissive_mix = create_material_property_group(
         FloatVectorProperty(
@@ -445,7 +444,7 @@ class MSFS_LI_material():
             description="The color value set here will be mixed in with the emissive value of the material.",
             set=set_emissive_color,
             get=get_emissive_color,
-        ), animated=True, animated_on_type="msfs_standard"
+        ), animated=True
     )
     Material.msfs_color_sss = create_material_property_group(
         FloatVectorProperty(
@@ -714,27 +713,27 @@ class MSFS_LI_material():
     Material.msfs_uv_offset_u = create_material_property_group(
         FloatProperty(
             name="U", min=-10.0, max=10.0, default=0.0
-        ), animated=True, animated_on_type="msfs_env_occluder"
+        ), animated=True
     )
     Material.msfs_uv_offset_v = create_material_property_group(
         FloatProperty(
             name="V", min=-10.0, max=10.0, default=0.0
-        ), animated=True, animated_on_type="msfs_env_occluder"
+        ), animated=True
     )
     Material.msfs_uv_tiling_u = create_material_property_group(
         FloatProperty(
             name="U", min=-10.0, max=10.0, default=1.0
-        ), animated=True, animated_on_type="msfs_env_occluder"
+        ), animated=True
     )
     Material.msfs_uv_tiling_v = create_material_property_group(
         FloatProperty(
             name="V", min=-10.0, max=10.0, default=1.0
-        ), animated=True, animated_on_type="msfs_env_occluder"
+        ), animated=True
     )
     Material.msfs_uv_rotation = create_material_property_group(
         FloatProperty(
             name="UV Rotation", min=-360.0, max=360.0, default=0.0
-        ), animated=True, animated_on_type="msfs_env_occluder"
+        ), animated=True
     )
     Material.msfs_ao_use_uv2 = create_material_property_group(
         BoolProperty(
@@ -761,12 +760,12 @@ class MSFS_LI_material():
     Material.msfs_roughness_scale = create_material_property_group(
         FloatProperty(
             name="Roughness scale", min=0, max=1, default=1, update=match_roughness_scale
-        ), animated=True, animated_on_type="msfs_standard"
+        ), animated=True
     )
     Material.msfs_metallic_scale = create_material_property_group(
         FloatProperty(
             name="Metallic scale", min=0, max=1, default=1, update=match_metallic_scale
-        ), animated=True, animated_on_type="msfs_standard"
+        ), animated=True
     )
     Material.msfs_emissive_scale = create_material_property_group(
         FloatProperty(
