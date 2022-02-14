@@ -87,7 +87,7 @@ class MSFSMaterialAnimation:
 
         for channel in channels:
             try:
-                gltf2_animation_channel.target = blender_material.path_resolve(channel.data_path)
+                gltf2_animation_channel.target = blender_material.path_resolve(channel.data_path.split(".")[0])
             except ValueError:
                 continue
             else:
@@ -136,9 +136,9 @@ class MSFSMaterialAnimation:
             if material_index is None:
                 continue
 
-            blender_material = channel["target"]
-            target_property = blender_material.path_from_id().split(".")[0]
-            if blender_material.msfs_material_mode == "msfs_standard":
+            blender_material = channel["target"].id_data
+            target_property = channel["target"].path_from_id().split(".")[0]
+            if blender_material.msfs_material_mode.value == "msfs_standard":
                 if target_property == "msfs_color_albedo_mix":
                     channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/baseColorFactor"
                 elif target_property == "msfs_color_emissive_mix":
@@ -147,7 +147,7 @@ class MSFSMaterialAnimation:
                     channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/metallicFactor"
                 elif target_property == "msfs_roughness_scale":
                     channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/roughnessFactor"
-            elif blender_material.msfs_material_mode == "msfs_env_occluder":
+            elif blender_material.msfs_material_mode.value == "msfs_env_occluder":
                 if target_property == "msfs_uv_offset_u":
                     channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVOffsetU"
                 elif target_property == "msfs_uv_offset_v":
