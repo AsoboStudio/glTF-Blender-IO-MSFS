@@ -23,9 +23,6 @@ from .msfs_material import MSFSMaterial
 from .msfs_material_animation import MSFSMaterialAnimation
 
 class Export:
-    def __init__(self):
-        self.temp_fcurves = []
-
     def gather_asset_hook(self, gltf2_asset, export_settings):
         if self.properties.enabled == True:
             if gltf2_asset.extensions is None:
@@ -43,12 +40,6 @@ class Export:
         for animation in gltf2_plan.animations:
             MSFSMaterialAnimation.finalize_target(animation, gltf2_plan)
 
-        # Remove our temp fcurves
-        for fcurve in self.temp_fcurves:
-            blender_action = fcurve.id_data
-            blender_action.fcurves.remove(fcurve)
-
-        self.temp_fcurves = []
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         if self.properties.enabled == True:
@@ -92,8 +83,8 @@ class Export:
 
                 MSFSMaterial.export(gltf2_material, blender_material, export_settings)
 
-    def pre_gather_actions_hook(self, blender_object, export_settings):
-        self.temp_fcurves.extend(MSFSMaterialAnimation.add_placeholder_channel(blender_object, export_settings))
+    def pre_gather_animation_hook(self, gltf2_animation, blender_action, blender_object, export_settings):
+        MSFSMaterialAnimation.add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings)
 
     def gather_actions_hook(self, blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
         MSFSMaterialAnimation.gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings)

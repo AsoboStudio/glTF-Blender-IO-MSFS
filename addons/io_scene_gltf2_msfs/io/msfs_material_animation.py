@@ -18,6 +18,7 @@ import bpy
 
 from io_scene_gltf2.io.com import gltf2_io
 from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_samplers
+from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_channels
 from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_channel_target
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
@@ -30,32 +31,29 @@ class MSFSMaterialAnimation:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def add_placeholder_channel(blender_object, export_settings):
+    def add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings):
         # If we only have material animations, we need to create a placeholder scale channel so that the animation retains the `channels` property
-        blender_actions = []
-        MSFSMaterialAnimation.gather_actions(blender_object, blender_actions, {}, {}, export_settings)
-
-        temp_fcurves = []
-        for blender_action in blender_actions:
-            material = MSFSMaterialAnimation.get_material_from_action(blender_object, blender_action)
+        for fcurve in blender_action.fcurves:
+            material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, blender_action, fcurve.data_path)
 
             if material is None:
-                continue
+                # If we actually find a property besides the material animations, we don't need a temp fcurve
+                return
 
-            try:
-                for fcurve in blender_action.fcurves:
-                    material.path_resolve(fcurve.data_path.split(".")[0])
-            except ValueError:
-                continue
-            else:
-                # All fcurves in the action are for material
-                # Insert fake scale keyframe
-                fcurve = blender_action.fcurves.new(data_path="scale", index=0)
-                fcurve.keyframe_points.add(1)
+        # Create temp action and insert fake keyframes
+        temp_action = bpy.data.actions.new(name="TempAction")
 
-                temp_fcurves.append(fcurve)
+        fcurve = temp_action.fcurves.new(data_path="scale", index=0)
+        fcurve.keyframe_points.add(1)
 
-        return temp_fcurves
+
+        # Collect temp channel and cleanup
+        gltf2_animation.channels.extend(
+            gltf2_blender_gather_animation_channels.gather_animation_channels(temp_action, blender_object, export_settings)
+        )
+
+        bpy.data.actions.remove(temp_action)
+    
 
     @staticmethod
     def gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
@@ -92,7 +90,7 @@ class MSFSMaterialAnimation:
                         action_on_type[material.animation_data.action.name] = "MATERIAL"
 
     @staticmethod
-    def get_material_from_action(blender_object, blender_action):
+    def get_material_from_data_path(blender_object, blender_action, data_path):
         blender_material = None
         for material_slot in blender_object.material_slots:
             material = material_slot.material
@@ -102,24 +100,24 @@ class MSFSMaterialAnimation:
 
             if material.animation_data is not None:
                 if blender_action == material.animation_data.action:
-                    blender_material = material
-                    break
+                    try: # Only return material if the target is on the material
+                        material.path_resolve(data_path.split(".")[0])
+                    except:
+                        continue
+                    else:
+                        blender_material = material
+                        break
 
         return blender_material
 
     @staticmethod
     def replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name):
-        blender_material = MSFSMaterialAnimation.get_material_from_action(blender_object, bpy.data.actions[action_name])
-        if blender_material is None:
-            return
-
         for channel in channels:
-            try:
-                gltf2_animation_channel.target = blender_material.path_resolve(channel.data_path.split(".")[0])
-            except ValueError:
+            blender_material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, bpy.data.actions[action_name], channel.data_path)
+            if not blender_material:
                 continue
-            else:
-                return
+
+            gltf2_animation_channel.target = blender_material.path_resolve(channel.data_path.split(".")[0])
 
     @staticmethod
     def finalize_animation(gltf2_animation):

@@ -175,5 +175,3 @@ class glTF2ExportUserExtension(Export):
         from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
         self.Extension = Extension
         self.properties = bpy.context.scene.msfs_exporter_properties
-
-        super().__init__()
