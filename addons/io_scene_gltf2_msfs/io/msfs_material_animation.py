@@ -30,6 +30,34 @@ class MSFSMaterialAnimation:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
+    def add_placeholder_channel(blender_object, export_settings):
+        # If we only have material animations, we need to create a placeholder scale channel so that the animation retains the `channels` property
+        blender_actions = []
+        MSFSMaterialAnimation.gather_actions(blender_object, blender_actions, {}, {}, export_settings)
+
+        temp_fcurves = []
+        for blender_action in blender_actions:
+            material = MSFSMaterialAnimation.get_material_from_action(blender_object, blender_action)
+
+            if material is None:
+                continue
+
+            try:
+                for fcurve in blender_action.fcurves:
+                    material.path_resolve(fcurve.data_path.split(".")[0])
+            except ValueError:
+                continue
+            else:
+                # All fcurves in the action are for material
+                # Insert fake scale keyframe
+                fcurve = blender_action.fcurves.new(data_path="scale", index=0)
+                fcurve.keyframe_points.add(1)
+
+                temp_fcurves.append(fcurve)
+
+        return temp_fcurves
+
+    @staticmethod
     def gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
         # First step is to get a list of all material animation actions and NLA tracks (if used)
         if not (blender_object.type == "MESH" and blender_object.data is not None
