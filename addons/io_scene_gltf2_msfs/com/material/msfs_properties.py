@@ -134,13 +134,10 @@ class MSFS_LI_material():
                   
 
     def match_comp_tex(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-
-        comp_tex = nodes.get(MSFS_ShaderNodes.compTex.value)
-        if not comp_tex:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        comp_tex.image = mat.msfs_metallic_texture                
+        msfs.setCompTex(self.msfs_metallic_texture)          
 
     def match_normal_tex(self, context):
         mat = context.active_object.active_material
@@ -161,25 +158,16 @@ class MSFS_LI_material():
         emissiveTex.image = mat.msfs_emissive_texture                    
 
     def match_detail_color(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-
-        detailColorTex = nodes.get(MSFS_ShaderNodes.detailColorTex.value)
-        blendColorMapNode =  nodes.get(MSFS_ShaderNodes.blendColorMap.value)
-        if not detailColorTex or not blendColorMapNode:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        detailColorTex.image = mat.msfs_detail_albedo_texture
-        blendColorMapNode.inputs[0].default_value = 0 if mat.msfs_detail_albedo_texture==None else 1 
+        msfs.setDetailColorTex(self.msfs_detail_albedo_texture)        
 
     def match_detail_comp(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-        detailCompTex = nodes.get(MSFS_ShaderNodes.detailCompTex.value)
-        blendCompMapNode =  nodes.get(MSFS_ShaderNodes.blendCompMap.value)  
-        if not detailCompTex or not blendCompMapNode:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        detailCompTex.image = mat.msfs_detail_metallic_texture
-        blendCompMapNode.inputs[0].default_value = 0 if mat.msfs_detail_metallic_texture==None else 1  
+        msfs.setDetailCompTex(self.msfs_detail_metallic_texture)
 
     def match_detail_normal(self, context):
         mat = context.active_object.active_material
@@ -289,18 +277,12 @@ class MSFS_LI_material():
         emissiveScale.outputs[0].default_value =  mat.msfs_emissive_scale
 
     def match_metallic_scale(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-        node = nodes.get(MSFS_ShaderNodes.metallicScale.value)
-        if node:
-            node.outputs[0].default_value =  mat.msfs_metallic_scale
+        msfs = getMaterial(self)
+        msfs.setMetallicScale(self.msfs_roughness_scale)
 
     def match_roughness_scale(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-        node =nodes.get(MSFS_ShaderNodes.roughnessScale.value)
-        if node:
-            node.outputs[0].default_value =  mat.msfs_roughness_scale
+        msfs = getMaterial(self)
+        msfs.setRoughnessScale(self.msfs_roughness_scale)
 
     def match_normal_scale(self, context):
         mat = context.active_object.active_material
