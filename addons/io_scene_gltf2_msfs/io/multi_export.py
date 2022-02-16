@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -311,7 +311,7 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.scene.msfs_ExtAsoboProperties.enabled
+        return context.scene.msfs_exporter_properties.enabled
 
     def draw(self, context):
         layout = self.layout
