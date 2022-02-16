@@ -40,7 +40,6 @@ class Export:
         for animation in gltf2_plan.animations:
             MSFSMaterialAnimation.finalize_target(animation, gltf2_plan)
 
-
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         if self.properties.enabled == True:
             if gltf2_object.extensions is None:
@@ -83,14 +82,14 @@ class Export:
 
                 MSFSMaterial.export(gltf2_material, blender_material, export_settings)
 
-    def pre_gather_animation_hook(self, gltf2_animation, blender_action, blender_object, export_settings):
-        MSFSMaterialAnimation.add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings)
-
     def gather_actions_hook(self, blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
         MSFSMaterialAnimation.gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings)
 
     def gather_animation_channel_hook(self, gltf2_animation_channel, channels, blender_object, bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, export_settings):
         MSFSMaterialAnimation.replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name)
+
+    def pre_gather_animation_hook(self, gltf2_animation, blender_action, blender_object, export_settings):
+        MSFSMaterialAnimation.add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings)
 
     def gather_animation_hook(self, gltf2_animation, blender_action, blender_object, export_settings):
         MSFSMaterialAnimation.finalize_animation(gltf2_animation)

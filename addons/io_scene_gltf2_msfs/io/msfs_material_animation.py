@@ -16,12 +16,10 @@
 
 import bpy
 
-from io_scene_gltf2.io.com import gltf2_io
-from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_samplers
 from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_channels
-from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_channel_target
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
+# TODO: somehow centralize all the functions - very hard to keep track of process order
 class MSFSMaterialAnimation:
     bl_options = {"UNDO"}
 
@@ -31,32 +29,45 @@ class MSFSMaterialAnimation:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings):
-        # If we only have material animations, we need to create a placeholder scale channel so that the animation retains the `channels` property
-        for fcurve in blender_action.fcurves:
-            material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, blender_action, fcurve.data_path)
+    def get_material_from_data_path(blender_object, blender_action, data_path):
+        """
+        EXPORT
+        Utility function to return a blender material from an action, if the action's target is a material
+
+        :param blender_object: the blender object that is being animated
+        :param blender_action: the blender action that is being exported
+        :param data_path: the target path of the action
+
+        :return: a blender material, or None
+        """
+        for material_slot in blender_object.material_slots:
+            material = material_slot.material
 
             if material is None:
-                # If we actually find a property besides the material animations, we don't need a temp fcurve
-                return
+                continue
 
-        # Create temp action and insert fake keyframes
-        temp_action = bpy.data.actions.new(name="TempAction")
-
-        fcurve = temp_action.fcurves.new(data_path="scale", index=0)
-        fcurve.keyframe_points.add(1)
-
-
-        # Collect temp channel and cleanup
-        gltf2_animation.channels.extend(
-            gltf2_blender_gather_animation_channels.gather_animation_channels(temp_action, blender_object, export_settings)
-        )
-
-        bpy.data.actions.remove(temp_action)
-    
+            if material.animation_data is not None:
+                if blender_action == material.animation_data.action:
+                    try: # Only return material if the target is on the material
+                        material.path_resolve(data_path.split(".")[0])
+                    except:
+                        continue
+                    else:
+                        return material
 
     @staticmethod
     def gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
+        """
+        EXPORT
+        Based off code in the Khronos glTF exporter. This looks through all the materials in the object and checks
+        if there are any animations on them, and if so, add to the actions list.
+
+        :param blender_object: the blender object that is being animated
+        :param blender_actions: list of blender_actions affecting the object
+        :param blender_tracks: dictionary of NLA tracks for the animation
+        :param action_on_type: dictionary of animation type per action
+        :return:
+        """
         # First step is to get a list of all material animation actions and NLA tracks (if used)
         if not (blender_object.type == "MESH" and blender_object.data is not None
                     and len(blender_object.material_slots) > 0):
@@ -90,28 +101,19 @@ class MSFSMaterialAnimation:
                         action_on_type[material.animation_data.action.name] = "MATERIAL"
 
     @staticmethod
-    def get_material_from_data_path(blender_object, blender_action, data_path):
-        blender_material = None
-        for material_slot in blender_object.material_slots:
-            material = material_slot.material
-
-            if material is None:
-                continue
-
-            if material.animation_data is not None:
-                if blender_action == material.animation_data.action:
-                    try: # Only return material if the target is on the material
-                        material.path_resolve(data_path.split(".")[0])
-                    except:
-                        continue
-                    else:
-                        blender_material = material
-                        break
-
-        return blender_material
-
-    @staticmethod
     def replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name):
+        """
+        EXPORT
+        Replace targets for channels that are material animations. We don't use the target object for material targets, instead we
+        have a path to the material index and cooresponding property. Unfortunately, we don't have access to the finalized glTF material tree yet,
+        so we need to temporarily keep a reference to the blender material and the value that is being animated. This is properly finalized later.
+
+        :param gltf2_animation_channel: a glTF animation channel
+        :param channels: list of channel groups gathered by the Khronos exporter. This has the data_path that we're interested in.
+        :param blender_object: the blender object that is being animated
+        :param action_name: the name of the blender action being exported
+        :return:
+        """
         for channel in channels:
             blender_material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, bpy.data.actions[action_name], channel.data_path)
             if not blender_material:
@@ -120,7 +122,48 @@ class MSFSMaterialAnimation:
             gltf2_animation_channel.target = blender_material.path_resolve(channel.data_path.split(".")[0])
 
     @staticmethod
+    def add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings):
+        """
+        EXPORT
+        If we have a glTF animation with only material animations, we need to create a placeholder scale channel. Because we utilize the `extensions`
+        attribute of the animation, the channels end up being empty, which is against the glTF spec. By using this fake scale channel, we bypass this issue.
+
+        :param gltf2_animation: a glTF animation
+        :param blender_action: the blender action that is being exported
+        :param blender_object: the blender object that is being animated
+        :param export_settings: dictionary of export settings provided by the Khronos exporter
+        :return:
+        """
+        for fcurve in blender_action.fcurves:
+            material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, blender_action, fcurve.data_path)
+
+            if material is None:
+                # If we actually find a property besides the material animations, we don't need a temp fcurve
+                return
+
+        # Create temp action and insert fake keyframes
+        temp_action = bpy.data.actions.new(name="TempAction")
+
+        fcurve = temp_action.fcurves.new(data_path="scale", index=0)
+        fcurve.keyframe_points.add(1)
+
+
+        # Collect temp channel and cleanup
+        gltf2_animation.channels.extend(
+            gltf2_blender_gather_animation_channels.gather_animation_channels(temp_action, blender_object, export_settings)
+        )
+
+        bpy.data.actions.remove(temp_action)
+
+    @staticmethod
     def finalize_animation(gltf2_animation):
+        """
+        EXPORT
+        After the glTF animation is done being gathered, we can move all material animated channels to the Asobo extension and remove it from `channels`.
+
+        :param gltf2_animation: a glTF animation
+        :return:
+        """
         material_animation_channels = []
         for i, channel in enumerate(gltf2_animation.channels):
             if not hasattr(channel.target, "id_data"):
@@ -146,6 +189,15 @@ class MSFSMaterialAnimation:
 
     @staticmethod
     def finalize_target(gltf2_animation, gltf2_plan):
+        """
+        EXPORT
+        Now that we have the finalized material tree, we can properly set the animation channel targets to the proper index, and replace the temporary
+        blender material reference.
+
+        :param gltf2_animation: a glTF animation
+        :param gltf2_plan: the finalized glTF data
+        :return:
+        """
         if not gltf2_animation.extensions:
             return
         
