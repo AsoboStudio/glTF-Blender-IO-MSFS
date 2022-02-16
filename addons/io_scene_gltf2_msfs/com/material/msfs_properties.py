@@ -278,7 +278,7 @@ class MSFS_LI_material():
 
     def match_metallic_scale(self, context):
         msfs = getMaterial(self)
-        msfs.setMetallicScale(self.msfs_roughness_scale)
+        msfs.setMetallicScale(self.msfs_metallic_scale)
 
     def match_roughness_scale(self, context):
         msfs = getMaterial(self)
