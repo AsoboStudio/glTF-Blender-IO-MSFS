@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
