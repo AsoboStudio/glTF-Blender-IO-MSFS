@@ -18,8 +18,8 @@ from .msfs_material import *
 
 class MSFS_Decal(MSFS_Material):
 
-    def __init__(self, material):
-        super(MSFS_Decal, self).__init__(material)
+    def __init__(self, material,buildTree = False):
+        super().__init__(material,buildTree)
 
     def displayParams(self):
         self.material.msfs_show_tint = True
@@ -66,4 +66,4 @@ class MSFS_Decal(MSFS_Material):
         self.material.msfs_show_windshield_options = False
 
     def customShaderTree(self):
-        super(MSFS_Clearcoat, self).defaultShaderStree()
+        super(MSFS_Decal, self).defaultShaderStree()
