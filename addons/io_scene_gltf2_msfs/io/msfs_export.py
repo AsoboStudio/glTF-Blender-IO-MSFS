@@ -32,7 +32,7 @@ class Export:
                 required=False
             )
 
-    def gather_gltf_hook(self, gltf2_plan, export_settings):
+    def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
         for i, image in enumerate(gltf2_plan.images):
             image.uri =os.path.basename(image.uri)
 
