@@ -37,35 +37,35 @@ from .msfs_material_windshield import *
 from .msfs_material_parallax import *
 
 def getMaterial(mat):
-        if mat.msfs_material_mode == 'msfs_standard':
+        if mat.msfs_material_mode.value == 'msfs_standard':
           return MSFS_Standard(mat)
-        if mat.msfs_material_mode == 'msfs_anisotropic':
+        if mat.msfs_material_mode.value == 'msfs_anisotropic':
           return MSFS_Anisotropic(mat)
-        if mat.msfs_material_mode == 'msfs_sss':
+        if mat.msfs_material_mode.value == 'msfs_sss':
           return MSFS_SSS(mat)  
-        if mat.msfs_material_mode == 'msfs_glass':
+        if mat.msfs_material_mode.value == 'msfs_glass':
           return MSFS_Glass(mat)  
-        if mat.msfs_material_mode == 'msfs_decal':
+        if mat.msfs_material_mode.value == 'msfs_decal':
           return MSFS_Decal(mat)  
-        if mat.msfs_material_mode == 'msfs_clearcoat':
+        if mat.msfs_material_mode.value == 'msfs_clearcoat':
           return MSFS_Clearcoat(mat)  
-        if mat.msfs_material_mode == 'msfs_env_occluder':
+        if mat.msfs_material_mode.value == 'msfs_env_occluder':
           return MSFS_EnvOccluder(mat)  
-        if mat.msfs_material_mode == 'msfs_fake_terrain':
+        if mat.msfs_material_mode.value == 'msfs_fake_terrain':
           return MSFS_FakeTerrain(mat)
-        if mat.msfs_material_mode == 'msfs_fresnel':
+        if mat.msfs_material_mode.value == 'msfs_fresnel':
           return MSFS_Fresnel(mat)
-        if mat.msfs_material_mode == 'msfs_windshield':
+        if mat.msfs_material_mode.value == 'msfs_windshield':
           return MSFS_Windshield(mat)
-        if mat.msfs_material_mode == 'msfs_porthole':
+        if mat.msfs_material_mode.value == 'msfs_porthole':
           return MSFS_PortHole(mat)
-        if mat.msfs_material_mode == 'msfs_parallax':
+        if mat.msfs_material_mode.value == 'msfs_parallax':
           return MSFS_Parallax(mat)
-        if mat.msfs_material_mode == 'msfs_geo_decal':
+        if mat.msfs_material_mode.value == 'msfs_geo_decal':
           return MSFS_GeoDecal(mat) 
-        if mat.msfs_material_mode == 'msfs_hair':
+        if mat.msfs_material_mode.value == 'msfs_hair':
           return MSFS_Hair(mat)
-        if mat.msfs_material_mode == 'msfs_invisible':
+        if mat.msfs_material_mode.value == 'msfs_invisible':
           return MSFS_Invisible(mat) 
 class MSFS_LI_material():
 
@@ -248,8 +248,9 @@ class MSFS_LI_material():
 
 
     def switch_msfs_blendmode(self, context):
-        msfs_mat = MSFS_Material(self)
-        msfs_mat.setBlendMode(self.msfs_blend_mode)
+        mat = context.active_object.active_material
+        msfs_mat = MSFS_Material(mat)
+        msfs_mat.setBlendMode(self)
         
 
     #Update functions for the "tint" parameters:
@@ -287,13 +288,25 @@ class MSFS_LI_material():
             return
         emissiveScale.outputs[0].default_value = mat.msfs_emissive_scale.value
 
-    def match_metallic_scale(self, context):
-        msfs = getMaterial(self)
-        msfs.setMetallicScale(self.msfs_metallic_scale)
+    def set_metallic_scale(self, value):
+        mat = self.id_data
+        msfs = getMaterial(mat)
+        msfs.setMetallicScale(value)
 
-    def match_roughness_scale(self, context):
-        msfs = getMaterial(self)
-        msfs.setRoughnessScale(self.msfs_roughness_scale)
+        self["value"] = value
+
+    def get_metallic_scale(self):
+        return self.get("value", 1)
+
+    def set_roughness_scale(self, value):
+        mat = self.id_data
+        msfs = getMaterial(mat)
+        msfs.setRoughnessScale(value)
+
+        self["value"] = value
+
+    def get_roughness_scale(self):
+        return self.get("value", 1)
 
     def match_normal_scale(self, context):
         mat = context.active_object.active_material
@@ -759,12 +772,12 @@ class MSFS_LI_material():
     # Material parameters
     Material.msfs_roughness_scale = create_material_property_group(
         FloatProperty(
-            name="Roughness scale", min=0, max=1, default=1, update=match_roughness_scale
+            name="Roughness scale", min=0, max=1, default=1, set=set_roughness_scale, get=get_roughness_scale
         ), animated=True
     )
     Material.msfs_metallic_scale = create_material_property_group(
         FloatProperty(
-            name="Metallic scale", min=0, max=1, default=1, update=match_metallic_scale
+            name="Metallic scale", min=0, max=1, default=1, set=set_metallic_scale, get=get_metallic_scale
         ), animated=True
     )
     Material.msfs_emissive_scale = create_material_property_group(
