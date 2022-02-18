@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2020-2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +35,38 @@ from .msfs_material_geodecal import *
 from .msfs_material_porthole import *
 from .msfs_material_windshield import *
 from .msfs_material_parallax import *
+
+def getMaterial(mat):
+        if mat.msfs_material_mode == 'msfs_standard':
+          return MSFS_Standard(mat)
+        if mat.msfs_material_mode == 'msfs_anisotropic':
+          return MSFS_Anisotropic(mat)
+        if mat.msfs_material_mode == 'msfs_sss':
+          return MSFS_SSS(mat)  
+        if mat.msfs_material_mode == 'msfs_glass':
+          return MSFS_Glass(mat)  
+        if mat.msfs_material_mode == 'msfs_decal':
+          return MSFS_Decal(mat)  
+        if mat.msfs_material_mode == 'msfs_clearcoat':
+          return MSFS_Clearcoat(mat)  
+        if mat.msfs_material_mode == 'msfs_env_occluder':
+          return MSFS_EnvOccluder(mat)  
+        if mat.msfs_material_mode == 'msfs_fake_terrain':
+          return MSFS_FakeTerrain(mat)
+        if mat.msfs_material_mode == 'msfs_fresnel':
+          return MSFS_Fresnel(mat)
+        if mat.msfs_material_mode == 'msfs_windshield':
+          return MSFS_Windshield(mat)
+        if mat.msfs_material_mode == 'msfs_porthole':
+          return MSFS_PortHole(mat)
+        if mat.msfs_material_mode == 'msfs_parallax':
+          return MSFS_Parallax(mat)
+        if mat.msfs_material_mode == 'msfs_geo_decal':
+          return MSFS_GeoDecal(mat) 
+        if mat.msfs_material_mode == 'msfs_hair':
+          return MSFS_Hair(mat)
+        if mat.msfs_material_mode == 'msfs_invisible':
+          return MSFS_Invisible(mat) 
 class MSFS_LI_material():
 
     # Use this function to update the shader node tree
@@ -42,73 +74,70 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         msfs_mat = None
         if mat.msfs_material_mode.value == 'msfs_standard':
-            msfs_mat = MSFS_Standard(mat)
+            msfs_mat = MSFS_Standard(mat, buildTree = True)
             print("Switched to msfs_standard material.")
         elif mat.msfs_material_mode.value == 'msfs_anisotropic':
-            msfs_mat =MSFS_Anisotropic(mat)
+            msfs_mat =MSFS_Anisotropic(mat, buildTree = True)
             print("Switched to msfs_anisotropic material.")
         elif mat.msfs_material_mode.value == 'msfs_sss':
-            msfs_mat = MSFS_SSS(mat)
+            msfs_mat = MSFS_SSS(mat, buildTree = True)
             print("Switched to msfs_sss material.")
         elif mat.msfs_material_mode.value == 'msfs_glass':
-            msfs_mat = MSFS_Glass(mat)
+            msfs_mat = MSFS_Glass(mat, buildTree = True)
             print("Switched to msfs_glass material.")
         elif mat.msfs_material_mode.value == 'msfs_decal':
-            msfs_mat = MSFS_Decal(mat)
+            msfs_mat = MSFS_Decal(mat, buildTree = True)
             print("Switched to msfs_decal material.")
         elif mat.msfs_material_mode.value == 'msfs_clearcoat':
-            msfs_mat = MSFS_Clearcoat(mat)
+            msfs_mat = MSFS_Clearcoat(mat, buildTree = True)
             print("Switched to msfs_clearcoat material.")
         elif mat.msfs_material_mode.value == 'msfs_env_occluder':
-            msfs_mat = MSFS_EnvOccluder(mat)
+            msfs_mat = MSFS_EnvOccluder(mat, buildTree = True)
             print("Switched to msfs_env_occluder material.")
         elif mat.msfs_material_mode.value == 'msfs_fake_terrain':
-            msfs_mat = MSFS_FakeTerrain(mat)
+            msfs_mat = MSFS_FakeTerrain(mat, buildTree = True)
             print("Switched to msfs_fake_terrain material.")
         elif mat.msfs_material_mode.value == 'msfs_fresnel':
-            msfs_mat = MSFS_Fresnel(mat)
+            msfs_mat = MSFS_Fresnel(mat, buildTree = True)
             print("Switched to msfs_fresnel material.")
         elif mat.msfs_material_mode.value == 'msfs_windshield':
-            msfs_mat = MSFS_Windshield(mat)            
+            msfs_mat = MSFS_Windshield(mat, buildTree = True)            
             print("Switched to msfs_windshield material.")
         elif mat.msfs_material_mode.value == 'msfs_porthole':
-            msfs_mat = MSFS_PortHole(mat)
+            msfs_mat = MSFS_PortHole(mat, buildTree = True)
             print("Switched to msfs_porthole material.")
         elif mat.msfs_material_mode.value == 'msfs_parallax':
-            msfs_mat = MSFS_Parallax(mat)
+            msfs_mat = MSFS_Parallax(mat, buildTree = True)
             print("Switched to msfs_parallax material.")
         elif mat.msfs_material_mode.value == 'msfs_geo_decal':
-            msfs_mat = MSFS_GeoDecal(mat)
+            msfs_mat = MSFS_GeoDecal(mat, buildTree = True)
             print("Switched to msfs_geo_decal material.")
         elif mat.msfs_material_mode.value == 'msfs_hair':
-            msfs_mat = MSFS_Hair(mat)
+            msfs_mat = MSFS_Hair(mat, buildTree = True)
             print("Switched to msfs_hair material.")
         elif mat.msfs_material_mode.value == 'msfs_invisible':
-            msfs_mat = MSFS_Invisible(mat)
+            msfs_mat = MSFS_Invisible(mat, buildTree = True)
             print("Switched to msfs_invisible material.")
         else:
             msfs_mat = MSFS_Material(mat)
+            msfs_mat.revertToPBRShaderTree()
             print("Switched to non-sim material.")
+            return 
 
-        msfs_mat.buildShaderTree()
+    
 
     def match_base_color_tex(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-
-        base_color_tex = nodes.get(MSFS_ShaderNodes.baseColorTex.value)
-        if not base_color_tex:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        base_color_tex.image = mat.msfs_albedo_texture
+        msfs.setBaseColorTex(self.msfs_albedo_texture)
+                  
 
     def match_comp_tex(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-
-        comp_tex = nodes.get(MSFS_ShaderNodes.compTex.value)
-        if not comp_tex:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        comp_tex.image = mat.msfs_metallic_texture
+        msfs.setCompTex(self.msfs_metallic_texture)          
 
     def match_normal_tex(self, context):
         mat = context.active_object.active_material
@@ -129,25 +158,16 @@ class MSFS_LI_material():
         emissiveTex.image = mat.msfs_emissive_texture
 
     def match_detail_color(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-
-        detailColorTex = nodes.get(MSFS_ShaderNodes.detailColorTex.value)
-        blendColorMapNode =  nodes.get(MSFS_ShaderNodes.blendColorMap.value)
-        if not detailColorTex or not blendColorMapNode:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        detailColorTex.image = mat.msfs_detail_albedo_texture
-        blendColorMapNode.inputs[0].default_value = 0 if mat.msfs_detail_albedo_texture == None else 1
+        msfs.setDetailColorTex(self.msfs_detail_albedo_texture)        
 
     def match_detail_comp(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-        detailCompTex = nodes.get(MSFS_ShaderNodes.detailCompTex.value)
-        blendCompMapNode =  nodes.get(MSFS_ShaderNodes.blendCompMap.value)  
-        if not detailCompTex or not blendCompMapNode:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        detailCompTex.image = mat.msfs_detail_metallic_texture
-        blendCompMapNode.inputs[0].default_value = 0 if mat.msfs_detail_metallic_texture == None else 1
+        msfs.setDetailCompTex(self.msfs_detail_metallic_texture)
 
     def match_detail_normal(self, context):
         mat = context.active_object.active_material
@@ -228,29 +248,15 @@ class MSFS_LI_material():
 
 
     def switch_msfs_blendmode(self, context):
-        mat = context.active_object.active_material
-        msfs_mat = MSFS_Material(mat)
-        if mat.msfs_blend_mode.value == 'BLEND':
-            msfs_mat.makeAlphaBlend()
-        elif mat.msfs_blend_mode.value == 'MASKED':
-            msfs_mat.makeMasked()
-        elif mat.msfs_blend_mode.value == 'DITHER':
-            msfs_mat.makeDither()
-        else:
-            msfs_mat.makeOpaque()
+        msfs_mat = MSFS_Material(self)
+        msfs_mat.setBlendMode(self.msfs_blend_mode)
+        
 
     #Update functions for the "tint" parameters:
     def set_base_color(self, value):
         mat = self.id_data
-        nodes = mat.node_tree.nodes
-        nodeColorRGB = nodes.get(MSFS_ShaderNodes.baseColorRGB.value)
-        if not nodeColorRGB:
-            return
-        colorValue=nodeColorRGB.outputs[0].default_value
-        colorValue[0] = value[0]
-        colorValue[1] = value[1]
-        colorValue[2] = value[2]
-        nodes.get(MSFS_ShaderNodes.baseColorA.value).outputs[0].default_value = value[3]
+        msfs = getMaterial(mat)
+        msfs.setBaseColor(value)
 
         self["value"] = value
 
@@ -282,18 +288,12 @@ class MSFS_LI_material():
         emissiveScale.outputs[0].default_value = mat.msfs_emissive_scale.value
 
     def match_metallic_scale(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-        node = nodes.get(MSFS_ShaderNodes.metallicScale.value)
-        if node:
-            node.outputs[0].default_value = mat.msfs_metallic_scale.value
+        msfs = getMaterial(self)
+        msfs.setMetallicScale(self.msfs_metallic_scale)
 
     def match_roughness_scale(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-        node =nodes.get(MSFS_ShaderNodes.roughnessScale.value)
-        if node:
-            node.outputs[0].default_value = mat.msfs_roughness_scale.value
+        msfs = getMaterial(self)
+        msfs.setRoughnessScale(self.msfs_roughness_scale)
 
     def match_normal_scale(self, context):
         mat = context.active_object.active_material
