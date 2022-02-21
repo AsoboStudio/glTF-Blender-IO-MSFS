@@ -1224,3 +1224,46 @@ class AsoboGlass:
             gltf2_material.extensions[AsoboGlass.SerializedName] = Extension(
                 name=AsoboGlass.SerializedName, extension=result, required=False
             )
+
+class AsoboTags: # TODO: make sure this works and also sort these classes
+
+    SerializedName = "ASOBO_tags"
+
+    class AsoboTag:
+        Collision = "Collision"
+        Road = "Road"
+
+    bpy.types.Material.msfs_collision_material = bpy.props.BoolProperty(
+        name = "Collision Material",
+        default = False
+    )
+    bpy.types.Material.msfs_road_collision_material = bpy.props.BoolProperty(
+        name = "Road Collision Material",
+        default = False
+    )
+
+    @staticmethod
+    def from_dict(material, obj, import_settings):
+        assert isinstance(obj, dict)
+        extension = obj.get("extensions", {}).get(AsoboTags.SerializedName, [])
+        if extension:
+            if AsoboTags.AsoboTag.Collision in extension:
+                material.msfs_collision_material = True
+            if AsoboTags.AsoboTag.Road in extension:
+                material.msfs_road_collision_material = True
+
+    @staticmethod
+    def to_extension(blender_material, gltf2_material, export_settings):
+        result = []
+        if (
+            blender_material.msfs_material_type != "msfs_environment_occluder"
+            and (blender_material.msfs_collision_material or blender_material.msfs_road_collision_material)
+        ):
+            if blender_material.msfs_collision_material:
+                result.append(AsoboTags.AsoboTag.Collision)
+            if blender_material.msfs_road_collision_material:
+                result.append(AsoboTags.AsoboTag.Road)
+
+            gltf2_material.extensions[AsoboTags.SerializedName] = Extension(
+                name=AsoboTags.SerializedName, extension=result, required=False
+            )
