@@ -363,6 +363,39 @@ class AsoboDayNightCycle:
                 name=AsoboDayNightCycle.SerializedName, extension={}, required=False
             )
 
+class AsoboDisableMotionBlur:
+
+    SerializedName = "ASOBO_material_disable_motion_blur"
+
+    bpy.types.Material.msfs_disable_motion_blur = bpy.props.BoolProperty(
+        name="Disable Motion Blur",
+        description="When this value is ON, the MotionBlur is disabled on the material, no matter what is defined in graphic options",
+        default=False,
+    )
+
+    @staticmethod
+    def from_dict(material, obj, import_settings):
+        assert isinstance(obj, dict)
+        extension = obj.get("extensions", {}).get(AsoboDisableMotionBlur.SerializedName)
+        if extension.get("enabled"):
+            material.msfs_disable_motion_blur = True
+
+    @staticmethod
+    def to_extension(blender_material, gltf2_material, export_settings):
+        result = {}
+        if (
+            blender_material.msfs_material_type != "msfs_environment_occluder"
+            and blender_material.msfs_disable_motion_blur
+        ):
+            result["enabled"] = True
+
+            gltf2_material.extensions[
+                AsoboDisableMotionBlur.SerializedName
+            ] = Extension(
+                name=AsoboDisableMotionBlur.SerializedName,
+                extension=result,
+                required=False,
+            )
 
 class AsoboPearlescent:
 
