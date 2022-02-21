@@ -29,6 +29,20 @@ class MSFSMaterial:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
+    def create_image(index, import_settings):
+        pytexture = import_settings.data.textures[index]
+        BlenderImage.create(import_settings, pytexture.source)
+        pyimg = import_settings.data.images[pytexture.source]
+
+        # Find image created
+        if pyimg.name in bpy.data.images:
+            return bpy.data.images[pyimg.name]
+        elif os.path.basename(pyimg.uri) in bpy.data.images:
+            return bpy.data.images[pyimg.uri]
+        elif "Image_%d" % index in bpy.data.images:
+            return bpy.data.images["Image_%d" % index]
+
+    @staticmethod
     def export_image(blender_material, blender_image, export_settings):
         nodes = blender_material.node_tree.nodes
         links = blender_material.node_tree.links
