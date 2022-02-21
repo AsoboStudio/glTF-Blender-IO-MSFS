@@ -559,7 +559,7 @@ class AsoboMaterialUVOptions:
     bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty(
         name="Clamp UV Y", default=Defaults.clampUVY
     )
-    bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty(
+    bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty( # Doesn't seem to actually be used, which makes sense. Keeping just in case
         name="Clamp UV Z", default=Defaults.clampUVZ
     )
     bpy.types.Material.msfs_uv_offset_u = bpy.props.FloatProperty(
@@ -1007,11 +1007,11 @@ class AsoboWindshield:
     SerializedName = "ASOBO_material_windshield_v2"
 
     class Defaults:
-        rainDropScale = 1.0
-        wiper1State = 0.0
-        wiper2State = 0.0
-        wiper3State = 0.0
-        wiper4State = 0.0
+        rainDropScale = 1
+        wiper1State = 0
+        wiper2State = 0
+        wiper3State = 0
+        wiper4State = 0
 
     bpy.types.Material.msfs_rain_drop_scale = bpy.props.IntProperty(
         name="Rain Drop Scale", min=0, max=100, default=Defaults.rainDropScale
