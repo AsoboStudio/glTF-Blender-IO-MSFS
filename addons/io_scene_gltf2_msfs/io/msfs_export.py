@@ -55,9 +55,12 @@ class Export:
             for child in node.children:
                 blender_object = bpy.context.scene.objects.get(child.name)
                 if blender_object:
-                    if blender_object.type != "EMPTY" and blender_object.msfs_gizmo_type == "NONE":
+                    if blender_object.msfs_gizmo_type == "NONE":
                         child.children = get_children(child)
                         children.append(child)
+                else: # We're most likely dealing with bones
+                    child.children = get_children(child)
+                    children.append(child)
             return children
 
         # Construct new node list with filtered children
