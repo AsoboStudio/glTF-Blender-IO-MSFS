@@ -173,7 +173,9 @@ class AsoboMaterialCommon:  # TODO: make sure all conditions for export are corr
     )
 
     @staticmethod
-    def from_dict(material, obj, import_settings): # This must be called first, as it sets a few parameters that the rest of the extensions might rely on
+    def from_dict(
+        material, obj, import_settings
+    ):  # This must be called first, as it sets a few parameters that the rest of the extensions might rely on
         assert isinstance(obj, dict)
         # If any Asobo extensions are present, set material to standard. If the material is another type, it will get changed later. This is the only way to see if it's a flight sim material
         for key in material.get("extensions", {}).keys():
@@ -181,28 +183,37 @@ class AsoboMaterialCommon:  # TODO: make sure all conditions for export are corr
                 material.msfs_material_type = "msfs_standard"
                 break
 
-        if material.msfs_material_type == "msfs_standard": # Only set properties if we are importing a flight sim material
+        if (
+            material.msfs_material_type == "msfs_standard"
+        ):  # Only set properties if we are importing a flight sim material
             if material.get("pbrMetallicRoughness"):
                 if material.get("pbrMetallicRoughness", {}).get("baseColorFactor"):
-                    material.msfs_base_color_factor = material.get("pbrMetallicRoughness", {}).get("baseColorFactor")
+                    material.msfs_base_color_factor = material.get(
+                        "pbrMetallicRoughness", {}
+                    ).get("baseColorFactor")
                 if material.get("pbrMetallicRoughness", {}).get("metallicFactor"):
-                    material.msfs_metallic_factor = material.get("pbrMetallicRoughness", {}).get("metallicFactor")
+                    material.msfs_metallic_factor = material.get(
+                        "pbrMetallicRoughness", {}
+                    ).get("metallicFactor")
                 if material.get("pbrMetallicRoughness", {}).get("roughnessFactor"):
-                    material.msfs_roughness_factor = material.get("pbrMetallicRoughness", {}).get("roughnessFactor")
+                    material.msfs_roughness_factor = material.get(
+                        "pbrMetallicRoughness", {}
+                    ).get("roughnessFactor")
             if material.get("emissiveFactor"):
                 material.msfs_emissive_factor = material.get("emissiveFactor")
             if material.get("normalTexture"):
                 if material.get("normalTexture", {}).get("scale"):
-                    material.msfs_normal_scale = material.get("normalTexture", {}).get("scale")
+                    material.msfs_normal_scale = material.get("normalTexture", {}).get(
+                        "scale"
+                    )
             if material.get("alphaMode"):
                 material.msfs_alpha_mode = material.get("alphaMode")
             if material.get("alphaMode"):
                 material.msfs_alpha_cutoff = material.get("alphaCutoff")
             if material.get("doubleSided"):
                 material.msfs_double_sided = material.get("doubleSided")
-            
+
             # TODO: import base color, metallic roughness, normal, emissive
-        
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
@@ -597,7 +608,7 @@ class AsoboMaterialUVOptions:
     bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty(
         name="Clamp UV V", default=Defaults.clampUVY
     )
-    bpy.types.Material.msfs_clamp_uv_z = bpy.props.BoolProperty( # Doesn't seem to actually be used, which makes sense. Keeping just in case
+    bpy.types.Material.msfs_clamp_uv_z = bpy.props.BoolProperty(  # Doesn't seem to actually be used, which makes sense. Keeping just in case
         name="Clamp UV Z", default=Defaults.clampUVZ
     )
     bpy.types.Material.msfs_uv_offset_u = bpy.props.FloatProperty(
@@ -775,10 +786,8 @@ class AsoboMaterialDetail:
     bpy.types.Material.msfs_detail_blend_threshold = bpy.props.FloatProperty(
         name="Blend Threshold", min=0.001, max=1.0, default=Defaults.blendThreshold
     )
-    bpy.types.Material.msfs_detail_normal_scale = (
-        bpy.props.FloatProperty(
-            name="Detail Normal Scale", min=0.0, max=1.0, default=Defaults.NormalScale
-        )
+    bpy.types.Material.msfs_detail_normal_scale = bpy.props.FloatProperty(
+        name="Detail Normal Scale", min=0.0, max=1.0, default=Defaults.NormalScale
     )
 
     @staticmethod
@@ -834,7 +843,10 @@ class AsoboMaterialDetail:
                     blender_material.msfs_detail_normal_texture,
                     export_settings,
                 )
-            if blender_material.msfs_detail_occlusion_metallic_roughness_texture is not None:
+            if (
+                blender_material.msfs_detail_occlusion_metallic_roughness_texture
+                is not None
+            ):
                 result["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_occlusion_metallic_roughness_texture,
@@ -1308,6 +1320,7 @@ class AsoboTags:
                 name=AsoboTags.SerializedName, extension=result, required=False
             )
 
+
 class AsoboMaterialCode:
 
     SerializedName = "ASOBO_material_code"
@@ -1315,7 +1328,7 @@ class AsoboMaterialCode:
     class MaterialCode:
         Windshield = "Windshield"
         Porthole = "Porthole"
-        GeoDecalFrosted = "GeoDecalFrosted",
+        GeoDecalFrosted = ("GeoDecalFrosted",)
         ClearCoat = "ClearCoat"
 
     @staticmethod
@@ -1335,7 +1348,12 @@ class AsoboMaterialCode:
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
         result = ""
-        if blender_material.msfs_material_type in ["msfs_windshield", "msfs_porthole", "msfs_geo_decal_frosted", "msfs_clearcoat"]:
+        if blender_material.msfs_material_type in [
+            "msfs_windshield",
+            "msfs_porthole",
+            "msfs_geo_decal_frosted",
+            "msfs_clearcoat",
+        ]:
             if blender_material.msfs_material_type == "msfs_windshield":
                 result = AsoboMaterialCode.MaterialCode.Windshield
             elif blender_material.msfs_material_type == "msfs_porthole":
