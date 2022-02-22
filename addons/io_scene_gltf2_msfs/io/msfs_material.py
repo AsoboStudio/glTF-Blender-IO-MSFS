@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2021-2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -306,15 +306,20 @@ class MSFSMaterial:
         # Detail maps
         if (blender_material.msfs_show_detail_albedo or blender_material.msfs_show_detail_metallic or  \
                 blender_material.msfs_show_detail_normal):
-            gltf2_material.extensions["ASOBO_material_detail_map"] = Extension(
-                    name="ASOBO_material_detail_map",
-                    extension={
-                        "detailColorTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings),
-                        "detailMetalRoughAOTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings),
-                        "detailNormalTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings),
-                        "UVScale": blender_material.msfs_detail_uv_scale,
-                        "UVOffset": (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y),
-                        "blendThreshold": blender_material.msfs_blend_threshold
-                    },
-                    required=False
-                )
+            extension = {}
+            if blender_material.msfs_detail_albedo_texture:
+                extension["detailColorTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings)
+            if blender_material.msfs_detail_metallic_texture:
+                extension["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings)
+            if blender_material.msfs_detail_normal_texture:
+                extension["detailNormalTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings)
+            if extension:
+                extension["UVScale"] = blender_material.msfs_detail_uv_scale
+                extension["UVOffset"] = (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y)
+                extension["blendThreshold"] = blender_material.msfs_blend_threshold
+
+                gltf2_material.extensions["ASOBO_material_detail_map"] = Extension(
+                        name="ASOBO_material_detail_map",
+                        extension=extension,
+                        required=False
+                    )
