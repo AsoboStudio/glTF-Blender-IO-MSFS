@@ -94,6 +94,7 @@ class AsoboMaterialCommon:  # TODO: make sure all conditions for export are corr
         default=Defaults.NormalScale,
     )
     bpy.types.Material.msfs_alpha_mode = bpy.props.EnumProperty(
+        name="Alpha Mode",
         items=(
             (
                 "OPAQUE",
@@ -170,6 +171,43 @@ class AsoboMaterialCommon:  # TODO: make sure all conditions for export are corr
     bpy.types.Material.msfs_detail_normal_texture = bpy.props.PointerProperty(
         name="Detail Normal Texture", type=bpy.types.Image
     )
+
+    @staticmethod
+    def from_dict(material, obj, import_settings): # This must be called first, as it sets a few parameters that the rest of the extensions might rely on
+        assert isinstance(obj, dict)
+        # If any Asobo extensions are present, set material to standard. If the material is another type, it will get changed later. This is the only way to see if it's a flight sim material
+        for key in material.get("extensions", {}).keys():
+            if key.upper().startswith("ASOBO_"):
+                material.msfs_material_type = "msfs_standard"
+                break
+
+        if material.msfs_material_type == "msfs_standard": # Only set properties if we are importing a flight sim material
+            if material.get("pbrMetallicRoughness"):
+                if material.get("pbrMetallicRoughness", {}).get("baseColorFactor"):
+                    material.msfs_base_color_factor = material.get("pbrMetallicRoughness", {}).get("baseColorFactor")
+                if material.get("pbrMetallicRoughness", {}).get("metallicFactor"):
+                    material.msfs_metallic_factor = material.get("pbrMetallicRoughness", {}).get("metallicFactor")
+                if material.get("pbrMetallicRoughness", {}).get("roughnessFactor"):
+                    material.msfs_roughness_factor = material.get("pbrMetallicRoughness", {}).get("roughnessFactor")
+            if material.get("emissiveFactor"):
+                material.msfs_emissive_factor = material.get("emissiveFactor")
+            if material.get("normalTexture"):
+                if material.get("normalTexture", {}).get("scale"):
+                    material.msfs_normal_scale = material.get("normalTexture", {}).get("scale")
+            if material.get("alphaMode"):
+                material.msfs_alpha_mode = material.get("alphaMode")
+            if material.get("alphaMode"):
+                material.msfs_alpha_cutoff = material.get("alphaCutoff")
+            if material.get("doubleSided"):
+                material.msfs_double_sided = material.get("doubleSided")
+            
+            # TODO: import base color, metallic roughness, normal, emissive
+        
+
+    @staticmethod
+    def to_extension(blender_material, gltf2_material, export_settings):
+        # All the properties here (besides some textures, which we handle elsewhere) are exported from the Khronos exporter
+        pass
 
 
 class AsoboMaterialGeometryDecal:
@@ -554,12 +592,12 @@ class AsoboMaterialUVOptions:
         name="AO Use UV2", default=Defaults.AOUseUV2
     )
     bpy.types.Material.msfs_clamp_uv_x = bpy.props.BoolProperty(
-        name="Clamp UV X", default=Defaults.clampUVX
+        name="Clamp UV U", default=Defaults.clampUVX
     )
     bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty(
-        name="Clamp UV Y", default=Defaults.clampUVY
+        name="Clamp UV V", default=Defaults.clampUVY
     )
-    bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty( # Doesn't seem to actually be used, which makes sense. Keeping just in case
+    bpy.types.Material.msfs_clamp_uv_z = bpy.props.BoolProperty( # Doesn't seem to actually be used, which makes sense. Keeping just in case
         name="Clamp UV Z", default=Defaults.clampUVZ
     )
     bpy.types.Material.msfs_uv_offset_u = bpy.props.FloatProperty(
@@ -738,7 +776,7 @@ class AsoboMaterialDetail:
         name="Blend Threshold", min=0.001, max=1.0, default=Defaults.blendThreshold
     )
     bpy.types.Material.msfs_detail_normal_scale = (
-        bpy.props.FloatProperty(  # TODO: not sure where this is used in 3ds max
+        bpy.props.FloatProperty(
             name="Detail Normal Scale", min=0.0, max=1.0, default=Defaults.NormalScale
         )
     )
@@ -784,25 +822,25 @@ class AsoboMaterialDetail:
             or blender_material.msfs_detail_occlusion_metallic_roughness_texture
             or blender_material.msfs_blend_mask_texture
         ):
-            if blender_material.msfs_detail_color_texture:
+            if blender_material.msfs_detail_color_texture is not None:
                 result["detailColorTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_color_texture,
                     export_settings,
                 )
-            if blender_material.msfs_detail_normal_texture:
+            if blender_material.msfs_detail_normal_texture is not None:
                 result["detailNormalTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_normal_texture,
                     export_settings,
                 )
-            if blender_material.msfs_detail_occlusion_metallic_roughness_texture:
+            if blender_material.msfs_detail_occlusion_metallic_roughness_texture is not None:
                 result["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_occlusion_metallic_roughness_texture,
                     export_settings,
                 )
-            if blender_material.msfs_blend_mask_texture:
+            if blender_material.msfs_blend_mask_texture is not None:
                 result["blendMaskTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_blend_mask_texture,
@@ -953,7 +991,7 @@ class AsoboSSS:
             or blender_material.msfs_material_type == "msfs_hair"
         ):
             result["SSSColor"] = blender_material.msfs_sss_color
-            if blender_material.msfs_opacity_texture:
+            if blender_material.msfs_opacity_texture is not None:
                 result["opacityTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_opacity_texture,
@@ -990,7 +1028,7 @@ class AsoboAnisotropic:
         if (
             blender_material.msfs_material_type == "msfs_anisotropic"
             or blender_material.msfs_material_type == "msfs_hair"
-        ) and blender_material.msfs_wetness_ao_texture:
+        ) and blender_material.msfs_wetness_ao_texture is not None:
             result["anisotropicTexture"] = MSFSMaterial.export_image(
                 blender_material,
                 blender_material.msfs_wetness_ao_texture,
@@ -1059,7 +1097,7 @@ class AsoboWindshield:
             result["wiper2State"] = blender_material.msfs_wiper_2_state
             result["wiper3State"] = blender_material.msfs_wiper_3_state
             result["wiper4State"] = blender_material.msfs_wiper_4_state
-            if blender_material.msfs_wetness_ao_texture:
+            if blender_material.msfs_wetness_ao_texture is not None:
                 result["wiperMaskTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_wetness_ao_texture,
@@ -1116,13 +1154,13 @@ class AsoboParallaxWindow:
     bpy.types.Material.msfs_parallax_scale = bpy.props.FloatProperty(
         name="Parallax Scale", min=0.0, max=1.0, default=Defaults.parallaxScale
     )
-    bpy.types.Material.msfs_room_size_x = bpy.props.FloatProperty(
+    bpy.types.Material.msfs_parallax_room_size_x = bpy.props.FloatProperty(
         name="Room Size X Scale", min=0.01, max=10.0, default=Defaults.roomSizeXScale
     )
-    bpy.types.Material.msfs_room_size_y = bpy.props.FloatProperty(
+    bpy.types.Material.msfs_parallax_room_size_y = bpy.props.FloatProperty(
         name="Room Size Y Scale", min=0.01, max=10.0, default=Defaults.roomSizeYScale
     )
-    bpy.types.Material.msfs_room_number_xy = bpy.props.IntProperty(
+    bpy.types.Material.msfs_parallax_room_number_xy = bpy.props.IntProperty(
         name="Room Number XY", min=1, max=16, default=Defaults.roomNumberXY
     )
     bpy.types.Material.msfs_parallax_corridor = bpy.props.BoolProperty(
@@ -1140,11 +1178,11 @@ class AsoboParallaxWindow:
             if extension.get("parallaxScale"):
                 material.msfs_parallax_scale = extension.get("parallaxScale")
             if extension.get("roomSizeXScale"):
-                material.msfs_room_size_x = extension.get("roomSizeXScale")
+                material.msfs_parallax_room_size_x = extension.get("roomSizeXScale")
             if extension.get("roomSizeYScale"):
-                material.msfs_room_size_y = extension.get("roomSizeYScale")
+                material.msfs_parallax_room_size_y = extension.get("roomSizeYScale")
             if extension.get("roomNumberXY"):
-                material.msfs_room_number_xy = extension.get("roomNumberXY")
+                material.msfs_parallax_room_number_xy = extension.get("roomNumberXY")
             if extension.get("corridor"):
                 material.msfs_parallax_corridor = extension.get("corridor")
             if extension.get("behindWindowMapTexture"):
@@ -1157,12 +1195,12 @@ class AsoboParallaxWindow:
         result = {}
         if blender_material.msfs_material_type == "msfs_parallax":
             result["parallaxScale"] = blender_material.msfs_parallax_scale
-            result["roomSizeXScale"] = blender_material.msfs_room_size_x
-            result["roomSizeYScale"] = blender_material.msfs_room_size_y
-            result["roomNumberXY"] = blender_material.msfs_room_number_xy
+            result["roomSizeXScale"] = blender_material.msfs_parallax_room_size_x
+            result["roomSizeYScale"] = blender_material.msfs_parallax_room_size_y
+            result["roomNumberXY"] = blender_material.msfs_parallax_room_number_xy
             result["corridor"] = blender_material.msfs_parallax_corridor
 
-            if blender_material.msfs_detail_color_texture:
+            if blender_material.msfs_detail_color_texture is not None:
                 result["behindWindowMapTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_color_texture,
@@ -1228,7 +1266,7 @@ class AsoboGlass:
             )
 
 
-class AsoboTags:  # TODO: make sure this works and also sort these classes
+class AsoboTags:
 
     SerializedName = "ASOBO_tags"
 
@@ -1260,11 +1298,51 @@ class AsoboTags:  # TODO: make sure this works and also sort these classes
             blender_material.msfs_collision_material
             or blender_material.msfs_road_collision_material
         ):
+            result["tags"] = []
             if blender_material.msfs_collision_material:
-                result.append(AsoboTags.AsoboTag.Collision)
+                result["tags"].append(AsoboTags.AsoboTag.Collision)
             if blender_material.msfs_road_collision_material:
-                result.append(AsoboTags.AsoboTag.Road)
+                result["tags"].append(AsoboTags.AsoboTag.Road)
 
             gltf2_material.extensions[AsoboTags.SerializedName] = Extension(
                 name=AsoboTags.SerializedName, extension=result, required=False
             )
+
+class AsoboMaterialCode:
+
+    SerializedName = "ASOBO_material_code"
+
+    class MaterialCode:
+        Windshield = "Windshield"
+        Porthole = "Porthole"
+        GeoDecalFrosted = "GeoDecalFrosted",
+        ClearCoat = "ClearCoat"
+
+    @staticmethod
+    def from_dict(material, obj, import_settings):
+        assert isinstance(obj, dict)
+        extension = obj.get("extras", {}).get(AsoboMaterialCode.SerializedName, [])
+        if extension:
+            if AsoboMaterialCode.MaterialCode.Windshield in extension:
+                material.msfs_material_type = "msfs_windshield"
+            elif AsoboMaterialCode.MaterialCode.Porthole in extension:
+                material.msfs_material_type = "msfs_porthole"
+            elif AsoboMaterialCode.MaterialCode.GeoDecalFrosted in extension:
+                material.msfs_material_type = "msfs_geo_decal_frosted"
+            elif AsoboMaterialCode.MaterialCode.ClearCoat in extension:
+                material.msfs_material_type = "msfs_clearcoat"
+
+    @staticmethod
+    def to_extension(blender_material, gltf2_material, export_settings):
+        result = ""
+        if blender_material.msfs_material_type in ["msfs_windshield", "msfs_porthole", "msfs_geo_decal_frosted", "msfs_clearcoat"]:
+            if blender_material.msfs_material_type == "msfs_windshield":
+                result = AsoboMaterialCode.MaterialCode.Windshield
+            elif blender_material.msfs_material_type == "msfs_porthole":
+                result = AsoboMaterialCode.MaterialCode.Porthole
+            elif blender_material.msfs_material_type == "msfs_geo_decal_frosted":
+                result = AsoboMaterialCode.MaterialCode.GeoDecalFrosted
+            elif blender_material.msfs_material_type == "msfs_clearcoat":
+                result = AsoboMaterialCode.MaterialCode.ClearCoat
+
+            gltf2_material.extras[AsoboMaterialCode.SerializedName] = result
