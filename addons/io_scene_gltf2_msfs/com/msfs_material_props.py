@@ -967,7 +967,7 @@ class AsoboMaterialFresnelFade:
 
 class AsoboSSS:
 
-    SerializedName = "ASOBO_material_SSS"
+    SerializedName = "ASOBO_material_SSS" # This entire extension is disabled for the time being. Keeping just in case
 
     class Defaults:
         SSSColor = [1.0, 1.0, 1.0, 1.0]
