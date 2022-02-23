@@ -290,22 +290,34 @@ class MSFSMaterial:
                 )
 
         # Detail maps
-        if (blender_material.msfs_show_detail_albedo or blender_material.msfs_show_detail_metallic or  \
-                blender_material.msfs_show_detail_normal):
-            extension = {}
-            if blender_material.msfs_detail_albedo_texture:
-                extension["detailColorTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings)
-            if blender_material.msfs_detail_metallic_texture:
-                extension["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings)
-            if blender_material.msfs_detail_normal_texture:
-                extension["detailNormalTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings)
-            if extension:
-                extension["UVScale"] = blender_material.msfs_detail_uv_scale
-                extension["UVOffset"] = (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y)
-                extension["blendThreshold"] = blender_material.msfs_blend_threshold
+        material_detail_map_extension = {}
+        detail_map_found = False
+        if blender_material.msfs_detail_albedo_texture:
+            texture_info = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings)
+            if texture_info:
+                material_detail_map_extension["detailColorTexture"] = texture_info
+                detail_map_found = True
+        if blender_material.msfs_detail_metallic_texture:
+            texture_info =material_detail_map_extension["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings)
+            if texture_info:
+                material_detail_map_extension["detailColorTexture"] = texture_info
+                detail_map_found = True
+        if blender_material.msfs_detail_normal_texture:
+            texture_info = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings)
+            if texture_info:
+                material_detail_map_extension["detailNormalTexture"] = texture_info
+                detail_map_found = True
+        
+        if detail_map_found:
+            if blender_material.msfs_detail_uv_scale != 1.0:
+                material_detail_map_extension["UVScale"] = blender_material.msfs_detail_uv_scale
+            if blender_material.msfs_detail_uv_offset_x != 0.0 or blender_material.msfs_detail_uv_offset_y != 0.0:
+                material_detail_map_extension["UVOffset"] = (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y)
+            if blender_material.msfs_blend_threshold != 0.1:
+                material_detail_map_extension["blendThreshold"] = blender_material.msfs_blend_threshold
 
-                gltf2_material.extensions["ASOBO_material_detail_map"] = Extension(
-                        name="ASOBO_material_detail_map",
-                        extension=extension,
-                        required=False
-                    )
+            gltf2_material.extensions["ASOBO_material_detail_map"] = Extension(
+                    name="ASOBO_material_detail_map",
+                    extension=material_detail_map_extension,
+                    required=False
+                )
