@@ -291,24 +291,14 @@ class MSFSMaterial:
 
         # Detail maps
         material_detail_map_extension = {}
-        detail_map_found = False
         if blender_material.msfs_detail_albedo_texture:
-            texture_info = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings)
-            if texture_info:
-                material_detail_map_extension["detailColorTexture"] = texture_info
-                detail_map_found = True
+            material_detail_map_extension["detailColorTexture"]  = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings)
         if blender_material.msfs_detail_metallic_texture:
-            texture_info =material_detail_map_extension["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings)
-            if texture_info:
-                material_detail_map_extension["detailColorTexture"] = texture_info
-                detail_map_found = True
+            material_detail_map_extension["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings)
         if blender_material.msfs_detail_normal_texture:
-            texture_info = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings)
-            if texture_info:
-                material_detail_map_extension["detailNormalTexture"] = texture_info
-                detail_map_found = True
+            material_detail_map_extension["detailNormalTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings)
         
-        if detail_map_found:
+        if material_detail_map_extension["detailColorTexture"] or material_detail_map_extension["detailMetalRoughAOTexture"] or material_detail_map_extension["detailNormalTexture"]:
             if blender_material.msfs_detail_uv_scale != 1.0:
                 material_detail_map_extension["UVScale"] = blender_material.msfs_detail_uv_scale
             if blender_material.msfs_detail_uv_offset_x != 0.0 or blender_material.msfs_detail_uv_offset_y != 0.0:
