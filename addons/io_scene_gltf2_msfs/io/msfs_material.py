@@ -293,16 +293,19 @@ class MSFSMaterial:
         if (blender_material.msfs_show_detail_albedo or blender_material.msfs_show_detail_metallic or  \
                 blender_material.msfs_show_detail_normal):
             extension = {}
-            if blender_material.msfs_detail_albedo_texture:
+            if blender_material.msfs_detail_albedo_texture is not None:
                 extension["detailColorTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_albedo_texture, export_settings)
-            if blender_material.msfs_detail_metallic_texture:
+            if blender_material.msfs_detail_metallic_texture is not None:
                 extension["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_metallic_texture, export_settings)
-            if blender_material.msfs_detail_normal_texture:
+            if blender_material.msfs_detail_normal_texture is not None:
                 extension["detailNormalTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings)
             if extension:
-                extension["UVScale"] = blender_material.msfs_detail_uv_scale
-                extension["UVOffset"] = (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y)
-                extension["blendThreshold"] = blender_material.msfs_blend_threshold
+                if blender_material.msfs_detail_uv_scale != 1.0:
+                    extension["UVScale"] = blender_material.msfs_detail_uv_scale
+                if blender_material.msfs_detail_uv_offset_x != 0.0 and blender_material.msfs_detail_uv_offset_y != 0.0:
+                    extension["UVOffset"] = (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y)
+                if blender_material.msfs_blend_threshold != 0.1:
+                    extension["blendThreshold"] = blender_material.msfs_blend_threshold
 
                 gltf2_material.extensions["ASOBO_material_detail_map"] = Extension(
                         name="ASOBO_material_detail_map",
