@@ -1057,26 +1057,26 @@ class AsoboWindshield:
     SerializedName = "ASOBO_material_windshield_v2"
 
     class Defaults:
-        rainDropScale = 1
-        wiper1State = 0
-        wiper2State = 0
-        wiper3State = 0
-        wiper4State = 0
+        rainDropScale = 1.0
+        wiper1State = 0.0
+        wiper2State = 0.0
+        wiper3State = 0.0
+        wiper4State = 0.0
 
-    bpy.types.Material.msfs_rain_drop_scale = bpy.props.IntProperty(
-        name="Rain Drop Scale", min=0, max=100, default=Defaults.rainDropScale
+    bpy.types.Material.msfs_rain_drop_scale = bpy.props.FloatProperty(
+        name="Rain Drop Scale", min=0.0, max=100.0, default=Defaults.rainDropScale
     )
-    bpy.types.Material.msfs_wiper_1_state = bpy.props.IntProperty(
-        name="Wiper 1 State", min=0, max=1, default=Defaults.wiper1State
+    bpy.types.Material.msfs_wiper_1_state = bpy.props.FloatProperty(
+        name="Wiper 1 State", min=0.0, max=1.0, default=Defaults.wiper1State
     )
-    bpy.types.Material.msfs_wiper_2_state = bpy.props.IntProperty(
-        name="Wiper 2 State", min=0, max=1, default=Defaults.wiper2State
+    bpy.types.Material.msfs_wiper_2_state = bpy.props.FloatProperty(
+        name="Wiper 2 State", min=0.0, max=1.0, default=Defaults.wiper2State
     )
-    bpy.types.Material.msfs_wiper_3_state = bpy.props.IntProperty(
-        name="Wiper 3 State", min=0, max=1, default=Defaults.wiper3State
+    bpy.types.Material.msfs_wiper_3_state = bpy.props.FloatProperty(
+        name="Wiper 3 State", min=0.0, max=1.0, default=Defaults.wiper3State
     )
-    bpy.types.Material.msfs_wiper_4_state = bpy.props.IntProperty(
-        name="Wiper 4 State", min=0, max=1, default=Defaults.wiper4State
+    bpy.types.Material.msfs_wiper_4_state = bpy.props.FloatProperty(
+        name="Wiper 4 State", min=0.0, max=1.0, default=Defaults.wiper4State
     )
 
     @staticmethod
