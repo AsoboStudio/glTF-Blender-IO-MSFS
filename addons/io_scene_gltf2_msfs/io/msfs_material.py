@@ -302,7 +302,7 @@ class MSFSMaterial:
             if extension:
                 if blender_material.msfs_detail_uv_scale != 1.0:
                     extension["UVScale"] = blender_material.msfs_detail_uv_scale
-                if blender_material.msfs_detail_uv_offset_x != 0.0 and blender_material.msfs_detail_uv_offset_y != 0.0:
+                if blender_material.msfs_detail_uv_offset_x != 0.0 or blender_material.msfs_detail_uv_offset_y != 0.0:
                     extension["UVOffset"] = (blender_material.msfs_detail_uv_offset_x, blender_material.msfs_detail_uv_offset_y)
                 if blender_material.msfs_blend_threshold != 0.1:
                     extension["blendThreshold"] = blender_material.msfs_blend_threshold
