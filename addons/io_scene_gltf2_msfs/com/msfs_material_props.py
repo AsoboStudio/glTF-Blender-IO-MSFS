@@ -826,10 +826,10 @@ class AsoboMaterialDetail:
     def to_extension(blender_material, gltf2_material, export_settings):
         result = {}
         if blender_material.msfs_material_type != "msfs_parallax" and (
-            blender_material.msfs_detail_color_texture
-            or blender_material.msfs_detail_normal_texture
-            or blender_material.msfs_detail_occlusion_metallic_roughness_texture
-            or blender_material.msfs_blend_mask_texture
+            blender_material.msfs_detail_color_texture is not None
+            or blender_material.msfs_detail_normal_texture is not None
+            or blender_material.msfs_detail_occlusion_metallic_roughness_texture is not None
+            or blender_material.msfs_blend_mask_texture is not None
         ):
             if blender_material.msfs_detail_color_texture is not None:
                 result["detailColorTexture"] = MSFSMaterial.export_image(
