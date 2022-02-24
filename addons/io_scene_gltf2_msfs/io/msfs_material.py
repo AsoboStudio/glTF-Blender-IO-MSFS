@@ -276,21 +276,41 @@ class MSFSMaterial:
 
         # UV Options
         if blender_material.msfs_show_ao_use_uv2 or blender_material.msfs_show_uv_clamp:
-            gltf2_material.extensions["ASOBO_material_UV_options"] = Extension(
-                name="ASOBO_material_UV_options",
-                extension={
-                    "AOUseUV2": blender_material.msfs_ao_use_uv2.value,
-                    "clampUVX": blender_material.msfs_uv_clamp_x.value,
-                    "clampUVY": blender_material.msfs_uv_clamp_y.value,
-                    "clampUVZ": blender_material.msfs_uv_clamp_z.value,
-                    "UVOffsetU": blender_material.msfs_uv_offset_u.value,
-                    "UVOffsetV": blender_material.msfs_uv_offset_v.value,
-                    "UVTilingU": blender_material.msfs_uv_tiling_u.value,
-                    "UVTilingV": blender_material.msfs_uv_tiling_v.value,
-                    "UVRotation": blender_material.msfs_uv_rotation.value
-                },
-                required=False
-            )
+            if (
+                blender_material.msfs_ao_use_uv2.value
+                or blender_material.msfs_clamp_uv_x.value
+                or blender_material.msfs_clamp_uv_y.value
+                or blender_material.msfs_clamp_uv_z.value
+                or (
+                    blender_material.msfs_uv_offset_u.value
+                    != 0.0
+                    or blender_material.msfs_uv_offset_v.value
+                    != 0.0
+                )
+                or (
+                    blender_material.msfs_uv_tiling_u.value
+                    != 0.0
+                    or blender_material.msfs_uv_tiling_v.value
+                    != 0.0
+                )
+                or blender_material.msfs_uv_rotation.value
+                != 0.0
+            ):
+                gltf2_material.extensions["ASOBO_material_UV_options"] = Extension(
+                    name="ASOBO_material_UV_options",
+                    extension={
+                        "AOUseUV2": blender_material.msfs_ao_use_uv2.value,
+                        "clampUVX": blender_material.msfs_uv_clamp_x.value,
+                        "clampUVY": blender_material.msfs_uv_clamp_y.value,
+                        "clampUVZ": blender_material.msfs_uv_clamp_z.value,
+                        "UVOffsetU": blender_material.msfs_uv_offset_u.value,
+                        "UVOffsetV": blender_material.msfs_uv_offset_v.value,
+                        "UVTilingU": blender_material.msfs_uv_tiling_u.value,
+                        "UVTilingV": blender_material.msfs_uv_tiling_v.value,
+                        "UVRotation": blender_material.msfs_uv_rotation.value
+                    },
+                    required=False
+                )
 
         # Detail maps
         material_detail_map_extension = {}
