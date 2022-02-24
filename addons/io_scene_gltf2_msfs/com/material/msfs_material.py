@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2021-2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -102,6 +102,7 @@ class MSFS_ShaderNodes(Enum):
     detailNormalMap = "Detail Normal Map"
     blendNormalMap = "Blend Normal Map"
     blendColorMap = "Blend Color Map"
+    blendAlphaMap = "Blend Alpha Map"
     blendCompMap = "Blend Occlusion(R) Roughness(G) Metallic(B) Map"
     vertexColor = "Vertex Color"
 
@@ -113,19 +114,23 @@ class MSFS_Material():
 
     bl_icon = 'SOUND'
 
-    def __init__(self,material):
+    def __init__(self,material,buildTree = False, defaultPBR = False):
         self.material = material
         self.node_tree = self.material.node_tree
         self.nodes = self.material.node_tree.nodes
         self.links = material.node_tree.links
-        
+        if buildTree:
+            self.__buildShaderTree()
+    
+    def revertToPBRShaderTree(self):
+        self.cleanNodeTree()
+        self.__createPBRTree()
 
-    def buildShaderTree(self): 
+    def __buildShaderTree(self): 
         self.cleanNodeTree()
         self.displayParams()
         self.createNodetree()
-        self.refresh()       
-        
+        self.refresh()
 
     def cleanNodeTree(self):
         nodes = self.material.node_tree.nodes
@@ -202,6 +207,12 @@ class MSFS_Material():
         self.material.msfs_show_pearl = False
         self.material.msfs_show_windshield_options = False
 
+    def __createPBRTree(self):
+        self.nodeOutputMaterial = self.addNode('ShaderNodeOutputMaterial', {'location':(1000.0,0.0),'hide' : False })
+        self.nodebsdf = self.addNode('ShaderNodeBsdfPrincipled', {'location':(500.0,0.0), 'hide' : False})
+        self.innerLink('nodes["Principled BSDF"].outputs[0]', 'nodes["Material Output"].inputs[0]')
+        self.makeOpaque()
+
     def createNodetree(self):
         self.nodeOutputMaterial = self.addNode('ShaderNodeOutputMaterial', {'location':(1000.0,0.0),'hide' : False })
         self.nodebsdf = self.addNode('ShaderNodeBsdfPrincipled', {'location':(500.0,0.0), 'hide' : False})
@@ -236,7 +247,7 @@ class MSFS_Material():
         self.nodeNormalTex = self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.normalTex.value,'location':(-500,-900.0)})
         self.nodeNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.normalScale.value,'location':(-500,-1000.0)})
         self.nodeDetailColor =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailColorTex.value,'location':(-500,0.0)})
-        self.nodeDetailComp =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailCompTex.value,'location':(-800,-350.0)})
+        self.nodeDetailCompTex =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailCompTex.value,'location':(-800,-350.0)})
         self.nodeDetailNormal =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailNormalTex.value,'location':(-500,-1300.0)})
         self.nodeNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailNormalScale.value,'location':(-500,-1400.0)})
         self.nodeBlendMask =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.blendMaskTex.value,'location':(-500,-1500.0)})
@@ -255,9 +266,9 @@ class MSFS_Material():
         addUVOffset =  self.addNode('ShaderNodeVectorMath', { 'name':MSFS_ShaderNodes.addUVOffset.value , 'operation':'ADD','location':(-800,-600.0) })
 
         #basecolor operators 
-        mulBaseColorRGBNode =self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.baseColorMulRGB.value ,'blend_type':'MULTIPLY', 'location':(-150,50.0) })
-        mulBaseColorRGBNode.inputs[0].default_value = 1
-        mulBaseColorANode =self.addNode('ShaderNodeMath', { 'name':MSFS_ShaderNodes.baseColorMulA.value ,'operation':'MULTIPLY','location':(0,-100.0)})
+        self.mulBaseColorRGBNode =self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.baseColorMulRGB.value ,'blend_type':'MULTIPLY', 'location':(0,50.0) })
+        self.mulBaseColorRGBNode.inputs[0].default_value = 1
+        self.mulBaseColorANode =self.addNode('ShaderNodeMath', { 'name':MSFS_ShaderNodes.baseColorMulA.value ,'operation':'MULTIPLY','location':(0,-100.0)})
         
         
         #emissive operators
@@ -276,8 +287,11 @@ class MSFS_Material():
         #normal operators
         normalMapNode = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.normalMap.value,'location':(0.0,-900.0) })
 
+        #detail alpha Operator
+        self.blendAlphaMapNode = self.addNode('ShaderNodeMath', { 'name':MSFS_ShaderNodes.blendAlphaMap.value ,'operation':'MULTIPLY', 'location':(-150,0.0) })
+        self.blendAlphaMapNode.inputs[0].default_value = 1.0
         #detail color operators
-        self.blendColorMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendColorMap.value ,'blend_type':'MULTIPLY', 'location':(200,100.0) })
+        self.blendColorMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendColorMap.value ,'blend_type':'MULTIPLY', 'location':(-150,100.0) })
         self.blendColorMapNode.inputs[0].default_value = 1.0
 
         #detail comp operators
@@ -293,6 +307,9 @@ class MSFS_Material():
 
         self.toggleVertexBlendMapMask( self.material.msfs_blend_mask_texture is None )
 
+        self.updateColorLinks()
+        self.updateCompLinks()
+
         #uv
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailUVScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.combineUVScale.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailUVScale.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.combineUVScale.value))
@@ -304,12 +321,6 @@ class MSFS_Material():
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.mulUVScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.combineUVOffset.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.addUVOffset.value))
 
-        #color RGB
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMulRGB.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorRGB.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.baseColorMulRGB.value))
-        #color A
-        self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMulA.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorA.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value))
         
 
         #emissive
@@ -317,19 +328,12 @@ class MSFS_Material():
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveColor.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.emissiveMul.value))
 
 
-        #blend comp 
-        # !!!! input orders matters for the exporter here
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.compTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendCompMap.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailCompTex.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendCompMap.value))
-
-        #occlMetalRough
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendCompMap.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.compSeparate.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.metallicMul.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.roughnessMul.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.compSeparate.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.occlusionMul.value))
-        self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.compSeparate.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.roughnessMul.value))
-        self.innerLink('nodes["{0}"].outputs[2]'.format(MSFS_ShaderNodes.compSeparate.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.metallicMul.value))
+        
        
+        #blend normal 
+        # !!!! input orders matters for the exporter here
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMap.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendNormalMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalMap.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendNormalMap.value))
 
         #normal
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.normalMap.value))
@@ -343,31 +347,144 @@ class MSFS_Material():
         #detail normal
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.detailNormalMap.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailNormalMap.value))
-
-        #blend color 
-        # !!!! input orders matters for the exporter here
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulRGB.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendColorMap.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailColorTex.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendColorMap.value))
-
-        #blend normal 
-        # !!!! input orders matters for the exporter here
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMap.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendNormalMap.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalMap.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendNormalMap.value))
-
-
-        #PrincipledBSDF connections
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendColorMap.value),      'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value),      'nodes["{0}"].inputs[21]'.format(MSFS_ShaderNodes.principledBSDF.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.occlusionMul.value),       'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.glTFSettings.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessMul.value),       'nodes["{0}"].inputs[9]'.format(MSFS_ShaderNodes.principledBSDF.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicMul.value),        'nodes["{0}"].inputs[6]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        
+        
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendNormalMap.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveMul.value),        'nodes["{0}"].inputs[19]'.format(MSFS_ShaderNodes.principledBSDF.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveScale.value),      'nodes["{0}"].inputs[20]'.format(MSFS_ShaderNodes.principledBSDF.value))
 
-    def toggleVertexBlendMapMask(self, useVertex = True):
+    def setBaseColor(self, color):
+        self.nodeBaseColorRGB = self.getNode(MSFS_ShaderNodes.baseColorRGB.value)
+        self.nodeBaseColorA = self.getNode(MSFS_ShaderNodes.baseColorA.value)
+        colorValue=self.nodeBaseColorRGB.outputs[0].default_value
+        colorValue[0]= color[0]
+        colorValue[1]= color[1]
+        colorValue[2]= color[2]
+        self.nodeBaseColorA.outputs[0].default_value =  color[3]
+        self.updateColorLinks()
 
-        return
+    def setBaseColorTex(self, tex):
+        self.nodeBaseColorTex = self.getNode(MSFS_ShaderNodes.baseColorTex.value)
+        self.nodeBaseColorTex.image = tex
+        self.updateColorLinks()
+
+    def setDetailColorTex(self, tex):
+        self.nodeDetailColor = self.getNode(MSFS_ShaderNodes.detailColorTex.value)
+        self.nodeDetailColor.image = tex
+        self.updateColorLinks()
+
+    def updateColorLinks(self):
+        #relink nodes
+
+        self.nodeBaseColorRGB = self.getNode(MSFS_ShaderNodes.baseColorRGB.value)
+        self.nodeBaseColorA = self.getNode(MSFS_ShaderNodes.baseColorA.value)
+        self.nodeBaseColorTex = self.getNode(MSFS_ShaderNodes.baseColorTex.value)
+        self.nodeDetailColor = self.getNode(MSFS_ShaderNodes.detailColorTex.value)
+        self.mulBaseColorRGBNode = self.getNode(MSFS_ShaderNodes.baseColorMulRGB.value)
+        self.mulBaseColorANode = self.getNode(MSFS_ShaderNodes.baseColorMulA.value)
+        self.blendColorMapNode = self.getNode(MSFS_ShaderNodes.blendColorMap.value)
+        self.blendAlphaMapNode = self.getNode(MSFS_ShaderNodes.blendAlphaMap.value)
+
+        # !!!! input orders matters for the exporter here
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendColorMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailColorTex.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendColorMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendColorMap.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.baseColorMulRGB.value))
+        self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.blendAlphaMap.value))
+        self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.detailColorTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendAlphaMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorA.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMulA.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorRGB.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.baseColorMulRGB.value))
+
+        
+        
+        if not self.nodeBaseColorTex.image and not self.nodeDetailColor.image:
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorRGB.value),'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorA.value),'nodes["{0}"].inputs[21]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        elif self.nodeBaseColorTex.image and not self.nodeDetailColor.image:
+            self.blendColorMapNode.blend_type = 'ADD'
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulRGB.value),'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.baseColorTex.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value), 'nodes["{0}"].inputs[21]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        elif not self.nodeBaseColorTex.image and self.nodeDetailColor.image:
+            self.blendColorMapNode.blend_type = 'ADD'
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulRGB.value),'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.detailColorTex.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value), 'nodes["{0}"].inputs[21]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        else:
+            self.blendColorMapNode.blend_type = 'MULTIPLY'
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.baseColorMulRGB.value),'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendAlphaMap.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.baseColorMulA.value))
+    
+
+    def setCompTex(self,tex):
+        self.nodeCompTex = self.getNode(MSFS_ShaderNodes.compTex.value)
+        self.nodeCompTex.image = tex
+        self.updateCompLinks()
+
+    def setDetailCompTex(self,tex):
+        self.nodeDetailCompTex = self.getNode(MSFS_ShaderNodes.detailCompTex.value)
+        self.nodeDetailCompTex.image = tex
+        self.updateCompLinks()
+
+    def setRoughnessScale(self,scale):
+        self.nodeRoughnessScale = self.getNode(MSFS_ShaderNodes.roughnessScale.value)
+        self.nodeRoughnessScale.outputs[0].default_value = scale
+        self.updateCompLinks()
+
+    def setMetallicScale(self,scale):
+        self.nodeMetallicScale = self.getNode(MSFS_ShaderNodes.metallicScale.value)
+        self.nodeMetallicScale.outputs[0].default_value = scale
+        self.updateCompLinks()
+
+    def updateCompLinks(self):
+        self.nodeCompTex = self.getNode(MSFS_ShaderNodes.compTex.value)
+        self.nodeDetailCompTex = self.getNode(MSFS_ShaderNodes.detailCompTex.value)
+        self.nodeRoughnessScale = self.getNode(MSFS_ShaderNodes.roughnessScale.value)
+        self.nodeMetallicScale = self.getNode(MSFS_ShaderNodes.metallicScale.value)
+        self.blendCompMapNode = self.getNode(MSFS_ShaderNodes.blendCompMap.value)
+
+        #blend comp 
+        # !!!! input orders matters for the exporter here
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.compTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendCompMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailCompTex.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendCompMap.value))
+
+        #occlMetalRough
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendCompMap.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.compSeparate.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.metallicMul.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.roughnessMul.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.compSeparate.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.occlusionMul.value))
+        self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.compSeparate.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.roughnessMul.value))
+        self.innerLink('nodes["{0}"].outputs[2]'.format(MSFS_ShaderNodes.compSeparate.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.metallicMul.value))
+
+        if not self.nodeCompTex.image and not self.nodeDetailCompTex.image:
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessScale.value), 'nodes["{0}"].inputs[9]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicScale.value), 'nodes["{0}"].inputs[6]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        elif self.nodeCompTex.image and not self.nodeDetailCompTex.image:
+            self.blendCompMapNode.blend_type = 'ADD'
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessMul.value),       'nodes["{0}"].inputs[9]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicMul.value),        'nodes["{0}"].inputs[6]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        elif not self.nodeCompTex.image and self.nodeDetailCompTex.image:
+            self.blendCompMapNode.blend_type = 'ADD'
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessMul.value),       'nodes["{0}"].inputs[9]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicMul.value),        'nodes["{0}"].inputs[6]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        else:
+            self.blendCompMapNode.blend_type = 'MULTIPLY'
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.roughnessMul.value),       'nodes["{0}"].inputs[9]'.format(MSFS_ShaderNodes.principledBSDF.value))
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.metallicMul.value),        'nodes["{0}"].inputs[6]'.format(MSFS_ShaderNodes.principledBSDF.value))
+
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.occlusionMul.value),       'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.glTFSettings.value))
+        
+    
+    def setBlendMode(self,blendMode):
+        if blendMode == 'BLEND':
+            self.makeAlphaBlend()
+        elif blendMode == 'MASKED':
+            self.makeMasked()
+        elif blendMode == 'DITHER':
+            self.makeDither()
+        else:
+            self.makeOpaque()
+    
+    def toggleVertexBlendMapMask(self, useVertex = True):
         # vertexcolor mask
         if useVertex:
             self.innerLink('nodes["{0}"].outputs[1]'.format(MSFS_ShaderNodes.vertexColor.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.blendColorMap.value))
@@ -377,8 +494,6 @@ class MSFS_Material():
             self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendMaskTex.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.blendColorMap.value))
             self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendMaskTex.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.blendCompMap.value))
             self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendMaskTex.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.blendNormalMap.value))
-
-        
 
     def value_set(self, obj, path, value):
         if '.' in path:
@@ -456,7 +571,7 @@ class MSFS_Material():
     def makeDither(self):
         #Since Eevee doesn't provide a dither mode, we'll just use alpha-blend instead.
         #It sucks, but what else is there to do?
-        self.blend_method = 'BLEND'
+        self.material.blend_method = 'BLEND'
 
     
 

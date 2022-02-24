@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2021-2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,11 @@ from .msfs_gizmo import MSFSGizmo
 from .msfs_material import MSFSMaterial
 
 class Export:
+
+    gizmoNodes = None
+    
     def gather_asset_hook(self, gltf2_asset, export_settings):
+        self.gizmoNodes = []
         if self.properties.enabled == True:
             if gltf2_asset.extensions is None:
                 gltf2_asset.extensions = {}
@@ -37,6 +41,9 @@ class Export:
             image.uri =os.path.basename(image.uri)
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
+
+        if blender_object.msfs_gizmo_type != "NONE":
+            self.gizmoNodes.append(gltf2_object)
         if self.properties.enabled == True:
             if gltf2_object.extensions is None:
                 gltf2_object.extensions = {}
@@ -53,11 +60,9 @@ class Export:
         def get_children(node):
             children = []
             for child in node.children:
-                blender_object = bpy.context.scene.objects.get(child.name)
-                if blender_object:
-                    if blender_object.type != "EMPTY" and blender_object.msfs_gizmo_type == "NONE":
-                        child.children = get_children(child)
-                        children.append(child)
+                if child not in self.gizmoNodes:
+                    child.children = get_children(child)
+                    children.append(child)                        
             return children
 
         # Construct new node list with filtered children

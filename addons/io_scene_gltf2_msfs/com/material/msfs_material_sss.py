@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2021-2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@ from .msfs_material import *
 
 class MSFS_SSS(MSFS_Material):
 
-    def __init__(self, material):
-        super(MSFS_SSS, self).__init__(material)
+    def __init__(self, material, buildTree = False):
+        super().__init__(material,buildTree)
 
     def displayParams(self):
         self.material.msfs_show_tint = True
