@@ -106,7 +106,7 @@ class MSFSMaterial:
             gltf2_material.extensions["ASOBO_material_clear_coat"] = Extension(
                 name="ASOBO_material_clear_coat",
                 extension={
-                    "dirtTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_clearcoat_texture.value, export_settings)
+                    "dirtTexture": MSFSMaterial.export_image(blender_material, blender_material.msfs_clearcoat_texture, export_settings)
                 },
                 required=False
             )
