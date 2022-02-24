@@ -29,7 +29,7 @@ class MSFSMaterialAnimation:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def get_material_from_data_path(blender_object, blender_action, data_path):
+    def get_material_from_data_path(blender_object, blender_action, data_path, export_settings):
         """
         EXPORT
         Utility function to return a blender material from an action, if the action's target is a material
@@ -54,6 +54,19 @@ class MSFSMaterialAnimation:
                         continue
                     else:
                         return material
+                elif export_settings['gltf_nla_strips'] is True: # Check if the animation is an NLA strip
+                    for track in material.animation_data.nla_tracks:
+                        non_muted_strips = [strip for strip in track.strips if strip.action is not None and strip.mute is False]
+                        if track.strips is None or len(non_muted_strips) != 1:
+                            continue
+                        for strip in non_muted_strips:
+                            if blender_action == strip.action:
+                                try: # Only return material if the target is on the material
+                                    material.path_resolve(data_path.split(".")[0])
+                                except:
+                                    continue
+                                else:
+                                    return material
 
     @staticmethod
     def gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
@@ -76,18 +89,15 @@ class MSFSMaterialAnimation:
         for material_slot in blender_object.material_slots:
             material = material_slot.material
 
-            if material is None:
-                continue
-            if material.animation_data is None: # Something to look out for - there may be circumstances where the animation data is actually in material.node_tree.animation_data
-                continue
-            if material.animation_data.action is None:
+            if material is None or material.animation_data is None:
                 continue
 
-            blender_actions.append(material.animation_data.action)
-            blender_tracks[material.animation_data.action.name] = None
-            action_on_type[material.animation_data.action.name] = "MATERIAL"
+            if material.animation_data.action is not None:
+                blender_actions.append(material.animation_data.action)
+                blender_tracks[material.animation_data.action.name] = None
+                action_on_type[material.animation_data.action.name] = "MATERIAL"
 
-            # Collect associated strips from NLA tracks.
+            # Collect associated strips from NLA tracks
             if export_settings['gltf_nla_strips'] is True:
                 for track in material.animation_data.nla_tracks:
                     # Multi-strip tracks do not export correctly yet (they need to be baked),
@@ -98,10 +108,10 @@ class MSFSMaterialAnimation:
                     for strip in non_muted_strips:
                         blender_actions.append(strip.action)
                         blender_tracks[strip.action.name] = track.name # Always set after possible active action -> None will be overwrite
-                        action_on_type[material.animation_data.action.name] = "MATERIAL"
+                        action_on_type[strip.action.name] = "MATERIAL"
 
     @staticmethod
-    def replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name):
+    def replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name, export_settings):
         """
         EXPORT
         Replace targets for channels that are material animations. We don't use the target object for material targets, instead we
@@ -115,7 +125,7 @@ class MSFSMaterialAnimation:
         :return:
         """
         for channel in channels:
-            blender_material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, bpy.data.actions[action_name], channel.data_path)
+            blender_material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, bpy.data.actions[action_name], channel.data_path, export_settings)
             if not blender_material:
                 continue
 
@@ -135,7 +145,7 @@ class MSFSMaterialAnimation:
         :return:
         """
         for fcurve in blender_action.fcurves:
-            material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, blender_action, fcurve.data_path)
+            material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, blender_action, fcurve.data_path, export_settings)
 
             if material is None:
                 # If we actually find a property besides the material animations, we don't need a temp fcurve

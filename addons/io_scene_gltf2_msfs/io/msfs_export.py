@@ -91,7 +91,7 @@ class Export:
         MSFSMaterialAnimation.gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings)
 
     def gather_animation_channel_hook(self, gltf2_animation_channel, channels, blender_object, bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, export_settings):
-        MSFSMaterialAnimation.replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name)
+        MSFSMaterialAnimation.replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name, export_settings)
 
     def pre_gather_animation_hook(self, gltf2_animation, blender_action, blender_object, export_settings):
         MSFSMaterialAnimation.add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings)
