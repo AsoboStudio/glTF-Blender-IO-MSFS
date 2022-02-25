@@ -298,7 +298,7 @@ class MSFSMaterial:
         if blender_material.msfs_detail_normal_texture:
             material_detail_map_extension["detailNormalTexture"] = MSFSMaterial.export_image(blender_material, blender_material.msfs_detail_normal_texture, export_settings)
         
-        if material_detail_map_extension["detailColorTexture"] or material_detail_map_extension["detailMetalRoughAOTexture"] or material_detail_map_extension["detailNormalTexture"]:
+        if material_detail_map_extension.get("detailColorTexture") or material_detail_map_extension.get("detailMetalRoughAOTexture") or material_detail_map_extension.get("detailNormalTexture"):
             if blender_material.msfs_detail_uv_scale != 1.0:
                 material_detail_map_extension["UVScale"] = blender_material.msfs_detail_uv_scale
             if blender_material.msfs_detail_uv_offset_x != 0.0 or blender_material.msfs_detail_uv_offset_y != 0.0:
