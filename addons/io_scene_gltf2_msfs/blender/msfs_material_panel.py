@@ -32,7 +32,7 @@ class MSFS_PT_material(bpy.types.Panel):
         if visible:
             column = layout.column()
             if text:
-                column.prop(mat, prop, text="")
+                column.prop(mat, prop, text=text)
             else:
                 column.prop(mat, prop)
 

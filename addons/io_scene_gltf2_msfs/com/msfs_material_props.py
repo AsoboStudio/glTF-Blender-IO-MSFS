@@ -15,7 +15,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import bpy
-from ..io.msfs_material import MSFSMaterial
 
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
@@ -903,6 +902,8 @@ class AsoboMaterialDetail:
 
     @staticmethod
     def from_dict(material, obj, import_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         assert isinstance(obj, dict)
         extension = obj.get("extensions", {}).get(
             AsoboMaterialDetail.SerializedName, {}
@@ -935,6 +936,8 @@ class AsoboMaterialDetail:
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         result = {}
         if blender_material.msfs_material_type != "msfs_parallax" and (
             blender_material.msfs_detail_color_texture is not None
@@ -1102,6 +1105,8 @@ class AsoboSSS:
 
     @staticmethod
     def from_dict(material, obj, import_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         assert isinstance(obj, dict)
         extension = obj.get("extensions", {}).get(AsoboSSS.SerializedName, {})
         if extension:
@@ -1115,6 +1120,8 @@ class AsoboSSS:
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         result = {}
         if (
             blender_material.msfs_material_type == "msfs_sss"
@@ -1139,6 +1146,8 @@ class AsoboAnisotropic:
 
     @staticmethod
     def from_dict(material, obj, import_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         assert isinstance(obj, dict)
         extension = obj.get("extensions", {}).get(AsoboAnisotropic.SerializedName, {})
         if extension:
@@ -1154,6 +1163,8 @@ class AsoboAnisotropic:
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         result = {}
         if (
             blender_material.msfs_material_type == "msfs_anisotropic"
@@ -1219,6 +1230,8 @@ class AsoboWindshield:
 
     @staticmethod
     def from_dict(material, obj, import_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         assert isinstance(obj, dict)
         extension = obj.get("extensions", {}).get(AsoboWindshield.SerializedName, {})
         if extension:
@@ -1240,6 +1253,8 @@ class AsoboWindshield:
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         result = {}
         if blender_material.msfs_material_type == "msfs_windshield":
             result["rainDropScale"] = blender_material.msfs_rain_drop_scale
@@ -1265,6 +1280,8 @@ class AsoboClearCoat:
 
     @staticmethod
     def from_dict(material, obj, import_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         assert isinstance(obj, dict)
         extension = obj.get("extensions", {}).get(AsoboClearCoat.SerializedName, {})
         if extension:
@@ -1276,6 +1293,8 @@ class AsoboClearCoat:
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         result = {}
         if (
             blender_material.msfs_material_type == "msfs_clearcoat"
@@ -1337,6 +1356,8 @@ class AsoboParallaxWindow:
 
     @staticmethod
     def from_dict(material, obj, import_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         assert isinstance(obj, dict)
         extension = obj.get("extensions", {}).get(
             AsoboParallaxWindow.SerializedName, {}
@@ -1360,6 +1381,8 @@ class AsoboParallaxWindow:
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
+        from ..io.msfs_material import MSFSMaterial
+
         result = {}
         if blender_material.msfs_material_type == "msfs_parallax":
             result["parallaxScale"] = blender_material.msfs_parallax_scale
