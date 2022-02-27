@@ -20,7 +20,7 @@ from ..blender.msfs_material_function import MSFSMaterialPropertyUpdates
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
 
-class AsoboMaterialCommon:  # TODO: make sure all conditions for export are correct
+class AsoboMaterialCommon:
     class Defaults:
         BaseColorFactor = [1.0, 1.0, 1.0, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
@@ -161,7 +161,6 @@ class AsoboMaterialCommon:  # TODO: make sure all conditions for export are corr
     )
 
     # Textures (reused across material types, but named different)
-    # TODO: proper names per material type - also make sure these are right
     bpy.types.Material.msfs_base_color_texture = bpy.props.PointerProperty(
         name="Base Color Texture",
         type=bpy.types.Image,
@@ -181,13 +180,19 @@ class AsoboMaterialCommon:  # TODO: make sure all conditions for export are corr
         update=MSFSMaterialPropertyUpdates.update_normal_texture,
     )
     bpy.types.Material.msfs_blend_mask_texture = bpy.props.PointerProperty(
-        name="Blend Mask Texture", type=bpy.types.Image, update=MSFSMaterialPropertyUpdates.update_blend_mask_texture
+        name="Blend Mask Texture",
+        type=bpy.types.Image,
+        update=MSFSMaterialPropertyUpdates.update_blend_mask_texture,
     )
     bpy.types.Material.msfs_dirt_texture = bpy.props.PointerProperty(
-        name="Dirt Texture", type=bpy.types.Image, update=MSFSMaterialPropertyUpdates.update_dirt_texture
+        name="Dirt Texture",
+        type=bpy.types.Image,
+        update=MSFSMaterialPropertyUpdates.update_dirt_texture,
     )
     bpy.types.Material.msfs_wetness_ao_texture = bpy.props.PointerProperty(
-        name="Wetness AO Texture", type=bpy.types.Image, update=MSFSMaterialPropertyUpdates.update_wetness_ao_texture
+        name="Wetness AO Texture",
+        type=bpy.types.Image,
+        update=MSFSMaterialPropertyUpdates.update_wetness_ao_texture,
     )
     bpy.types.Material.msfs_opacity_texture = bpy.props.PointerProperty(
         name="Opacity Texture", type=bpy.types.Image
@@ -211,7 +216,9 @@ class AsoboMaterialCommon:  # TODO: make sure all conditions for export are corr
     )
 
     bpy.types.Material.msfs_detail_normal_texture = bpy.props.PointerProperty(
-        name="Detail Normal Texture", type=bpy.types.Image, update=MSFSMaterialPropertyUpdates.update_detail_normal_texture
+        name="Detail Normal Texture",
+        type=bpy.types.Image,
+        update=MSFSMaterialPropertyUpdates.update_detail_normal_texture,
     )
 
     @staticmethod

@@ -17,6 +17,7 @@
 import bpy
 from enum import Enum
 
+
 class MSFS_ShaderNodes(Enum):
     materialOutput = "Material Output"
     principledBSDF = "Principled BSDF"
@@ -61,6 +62,7 @@ class MSFS_ShaderNodes(Enum):
     blendCompMap = "Blend Occlusion(R) Roughness(G) Metallic(B) Map"
     vertexColor = "Vertex Color"
 
+
 class MSFSMaterialPropertyUpdates:
     @staticmethod
     def update_msfs_material_type(material, context):
@@ -101,7 +103,9 @@ class MSFSMaterialPropertyUpdates:
 
     @staticmethod
     def update_normal_texture(material, context):
-        normalTex = MSFSMaterialRendering.get_node(material, MSFS_ShaderNodes.normalTex.value)
+        normalTex = MSFSMaterialRendering.get_node(
+            material, MSFS_ShaderNodes.normalTex.value
+        )
         if not normalTex:
             return
         normalTex.image = material.msfs_normal_texture
@@ -291,7 +295,9 @@ class MSFSMaterialPropertyUpdates:
 
     @staticmethod
     def update_normal_scale(material, context):
-        node = MSFSMaterialRendering.get_node(material, MSFS_ShaderNodes.normalScale.value)
+        node = MSFSMaterialRendering.get_node(
+            material, MSFS_ShaderNodes.normalScale.value
+        )
         if node:
             node.outputs[0].default_value = material.msfs_normal_scale
 
@@ -340,6 +346,7 @@ class MSFSMaterialPropertyUpdates:
             detailNormalScaleNode.outputs[
                 0
             ].default_value = material.msfs_detail_normal_scale
+
 
 class MSFSMaterialRendering:
     bl_label = "MSFS Shader Node Tree"
@@ -973,7 +980,9 @@ class MSFSMaterialRendering:
 
     @staticmethod
     def update_comp_links(material):
-        nodeCompTex = MSFSMaterialRendering.get_node(material, MSFS_ShaderNodes.compTex.value)
+        nodeCompTex = MSFSMaterialRendering.get_node(
+            material, MSFS_ShaderNodes.compTex.value
+        )
         nodeDetailCompTex = MSFSMaterialRendering.get_node(
             material, MSFS_ShaderNodes.detailCompTex.value
         )
