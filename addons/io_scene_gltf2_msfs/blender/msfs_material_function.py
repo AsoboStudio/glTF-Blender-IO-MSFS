@@ -451,13 +451,11 @@ class MSFSMaterialRendering:
             "ShaderNodeValue",
             {"name": MSFS_ShaderNodes.metallicScale.value, "location": (-500, -400.0)},
         )
-        nodeMetallicScale.outputs[0].default_value = 1.0
         nodeRoughnessScale = MSFSMaterialRendering.add_node(
             material,
             "ShaderNodeValue",
             {"name": MSFS_ShaderNodes.roughnessScale.value, "location": (-500, -500.0)},
         )
-        nodeRoughnessScale.outputs[0].default_value = 1.0
         nodeEmissiveTex = MSFSMaterialRendering.add_node(
             material,
             "ShaderNodeTexImage",
@@ -473,7 +471,6 @@ class MSFSMaterialRendering:
             "ShaderNodeValue",
             {"name": MSFS_ShaderNodes.emissiveScale.value, "location": (-500, -800.0)},
         )
-        nodeEmissiveScale.outputs[0].default_value = 1.0
         nodeNormalTex = MSFSMaterialRendering.add_node(
             material,
             "ShaderNodeTexImage",
