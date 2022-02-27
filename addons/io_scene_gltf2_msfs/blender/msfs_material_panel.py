@@ -204,7 +204,15 @@ class MSFS_PT_material(bpy.types.Panel):
                         and mat.msfs_blend_mask_texture is not None
                     ),
                 )
-                # TODO: emissive multiplier?
+                self.draw_prop(
+                    box,
+                    mat,
+                    "msfs_emissive_scale",
+                    enabled=(
+                        mat.msfs_material_type
+                        not in ["msfs_invisible", "msfs_environment_occluder"]
+                    ),
+                )
 
                 # Decal params
                 if mat.msfs_material_type in [
@@ -303,17 +311,7 @@ class MSFS_PT_material(bpy.types.Panel):
                     self.draw_prop(box, mat, "msfs_pearl_range")
                     self.draw_prop(box, mat, "msfs_pearl_brightness")
 
-                # Overwrites for different material types. TODO: move to update material type
-                # if mat.msfs_material_type == "msfs_windshield":
-                #     mat.msfs_metallic_factor = 0.0
-                # elif mat.msfs_material_type == "msfs_glass":
-                #     mat.msfs_metallic_factor = 0.0
-                # elif mat.msfs_material_type == "msfs_parallax":
-                #     mat.msfs_alpha_mode = "MASK"
-                # elif mat.msfs_material_type == "msfs_ghost":
-                #     mat.msfs_no_cast_shadow = True
-                #     mat.msfs_alpha_mode = "BLEND"
-
+                # Textures
                 if mat.msfs_material_type not in [
                     "msfs_invisible",
                     "msfs_environment_occluder",
@@ -418,7 +416,7 @@ class MSFS_PT_material(bpy.types.Panel):
                         "msfs_hair",
                         "msfs_sss",
                         "msfs_fresnel_fade",
-                        "msfs_ghost"
+                        "msfs_ghost",
                     ]:
                         self.draw_texture_prop(
                             box,
