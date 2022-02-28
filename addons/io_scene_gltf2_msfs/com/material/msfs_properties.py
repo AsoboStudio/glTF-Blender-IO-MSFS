@@ -140,13 +140,10 @@ class MSFS_LI_material():
         msfs.setCompTex(self.msfs_metallic_texture)          
 
     def match_normal_tex(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-
-        normalTex = nodes.get(MSFS_ShaderNodes.normalTex.value)
-        if not normalTex:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        normalTex.image = mat.msfs_normal_texture                  
+        msfs.setNormalTex(self.msfs_normal_texture)                     
 
     def match_emissive_tex(self, context):
         mat = context.active_object.active_material
@@ -170,15 +167,10 @@ class MSFS_LI_material():
         msfs.setDetailCompTex(self.msfs_detail_metallic_texture)
 
     def match_detail_normal(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-
-        detailNormalTex = nodes.get(MSFS_ShaderNodes.detailNormalTex.value)
-        blendNormalMapNode =  nodes.get(MSFS_ShaderNodes.blendNormalMap.value)
-        if not detailNormalTex:
+        msfs = getMaterial(self)
+        if type(msfs) is MSFS_Invisible:
             return
-        detailNormalTex.image = mat.msfs_detail_normal_texture
-        blendNormalMapNode.inputs[0].default_value = 0 if mat.msfs_detail_normal_texture==None else 1  
+        msfs.setDetailNormalTex(self.msfs_detail_normal_texture)
 
     def match_blend_mask(self, context):
         mat = context.active_object.active_material
@@ -285,11 +277,8 @@ class MSFS_LI_material():
         msfs.setRoughnessScale(self.msfs_roughness_scale)
 
     def match_normal_scale(self, context):
-        mat = context.active_object.active_material
-        nodes = mat.node_tree.nodes
-        node = nodes.get(MSFS_ShaderNodes.normalScale.value)
-        if node:
-            node.outputs[0].default_value =  mat.msfs_normal_scale
+        msfs = getMaterial(self)
+        msfs.setNormalScale(self.msfs_normal_scale)
 
     def update_color_sss(self, context):
         mat = context.active_object.active_material
