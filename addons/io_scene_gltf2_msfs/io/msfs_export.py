@@ -37,7 +37,6 @@ class Export:
                 required=False
             )
 
-            # Append addon version to generator
             gltf2_asset.generator += " and Asobo Studio MSFS Blender I/O v" + get_version_string()
 
     def gather_gltf_hook(self, gltf2_plan, export_settings):
