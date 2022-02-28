@@ -32,6 +32,9 @@ bl_info = {
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
 }
 
+def get_version_string():
+    return str(bl_info['version'][0]) + '.' + str(bl_info['version'][1]) + '.' + str(bl_info['version'][2])
+
 class MSFS_ExporterProperties(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(
         name='Microsoft Flight Simulator Extensions',
