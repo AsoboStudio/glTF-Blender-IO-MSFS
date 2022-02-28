@@ -66,16 +66,24 @@ class MSFS_ShaderNodes(Enum):
 class MSFSMaterialPropertyUpdates:
     @staticmethod
     def update_msfs_material_type(material, context):
-        # Overwrite some properties if on certain property
+        # Overwrite some properties if on certain material type
         if material.msfs_material_type == "msfs_windshield":
             material.msfs_metallic_factor = 0.0
+            material.msfs_alpha_mode = "BLEND"
         elif material.msfs_material_type == "msfs_glass":
             material.msfs_metallic_factor = 0.0
+            material.msfs_alpha_mode = "BLEND"
         elif material.msfs_material_type == "msfs_parallax":
             material.msfs_alpha_mode = "MASK"
         elif material.msfs_material_type == "msfs_ghost":
             material.msfs_no_cast_shadow = True
             material.msfs_alpha_mode = "BLEND"
+        elif material.msfs_material_type == "msfs_geo_decal":
+            material.msfs_alpha_mode = "BLEND"
+        elif material.msfs_material_type == "msfs_geo_decal_frosted":
+            material.msfs_alpha_mode = "BLEND"
+        elif material.msfs_material_type == "msfs_porthole":
+            material.msfs_alpha_mode = "OPAQUE"
 
         # Update node tree
         if material.msfs_material_type == "NONE":
