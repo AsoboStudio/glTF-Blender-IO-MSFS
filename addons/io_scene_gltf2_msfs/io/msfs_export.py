@@ -16,6 +16,7 @@
 
 import os
 import bpy
+from .. import get_version_string
 
 from .msfs_light import MSFSLight
 from .msfs_gizmo import MSFSGizmo
@@ -35,6 +36,8 @@ class Export:
                 extension={"tangent_space_convention": "DirectX"},
                 required=False
             )
+
+            gltf2_asset.generator += " and Asobo Studio MSFS Blender I/O v" + get_version_string()
 
     def gather_gltf_hook(self, gltf2_plan, export_settings):
         if self.properties.enabled:
