@@ -694,8 +694,8 @@ class AsoboMaterialUVOptions:
         clampUVZ = False
         UVOffsetU = 0.0
         UVOffsetV = 0.0
-        UVTilingU = 0.0
-        UVTilingV = 0.0
+        UVTilingU = 1.0
+        UVTilingV = 1.0
         UVRotation = 0.0
 
     bpy.types.Material.msfs_ao_use_uv2 = bpy.props.BoolProperty(
