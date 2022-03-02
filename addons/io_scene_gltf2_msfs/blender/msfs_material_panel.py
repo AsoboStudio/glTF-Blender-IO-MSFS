@@ -98,6 +98,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         # Do material type last so that the material update call overwrites any values that should change based off material (old addon didn't implement this)
         if mat.get("msfs_material_mode"):
             old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
+                "NONE",
                 "msfs_standard",
                 "msfs_anisotropic",
                 "msfs_sss",
