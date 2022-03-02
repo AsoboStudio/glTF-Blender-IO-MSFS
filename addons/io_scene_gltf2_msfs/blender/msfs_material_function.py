@@ -816,7 +816,7 @@ class MSFS_Material:
     def setBlendMode(self, blendMode):
         if blendMode == "BLEND":
             self.makeAlphaBlend()
-        elif blendMode == "MASKED":
+        elif blendMode == "MASK":
             self.makeMasked()
         elif blendMode == "DITHER":
             self.makeDither()
