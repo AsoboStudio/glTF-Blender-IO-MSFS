@@ -18,10 +18,7 @@ import bpy
 
 
 class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
-    """
-    This addon changes some of the internal property names. This current material has older properties, and is able to be migrated.
-    WARNING: This removes all the old properties from the material!
-    """
+    """This addon changes some of the internal property names. This current material has older properties, and is able to be migrated.\nWARNING: This removes all the old properties from the material"""
 
     bl_idname = "msfs.migrate_material_data"
     bl_label = "Migrate Material Data"
