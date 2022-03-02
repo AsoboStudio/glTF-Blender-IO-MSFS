@@ -17,7 +17,111 @@
 import bpy
 
 
-class MSFS_PT_material(bpy.types.Panel):
+class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
+    """
+    This addon changes some of the internal property names. This current material has older properties, and is able to be migrated.
+    WARNING: This removes all the old properties from the material!
+    """
+
+    bl_idname = "msfs.migrate_material_data"
+    bl_label = "Migrate Material Data"
+
+    old_property_to_new_mapping = {
+        "msfs_color_albedo_mix": "msfs_base_color_factor",
+        "msfs_color_emissive_mix": "msfs_emissive_factor",
+        "msfs_color_sss": "msfs_sss_color",
+        "msfs_use_pearl_effect ": "msfs_use_pearl",
+        "msfs_decal_blend_factor_color": "msfs_base_color_blend_factor",
+        "msfs_decal_blend_factor_metal": "msfs_metallic_blend_factor",
+        "msfs_decal_blend_factor_normal": "msfs_normal_blend_factor",
+        "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
+        "msfs_decal_blend_factor_occlusion": "msfs_occlusion_blend_factor",
+        "msfs_decal_blend_factor_emissive": "msfs_emissive_blend_factor",
+        "msfs_fresnel_opacity_bias": "msfs_fresnel_opacity_offset",
+        "msfs_parallax_room_number": "msfs_parallax_room_number_xy",
+        "msfs_geo_decal_blend_factor_color": "msfs_base_color_blend_factor",
+        "msfs_geo_decal_blend_factor_metal": "msfs_metallic_blend_factor",
+        "msfs_geo_decal_blend_factor_normal": "msfs_normal_blend_factor",
+        "msfs_geo_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
+        "msfs_geo_decal_blend_factor_blast_sys": "msfs_occlusion_blend_factor",
+        "msfs_geo_decal_blend_factor_melt_sys": "msfs_emissive_blend_factor",
+        "msfs_draw_order": "msfs_draw_order_offset",
+        "msfs_road_material": "msfs_road_collision_material",
+        "msfs_uv_clamp_x": "msfs_clamp_uv_x",
+        "msfs_uv_clamp_y": "msfs_clamp_uv_y",
+        "msfs_uv_clamp_z": "msfs_clamp_uv_z",
+        "msfs_roughness_scale": "msfs_roughness_factor",
+        "msfs_metallic_scale": "msfs_metallic_factor",
+        "msfs_detail_uv_offset_x": "msfs_detail_uv_offset_u",
+        "msfs_detail_uv_offset_y": "msfs_detail_uv_offset_v",
+        "msfs_blend_threshold": "msfs_detail_blend_threshold",
+        "msfs_albedo_texture": "msfs_base_color_texture",
+        "msfs_metallic_texture": "msfs_occlusion_metallic_roughness_texture",
+        "msfs_detail_albedo_texture": "msfs_detail_color_texture",
+        "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
+        "msfs_anisotropic_direction_texture": "msfs_wetness_ao_texture",
+        "msfs_clearcoat_texture": "msfs_dirt_texture",
+        "msfs_behind_glass_texture": "msfs_detail_color_texture",
+    }
+
+    @staticmethod
+    def old_properties_present(mat):
+        if len(mat.keys()) > 0: # Don't unnecessarily loop if we have no properties on the material
+            for old_property in MSFS_OT_MigrateMaterialData.old_property_to_new_mapping:
+                if mat.get(old_property) is not None:
+                    return True
+        return False
+
+    def execute(self, context):
+        mat = context.active_object.active_material
+        for (
+            old_property,
+            new_property,
+        ) in MSFS_OT_MigrateMaterialData.old_property_to_new_mapping.items():
+            if mat.get(old_property) is not None:
+                mat[new_property] = mat[old_property]
+
+                del mat[old_property]
+
+        # Do our enums manually as only their index of the value are stored - not the string
+        if mat.get("msfs_blend_mode"):
+            old_alpha_order = [
+                "OPAQUE",
+                "MASK",  # Changed from old version - matches new name
+                "BLEND",
+                "DITHER",
+            ]
+            mat.msfs_alpha_mode = old_alpha_order[mat["msfs_blend_mode"]]
+
+            del mat["msfs_blend_mode"]
+
+        # Do material type last so that the material update call overwrites any values that should change based off material (old addon didn't implement this)
+        if mat.get("msfs_material_mode"):
+            old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
+                "msfs_standard",
+                "msfs_anisotropic",
+                "msfs_sss",
+                "msfs_glass",
+                "msfs_geo_decal",  # Changed from old version - matches new name
+                "msfs_clearcoat",
+                "msfs_environment_occluder",  # Changed from old version - matches new name
+                "msfs_fake_terrain",
+                "msfs_fresnel_fade",  # Changed from old version - matches new name
+                "msfs_windshield",
+                "msfs_porthole",
+                "msfs_parallax",
+                "msfs_geo_decal_frosted",  # Changed from old version - matches new name
+                "msfs_hair",
+                "msfs_invisible",
+            ]
+            mat.msfs_material_type = old_material_older[mat["msfs_material_mode"]]
+
+            del mat["msfs_material_mode"]
+
+        return {"FINISHED"}
+
+
+class MSFS_PT_Material(bpy.types.Panel):
     bl_label = "MSFS Material Params"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
@@ -56,6 +160,9 @@ class MSFS_PT_material(bpy.types.Panel):
         mat = context.active_object.active_material
 
         if mat:
+            if MSFS_OT_MigrateMaterialData.old_properties_present(mat):
+                layout.operator(MSFS_OT_MigrateMaterialData.bl_idname)
+
             self.draw_prop(layout, mat, "msfs_material_type")
 
             if mat.msfs_material_type != "NONE":
