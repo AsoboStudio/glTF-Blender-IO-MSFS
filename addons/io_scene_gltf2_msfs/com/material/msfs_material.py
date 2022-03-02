@@ -456,6 +456,8 @@ class MSFS_Material():
             self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMapSampler.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
         elif self.nodeNormalTex.image and self.nodeDetailNormalTex.image:
             self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendNormalMap.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        elif not self.nodeNormalTex.image and self.nodeDetailNormalTex.image:
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalMapSampler.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
         else:
             self.unLinkNodeInput(self.principledBSDF,22)
     
