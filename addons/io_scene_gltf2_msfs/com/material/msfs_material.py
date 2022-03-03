@@ -299,7 +299,7 @@ class MSFS_Material():
 
         #detail normal operators
         self.nodeDetailNormalMapSampler = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.detailNormalMapSampler.value,'location':(0.0,-1300.0) })
-        self.blendNormalMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendNormalMap.value ,'blend_type':'ADD', 'location':(200,-1100.0) })
+        self.blendNormalMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendNormalMap.value ,'blend_type':'MULTIPLY', 'location':(200,-1100.0) })
         self.blendNormalMapNode.inputs[0].default_value = 1.0
         
         #LINKS
