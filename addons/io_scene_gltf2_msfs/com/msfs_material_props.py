@@ -968,6 +968,10 @@ class AsoboMaterialDetail:
             material.msfs_detail_normal_texture = MSFSMaterial.create_image(
                 extension.get("detailNormalTexture"), import_settings
             )
+            if extension.get("detailNormalTexture").get("scale"): # TODO:  check that this works properly
+                material.msfs_detail_normal_scale = extension.get(
+                    "detailNormalTexture"
+                ).get("scale")
         if extension.get("detailMetalRoughAOTexture"):
             material.msfs_detail_occlusion_metallic_roughness_texture = (
                 MSFSMaterial.create_image(
