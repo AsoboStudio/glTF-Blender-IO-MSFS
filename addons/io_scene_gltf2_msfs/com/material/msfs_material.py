@@ -73,7 +73,6 @@ class MSFS_ShaderNodes(Enum):
     baseColorMulRGB = 'Base Color Multiplier RGB'
     baseColorMulA = 'Base Color Multiplier A'
     normalTex = 'Normal Texture'
-    normalScale = 'Normal Scale'
     compTex = 'Occlusion(R) Roughness(G) Metallic(B)'
     compSeparate = 'SplitOcclMetalRough'
     roughnessScale = 'Roughness Scale'
@@ -85,7 +84,7 @@ class MSFS_ShaderNodes(Enum):
     emissiveColor = "Emissive RGB"
     emissiveScale = 'Emissive Scale'
     emissiveMul = "Emissive Multiplier"
-    normalMap = "Normal Map"
+    normalMapSampler = "Normal Map Sampler"
     detailColorTex = "Detail Color(RGBA)"
     detailCompTex = "Detail Occlusion(R) Roughness(G) Metallic(B)"
     detailNormalTex = "Detail Normal"
@@ -99,7 +98,7 @@ class MSFS_ShaderNodes(Enum):
     combineUVOffset = "Combine UV Offset"
     mulUVScale = "Multiply UV Scale"
     addUVOffset = "Multiply UV Offset"
-    detailNormalMap = "Detail Normal Map"
+    detailNormalMapSampler = "Detail Normal Map Sampler"
     blendNormalMap = "Blend Normal Map"
     blendColorMap = "Blend Color Map"
     blendAlphaMap = "Blend Alpha Map"
@@ -245,11 +244,11 @@ class MSFS_Material():
         self.nodeemissiveColor = self.addNode('ShaderNodeRGB', { 'name': MSFS_ShaderNodes.emissiveColor.value,'location':(-500,-700.0)})
         self.nodeEmissiveScale = self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.emissiveScale.value,'location':(-500,-800.0)})
         self.nodeNormalTex = self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.normalTex.value,'location':(-500,-900.0)})
-        self.nodeNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.normalScale.value,'location':(-500,-1000.0)})
         self.nodeDetailColor =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailColorTex.value,'location':(-500,0.0)})
         self.nodeDetailCompTex =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailCompTex.value,'location':(-800,-350.0)})
         self.nodeDetailNormal =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailNormalTex.value,'location':(-500,-1300.0)})
-        self.nodeNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailNormalScale.value,'location':(-500,-1400.0)})
+        self.nodeDetailNormalScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailNormalScale.value,'location':(-500,-1400.0)})
+        self.nodeDetailNormalTex =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.detailNormalTex.value,'location':(-500,-1300.0)})
         self.nodeBlendMask =self.addNode('ShaderNodeTexImage', { 'name': MSFS_ShaderNodes.blendMaskTex.value,'location':(-500,-1500.0)})
         self.nodeDetailUVScale =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailUVScale.value,'location':(-1350,-600.0)})
         self.nodeDetailUVOffsetU =self.addNode('ShaderNodeValue', { 'name': MSFS_ShaderNodes.detailUVOffsetU.value,'location':(-1350,-700.0)})
@@ -285,7 +284,7 @@ class MSFS_Material():
         
         
         #normal operators
-        normalMapNode = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.normalMap.value,'location':(0.0,-900.0) })
+        self.nodeNormalMapSampler = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.normalMapSampler.value,'location':(0.0,-900.0) })
 
         #detail alpha Operator
         self.blendAlphaMapNode = self.addNode('ShaderNodeMath', { 'name':MSFS_ShaderNodes.blendAlphaMap.value ,'operation':'MULTIPLY', 'location':(-150,0.0) })
@@ -299,15 +298,16 @@ class MSFS_Material():
         blendCompMapNode.inputs[0].default_value = 1.0
 
         #detail normal operators
-        detailNormalMapNode = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.detailNormalMap.value,'location':(0.0,-1300.0) })
-        blendNormalMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendNormalMap.value ,'blend_type':'ADD', 'location':(200,-1100.0) })
-        blendNormalMapNode.inputs[0].default_value = 1.0
+        self.nodeDetailNormalMapSampler = self.addNode('ShaderNodeNormalMap', { 'name':MSFS_ShaderNodes.detailNormalMapSampler.value,'location':(0.0,-1300.0) })
+        self.blendNormalMapNode = self.addNode('ShaderNodeMixRGB', { 'name':MSFS_ShaderNodes.blendNormalMap.value ,'blend_type':'ADD', 'location':(200,-1100.0) })
+        self.blendNormalMapNode.inputs[0].default_value = 1.0
         
         #LINKS
 
         self.toggleVertexBlendMapMask( self.material.msfs_blend_mask_texture is None )
 
         self.updateColorLinks()
+        self.updateNormalLinks()
         self.updateCompLinks()
 
         #uv
@@ -327,29 +327,13 @@ class MSFS_Material():
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.emissiveMul.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveColor.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.emissiveMul.value))
 
-
         
-       
-        #blend normal 
-        # !!!! input orders matters for the exporter here
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMap.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendNormalMap.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalMap.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendNormalMap.value))
-
-        #normal
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.normalMap.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.normalMap.value))
-
         #detail uv
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailColorTex.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailCompTex.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailNormalTex.value))
-
-        #detail normal
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.detailNormalMap.value))
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailNormalMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.addUVOffset.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailNormalTex.value))        
         
         
-        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendNormalMap.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveMul.value),        'nodes["{0}"].inputs[19]'.format(MSFS_ShaderNodes.principledBSDF.value))
         self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveScale.value),      'nodes["{0}"].inputs[20]'.format(MSFS_ShaderNodes.principledBSDF.value))
 
@@ -435,6 +419,49 @@ class MSFS_Material():
         self.nodeMetallicScale.outputs[0].default_value = scale
         self.updateCompLinks()
 
+    def setNormalScale(self,scale):
+        self.nodeNormalMapSampler = self.getNode(MSFS_ShaderNodes.normalMapSampler.value)
+        self.nodeNormalMapSampler.inputs[0].default_value = scale
+        self.updateNormalLinks()
+
+    def setDetailNormalTex(self,tex):
+        self.nodeDetailNormalTex = self.getNode(MSFS_ShaderNodes.detailNormalTex.value)
+        self.nodeDetailNormalTex.image = tex
+        self.updateNormalLinks()
+
+    def setNormalTex(self, tex):
+        self.nodeNormalTex = self.getNode(MSFS_ShaderNodes.normalTex.value)
+        self.nodeNormalTex.image = tex
+        self.updateNormalLinks()
+
+    
+
+    def updateNormalLinks(self):
+        self.nodeNormalTex = self.getNode(MSFS_ShaderNodes.normalTex.value)
+        self.nodeDetailNormalTex = self.getNode(MSFS_ShaderNodes.detailNormalTex.value)
+        self.nodeNormalMapSampler = self.getNode(MSFS_ShaderNodes.normalMapSampler.value)
+        self.nodeDetailNormalMapSampler = self.getNode(MSFS_ShaderNodes.detailNormalMapSampler.value)
+        self.blendNormalMapNode = self.getNode(MSFS_ShaderNodes.blendNormalMap.value)
+        self.principledBSDF = self.getNode(MSFS_ShaderNodes.principledBSDF.value)
+
+        #normal
+        
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.normalMapSampler.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMapSampler.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendNormalMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalMapSampler.value), 'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.blendNormalMap.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalScale.value), 'nodes["{0}"].inputs[0]'.format(MSFS_ShaderNodes.detailNormalMapSampler.value))
+        self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalTex.value), 'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.detailNormalMapSampler.value))
+
+        if self.nodeNormalTex.image and not self.nodeDetailNormalTex.image:
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMapSampler.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        elif self.nodeNormalTex.image and self.nodeDetailNormalTex.image:
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.blendNormalMap.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        elif not self.nodeNormalTex.image and self.nodeDetailNormalTex.image:
+            self.innerLink('nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.detailNormalMapSampler.value),     'nodes["{0}"].inputs[22]'.format(MSFS_ShaderNodes.principledBSDF.value))
+        else:
+            self.unLinkNodeInput(self.principledBSDF,22)
+    
+    
     def updateCompLinks(self):
         self.nodeCompTex = self.getNode(MSFS_ShaderNodes.compTex.value)
         self.nodeDetailCompTex = self.getNode(MSFS_ShaderNodes.detailCompTex.value)
@@ -554,6 +581,10 @@ class MSFS_Material():
         SI=self.node_tree.path_resolve(socketin)
         SO=self.node_tree.path_resolve(socketout)
         self.node_tree.links.new(SI, SO)
+    
+    def unLinkNodeInput(self, node, inputIndex):
+        for link in node.inputs[inputIndex].links:
+                self.node_tree.links.remove(link)
        
     def free(self):
         if self.node_tree.users==1:
