@@ -995,13 +995,16 @@ class AsoboMaterialDetail:
                 result["detailColorTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_color_texture,
+                    "DEFAULT",
                     export_settings,
                 )
             if blender_material.msfs_detail_normal_texture is not None:
                 result["detailNormalTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_normal_texture,
+                    "NORMAL",
                     export_settings,
+                    normal_scale=blender_material.msfs_detail_normal_scale,
                 )
             if (
                 blender_material.msfs_detail_occlusion_metallic_roughness_texture
@@ -1010,12 +1013,14 @@ class AsoboMaterialDetail:
                 result["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_occlusion_metallic_roughness_texture,
+                    "DEFAULT",
                     export_settings,
                 )
             if blender_material.msfs_blend_mask_texture is not None:
                 result["blendMaskTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_blend_mask_texture,
+                    "DEFAULT",
                     export_settings,
                 )
             if (
@@ -1178,6 +1183,7 @@ class AsoboSSS:
                 result["opacityTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_opacity_texture,
+                    "DEFAULT",
                     export_settings,
                 )
 
@@ -1219,6 +1225,7 @@ class AsoboAnisotropic:
             result["anisotropicTexture"] = MSFSMaterial.export_image(
                 blender_material,
                 blender_material.msfs_wetness_ao_texture,
+                "DEFAULT",
                 export_settings,
             )
 
@@ -1312,6 +1319,7 @@ class AsoboWindshield:
                 result["wiperMaskTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_wetness_ao_texture,
+                    "DEFAULT",
                     export_settings,
                 )
 
@@ -1347,7 +1355,10 @@ class AsoboClearCoat:
             and blender_material.msfs_dirt_texture
         ):
             result["dirtTexture"] = MSFSMaterial.export_image(
-                blender_material, blender_material.msfs_dirt_texture, export_settings
+                blender_material,
+                blender_material.msfs_dirt_texture,
+                "DEFAULT",
+                export_settings,
             )
 
             gltf2_material.extensions[AsoboClearCoat.SerializedName] = Extension(
@@ -1441,6 +1452,7 @@ class AsoboParallaxWindow:
                 result["behindWindowMapTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_color_texture,
+                    "DEFAULT",
                     export_settings,
                 )
 

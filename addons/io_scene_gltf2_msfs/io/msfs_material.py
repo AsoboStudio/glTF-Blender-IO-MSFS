@@ -22,6 +22,8 @@ from ..com import msfs_material_props as MSFSMaterialExtensions
 from io_scene_gltf2.blender.imp.gltf2_blender_image import BlenderImage
 from io_scene_gltf2.blender.exp.gltf2_blender_gather_texture_info import (
     gather_texture_info,
+    gather_material_normal_texture_info_class,
+    gather_material_occlusion_texture_info_class,
 )
 
 
@@ -46,7 +48,9 @@ class MSFSMaterial:
             return bpy.data.images["Image_%d" % index]
 
     @staticmethod
-    def export_image(blender_material, blender_image, export_settings):
+    def export_image(
+        blender_material, blender_image, type, export_settings, normal_scale=None
+    ):
         nodes = blender_material.node_tree.nodes
         links = blender_material.node_tree.links
 
@@ -55,18 +59,45 @@ class MSFSMaterial:
         texture_node.image = blender_image
 
         # Create shader to plug texture into
-        shader_node = nodes.new("ShaderNodeBsdfDiffuse")
-        link = links.new(shader_node.inputs[0], texture_node.outputs[0])
+        shader_node = nodes.new("ShaderNodeBsdfPrincipled")
 
         # Gather texture info
-        texture_info = gather_texture_info(
-            shader_node.inputs[0], (shader_node.inputs[0],), export_settings
-        )
+        if type == "DEFAULT":
+            link = links.new(shader_node.inputs["Base Color"], texture_node.outputs[0])
+
+            texture_info = gather_texture_info(
+                shader_node.inputs["Base Color"],
+                (shader_node.inputs["Base Color"],),
+                export_settings,
+            )
+        elif type == "NORMAL":
+            normal_node = nodes.new("ShaderNodeNormalMap")
+            if normal_scale:
+                normal_node.inputs["Strength"].default_value = normal_scale
+            link = links.new(normal_node.inputs["Color"], texture_node.outputs[0])
+            normal_blend_link = links.new(
+                shader_node.inputs["Normal"], normal_node.outputs[0]
+            )
+
+            texture_info = gather_material_normal_texture_info_class(
+                shader_node.inputs["Normal"],
+                (shader_node.inputs["Normal"],),
+                export_settings,
+            )
+
+            links.remove(normal_blend_link)
+        elif type == "OCCLUSION":
+            # TODO: handle this - may not be needed
+            texture_info = gather_material_occlusion_texture_info_class(
+                shader_node.inputs[0], (shader_node.inputs[0],), export_settings
+            )
 
         # Delete temp nodes
         links.remove(link)
         nodes.remove(shader_node)
         nodes.remove(texture_node)
+        if type == "NORMAL":
+            nodes.remove(normal_node)
 
         return texture_info
 
