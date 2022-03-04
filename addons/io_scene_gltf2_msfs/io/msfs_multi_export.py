@@ -88,9 +88,10 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     lod_values = []
 
                     for lod in object_group.lods:
+                        if context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                            continue
                         if lod.enabled:
                             lod_values.append(lod.lod_value)
-
                     lod_values = sorted(lod_values, reverse=True)
 
                     for lod_value in lod_values:
@@ -107,18 +108,22 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                 
                 # Export glTF
                 for lod in object_group.lods:
-                    # Use selected objects in order to specify what to export
-                    for obj in bpy.context.selected_objects:
-                        obj.select_set(False)
-
-                    def select_recursive(obj):
-                        obj.select_set(True)
-                        for child in obj.children:
-                            select_recursive(child)
-
-                    select_recursive(lod.object)
+                    if not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                        continue
 
                     if lod.enabled:
+                        # Use selected objects in order to specify what to export
+                        for obj in bpy.context.selected_objects:
+                            obj.select_set(False)
+
+                        def select_recursive(obj):
+                            obj.select_set(True)
+                            for child in obj.children:
+                                select_recursive(child)
+
+                        select_recursive(lod.object)
+
+                        
                         bpy.ops.export_scene.gltf(
                             export_format="GLTF_SEPARATE",
                             export_selected=True,
@@ -347,18 +352,28 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
         layout = self.layout
 
         layout.operator(MSFS_OT_ReloadObjectGroups.bl_idname, text="Reload LODs")
+        layout.prop(context.scene, "multi_exporter_show_hidden_objects")
 
         object_groups = context.scene.msfs_multi_exporter_object_groups
 
         total_lods = 0
         for object_group in object_groups:
-            total_lods += len(object_group.lods)
+            for lod in object_group.lods:
+                if not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                    continue
+
+                total_lods += 1
+
         if total_lods == 0:
             box = layout.box()
             box.label(text="No LODs found in scene")
         else:
             for object_group in object_groups:
                 row = layout.row()
+                if len(object_group.lods) == 1: # If we only have one LOD in the group, and it is hidden, then don't render the group
+                    if not context.scene.multi_exporter_show_hidden_objects and object_group.lods[0].object.hide_get():
+                        continue
+
                 if len(object_group.lods) > 0:
                     box = row.box()
                     box.prop(object_group, "expanded", text=object_group.group_name,
@@ -369,6 +384,9 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
 
                         col = box.column()
                         for lod in object_group.lods:
+                            if not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                                continue
+
                             row = col.row()
                             row.prop(lod, "enabled", text=lod.object.name)
                             subrow = row.column()
@@ -420,6 +438,9 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
 def register():
     bpy.types.Scene.msfs_multi_exporter_object_groups = bpy.props.CollectionProperty(type=MultiExporterObjectGroup)
     bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(type=MultiExporterPreset)
+
+    # Settings for multi exporter
+    bpy.types.Scene.multi_exporter_show_hidden_objects = bpy.props.BoolProperty(name="Show hidden objects", default=True)
 
 def register_panel():
     # Register the panel on demand, we need to be sure to only register it once
