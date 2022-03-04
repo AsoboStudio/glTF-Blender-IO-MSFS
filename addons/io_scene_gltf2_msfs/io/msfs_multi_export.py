@@ -52,6 +52,10 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
             )
             if self.file_path != file_path:
                 self.file_path = file_path
+        elif not os.path.isfile(self.file_path):
+            file_path = os.path.join(self.file_path, self.name + ".gltf")
+            if self.file_path != file_path:
+                self.file_path = file_path
 
     name: bpy.props.StringProperty(name="", default="")
     file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
@@ -226,6 +230,7 @@ class MSFS_OT_AddPreset(bpy.types.Operator):
         presets = bpy.context.scene.msfs_multi_exporter_presets
         preset = presets.add()
         preset.name = f"Preset {len(presets)}"
+        preset.file_path = preset.name + ".gltf"
 
         return {"FINISHED"}
 
