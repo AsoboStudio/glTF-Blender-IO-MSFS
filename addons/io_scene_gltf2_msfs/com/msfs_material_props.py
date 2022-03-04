@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import bpy
-from ..blender.msfs_material_update import MSFS_Material_Property_Update
+from ..blender.msfs_material_prop_update import MSFS_Material_Property_Update
 
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
