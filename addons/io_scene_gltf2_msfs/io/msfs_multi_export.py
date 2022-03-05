@@ -30,6 +30,7 @@ class MultiExporterObjectLOD(bpy.types.PropertyGroup):
     keep_instances: bpy.props.BoolProperty(name="", default=False)
     file_name: bpy.props.StringProperty(name="", default="")
 
+
 class MultiExporterObjectGroup(bpy.types.PropertyGroup):
     group_name: bpy.props.StringProperty(name="", default="")
     expanded: bpy.props.BoolProperty(name="", default=True)
@@ -37,10 +38,12 @@ class MultiExporterObjectGroup(bpy.types.PropertyGroup):
     folder_name: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH")
     generate_xml: bpy.props.BoolProperty(name="", default=True)
 
+
 class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
     enabled: bpy.props.BoolProperty(name="", default=False)
     expanded: bpy.props.BoolProperty(name="", default=True)
+
 
 class MultiExporterPreset(bpy.types.PropertyGroup):
     def update_file_path(self, context):
@@ -58,22 +61,25 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
                 self.file_path = file_path
 
     name: bpy.props.StringProperty(name="", default="")
-    file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
+    file_path: bpy.props.StringProperty(
+        name="", default="", subtype="FILE_PATH", update=update_file_path
+    )
     enabled: bpy.props.BoolProperty(name="", default=False)
     expanded: bpy.props.BoolProperty(name="", default=True)
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
 
+
 # Scene Properties
 class MSFSMultiExporterProperties:
-    bpy.types.Scene.msfs_multi_exporter_current_tab = bpy.props.EnumProperty(items=
-            (("OBJECTS", "Objects", ""),
-            ("PRESETS", " Presets", "")),
+    bpy.types.Scene.msfs_multi_exporter_current_tab = bpy.props.EnumProperty(
+        items=(("OBJECTS", "Objects", ""), ("PRESETS", " Presets", "")),
     )
+
 
 # Operators
 class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
-    bl_idname = 'export_scene.multi_export_gltf'
-    bl_label = 'Multi-Export glTF 2.0'
+    bl_idname = "export_scene.multi_export_gltf"
+    bl_label = "Multi-Export glTF 2.0"
 
     def execute(self, context):
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
@@ -82,33 +88,52 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
             for object_group in object_groups:
                 # Generate XML if needed
                 if object_group.generate_xml:
-                    root = etree.Element("ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1")
+                    root = etree.Element(
+                        "ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1"
+                    )
                     lods = etree.SubElement(root, "LODS")
 
                     lod_values = []
 
                     for lod in object_group.lods:
-                        if context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                        if (
+                            context.scene.multi_exporter_show_hidden_objects
+                            and lod.object.hide_get()
+                        ):
                             continue
                         if lod.enabled:
                             lod_values.append(lod.lod_value)
                     lod_values = sorted(lod_values, reverse=True)
 
                     for lod_value in lod_values:
-                        etree.SubElement(lods, "LOD", minSize=str(lod_value), ModelFile=os.path.splitext(lod.file_name)[0] + ".gltf")
+                        etree.SubElement(
+                            lods,
+                            "LOD",
+                            minSize=str(lod_value),
+                            ModelFile=os.path.splitext(lod.file_name)[0] + ".gltf",
+                        )
 
                     if lod_values:
                         # Format XML
                         dom = xml.dom.minidom.parseString(etree.tostring(root))
-                        xml_string = dom.toprettyxml(encoding='utf-8')
+                        xml_string = dom.toprettyxml(encoding="utf-8")
 
-                        with open(os.path.join(object_group.folder_name, object_group.group_name + ".xml"), 'wb') as f:
+                        with open(
+                            os.path.join(
+                                object_group.folder_name,
+                                object_group.group_name + ".xml",
+                            ),
+                            "wb",
+                        ) as f:
                             f.write(xml_string)
                             f.close()
-                
+
                 # Export glTF
                 for lod in object_group.lods:
-                    if not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                    if (
+                        not context.scene.multi_exporter_show_hidden_objects
+                        and lod.object.hide_get()
+                    ):
                         continue
 
                     if lod.enabled:
@@ -123,11 +148,12 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                         select_recursive(lod.object)
 
-                        
                         bpy.ops.export_scene.gltf(
                             export_format="GLTF_SEPARATE",
                             export_selected=True,
-                            filepath=os.path.join(object_group.folder_name, lod.file_name)
+                            filepath=os.path.join(
+                                object_group.folder_name, lod.file_name
+                            ),
                         )
 
         elif context.scene.msfs_multi_exporter_current_tab == "PRESETS":
@@ -147,10 +173,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     bpy.ops.export_scene.gltf(
                         export_format="GLTF_SEPARATE",
                         export_selected=True,
-                        filepath=os.path.join(preset.file_path)
+                        filepath=os.path.join(preset.file_path),
                     )
 
         return {"FINISHED"}
+
 
 class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
     bl_idname = "msfs.reload_object_groups"
@@ -179,7 +206,10 @@ class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
                     object_groups[i].lods.remove(j)
 
                 # Make sure object still matches group name
-                if not self.get_group_from_object_name(lod.object.name) == object_group.group_name:
+                if (
+                    not self.get_group_from_object_name(lod.object.name)
+                    == object_group.group_name
+                ):
                     object_groups[i].lods.remove(j)
 
             if len(object_group.lods) == 0:
@@ -188,7 +218,7 @@ class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
         # Search all objects in scene to find object groups
         found_object_groups = {}
         for obj in bpy.context.scene.objects:
-            if obj.parent is None: # Only search "root" objects
+            if obj.parent is None:  # Only search "root" objects
                 group_name = self.get_group_from_object_name(obj.name)
 
                 # Set object group or append
@@ -200,14 +230,16 @@ class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
         # Create object groups and LODs
         for _, (object_group_name, objects) in enumerate(found_object_groups.items()):
             # Check if object group already exists, and if it doesn't, create one
-            if not object_group_name in [object_group.group_name for object_group in object_groups]:
+            if not object_group_name in [
+                object_group.group_name for object_group in object_groups
+            ]:
                 object_group = object_groups.add()
                 object_group.group_name = object_group_name
             else:
                 for object_group in object_groups:
                     if object_group.group_name == object_group_name:
                         break
-            
+
             # Set all LODs in object group
             for obj in objects:
                 # If the object is at the root level (no parent)
@@ -219,6 +251,7 @@ class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
 
         return {"FINISHED"}
 
+
 class MSFS_OT_ChangeTab(bpy.types.Operator):
     bl_idname = "msfs.multi_export_change_tab"
     bl_label = "Change tab"
@@ -228,6 +261,7 @@ class MSFS_OT_ChangeTab(bpy.types.Operator):
     def execute(self, context):
         context.scene.msfs_multi_exporter_current_tab = self.current_tab
         return {"FINISHED"}
+
 
 class MSFS_OT_AddPreset(bpy.types.Operator):
     bl_idname = "msfs.multi_export_add_preset"
@@ -241,6 +275,7 @@ class MSFS_OT_AddPreset(bpy.types.Operator):
 
         return {"FINISHED"}
 
+
 class MSFS_OT_RemovePreset(bpy.types.Operator):
     bl_idname = "msfs.multi_export_remove_preset"
     bl_label = "Remove preset"
@@ -252,6 +287,7 @@ class MSFS_OT_RemovePreset(bpy.types.Operator):
         presets.remove(self.preset_index)
 
         return {"FINISHED"}
+
 
 class MSFS_OT_EditLayers(bpy.types.Operator):
     bl_idname = "msfs.multi_export_edit_layers"
@@ -301,8 +337,16 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
                         box = layout_item.box()
                         row = box.row()
                         if layer.collection.children:
-                            row.prop(layer, "expanded", text=layer.collection.name,
-                                        icon="DOWNARROW_HLT" if layer.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+                            row.prop(
+                                layer,
+                                "expanded",
+                                text=layer.collection.name,
+                                icon="DOWNARROW_HLT"
+                                if layer.expanded
+                                else "RIGHTARROW",
+                                icon_only=True,
+                                emboss=False,
+                            )
                             row.prop(layer, "enabled", text="Enabled")
                             if layer.expanded:
                                 drawTree(box, children)
@@ -314,11 +358,12 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
 
         drawTree(layout, self.collection_tree[bpy.context.scene.collection])
 
+
 # Panels
 class MSFS_PT_MultiExporter(bpy.types.Panel):
     bl_label = "Multi-Export glTF 2.0"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
     bl_category = "Multi-Export glTF 2.0"
 
     @classmethod
@@ -333,18 +378,25 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
         current_tab = context.scene.msfs_multi_exporter_current_tab
 
         row = layout.row(align=True)
-        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Objects",
-                     depress=(current_tab == "OBJECTS")).current_tab = "OBJECTS"
-        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Presets",
-                     depress=(current_tab == "PRESETS")).current_tab = "PRESETS"
+        row.operator(
+            MSFS_OT_ChangeTab.bl_idname,
+            text="Objects",
+            depress=(current_tab == "OBJECTS"),
+        ).current_tab = "OBJECTS"
+        row.operator(
+            MSFS_OT_ChangeTab.bl_idname,
+            text="Presets",
+            depress=(current_tab == "PRESETS"),
+        ).current_tab = "PRESETS"
+
 
 class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
     bl_label = ""
     bl_parent_id = "MSFS_PT_MultiExporter"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
     bl_category = "Multi-Export glTF 2.0"
-    bl_options = {'HIDE_HEADER'}
+    bl_options = {"HIDE_HEADER"}
 
     @classmethod
     def poll(cls, context):
@@ -361,7 +413,10 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
         total_lods = 0
         for object_group in object_groups:
             for lod in object_group.lods:
-                if not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                if (
+                    not context.scene.multi_exporter_show_hidden_objects
+                    and lod.object.hide_get()
+                ):
                     continue
 
                 total_lods += 1
@@ -372,21 +427,35 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
         else:
             for object_group in object_groups:
                 row = layout.row()
-                if len(object_group.lods) == 1: # If we only have one LOD in the group, and it is hidden, then don't render the group
-                    if not context.scene.multi_exporter_show_hidden_objects and object_group.lods[0].object.hide_get():
+                if (
+                    len(object_group.lods) == 1
+                ):  # If we only have one LOD in the group, and it is hidden, then don't render the group
+                    if (
+                        not context.scene.multi_exporter_show_hidden_objects
+                        and object_group.lods[0].object.hide_get()
+                    ):
                         continue
 
                 if len(object_group.lods) > 0:
                     box = row.box()
-                    box.prop(object_group, "expanded", text=object_group.group_name,
-                             icon="DOWNARROW_HLT" if object_group.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+                    box.prop(
+                        object_group,
+                        "expanded",
+                        text=object_group.group_name,
+                        icon="DOWNARROW_HLT" if object_group.expanded else "RIGHTARROW",
+                        icon_only=True,
+                        emboss=False,
+                    )
                     if object_group.expanded:
                         box.prop(object_group, "generate_xml", text="Generate XML")
                         box.prop(object_group, "folder_name", text="Folder")
 
                         col = box.column()
                         for lod in object_group.lods:
-                            if not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get():
+                            if (
+                                not context.scene.multi_exporter_show_hidden_objects
+                                and lod.object.hide_get()
+                            ):
                                 continue
 
                             row = col.row()
@@ -400,13 +469,14 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
         row = layout.row(align=True)
         row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
 
+
 class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
     bl_label = ""
     bl_parent_id = "MSFS_PT_MultiExporter"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
     bl_category = "Multi-Export glTF 2.0"
-    bl_options = {'HIDE_HEADER'}
+    bl_options = {"HIDE_HEADER"}
 
     @classmethod
     def poll(cls, context):
@@ -421,28 +491,45 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
         for i, preset in enumerate(presets):
             row = layout.row()
             box = row.box()
-            box.prop(preset, "expanded", text=preset.name,
-                        icon="DOWNARROW_HLT" if preset.expanded else "RIGHTARROW", icon_only=True, emboss=False)
+            box.prop(
+                preset,
+                "expanded",
+                text=preset.name,
+                icon="DOWNARROW_HLT" if preset.expanded else "RIGHTARROW",
+                icon_only=True,
+                emboss=False,
+            )
 
             if preset.expanded:
                 box.prop(preset, "enabled", text="Enabled")
                 box.prop(preset, "name", text="Name")
                 box.prop(preset, "file_path", text="Export Path")
 
-                box.operator(MSFS_OT_EditLayers.bl_idname, text="Edit Layers").preset_index = i
+                box.operator(
+                    MSFS_OT_EditLayers.bl_idname, text="Edit Layers"
+                ).preset_index = i
 
-                box.operator(MSFS_OT_RemovePreset.bl_idname, text="Remove").preset_index = i
+                box.operator(
+                    MSFS_OT_RemovePreset.bl_idname, text="Remove"
+                ).preset_index = i
 
         row = layout.row()
         row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
 
 
 def register():
-    bpy.types.Scene.msfs_multi_exporter_object_groups = bpy.props.CollectionProperty(type=MultiExporterObjectGroup)
-    bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(type=MultiExporterPreset)
+    bpy.types.Scene.msfs_multi_exporter_object_groups = bpy.props.CollectionProperty(
+        type=MultiExporterObjectGroup
+    )
+    bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(
+        type=MultiExporterPreset
+    )
 
     # Settings for multi exporter
-    bpy.types.Scene.multi_exporter_show_hidden_objects = bpy.props.BoolProperty(name="Show hidden objects", default=True)
+    bpy.types.Scene.multi_exporter_show_hidden_objects = bpy.props.BoolProperty(
+        name="Show hidden objects", default=True
+    )
+
 
 def register_panel():
     # Register the panel on demand, we need to be sure to only register it once
