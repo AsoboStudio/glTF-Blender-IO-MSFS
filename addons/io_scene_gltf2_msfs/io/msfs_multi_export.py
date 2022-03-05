@@ -157,7 +157,9 @@ class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
     bl_label = "Reload object groups"
 
     def get_group_from_object_name(self, object_name):
-        matches = re.findall("(?i)x\d_|_lod[0-9]+", object_name) # If an object starts with xN_ or ends with _LODN, treat as an LOD
+        matches = re.findall(
+            "(?i)x[0-9]_|_lod[0-9]+", object_name
+        )  # If an object starts with xN_ or ends with _LODN, treat as an LOD
         if matches:
             # Get base object group name from object
             for match in matches:
