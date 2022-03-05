@@ -50,7 +50,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                     for lod in object_group.lods:
                         if (
-                            context.scene.multi_exporter_show_hidden_objects
+                            not context.scene.multi_exporter_show_hidden_objects
                             and lod.object.hide_get()
                         ):
                             continue
