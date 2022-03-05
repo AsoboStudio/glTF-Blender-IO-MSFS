@@ -152,7 +152,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             export_format="GLTF_SEPARATE",
                             export_selected=True,
                             filepath=os.path.join(
-                                object_group.folder_name, lod.file_name
+                                object_group.folder_name,
+                                os.path.splitext(lod.file_name)[0],
                             ),
                         )
 
