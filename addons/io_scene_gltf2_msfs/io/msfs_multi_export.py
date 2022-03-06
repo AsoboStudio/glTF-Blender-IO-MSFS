@@ -49,6 +49,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     lod_values = []
 
                     for lod in object_group.lods:
+                        if lod.object is None:
+                            continue
                         if (
                             not context.scene.multi_exporter_show_hidden_objects
                             and lod.object.hide_get()
@@ -83,6 +85,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                 # Export glTF
                 for lod in object_group.lods:
+                    if lod.object is None:
+                        continue
                     if (
                         not context.scene.multi_exporter_show_hidden_objects
                         and lod.object.hide_get()

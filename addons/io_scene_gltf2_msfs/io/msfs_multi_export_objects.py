@@ -61,8 +61,9 @@ class MSFS_OT_ReloadObjectGroups(bpy.types.Operator):
         # Remove deleted objects and empty object groups
         for i, object_group in enumerate(object_groups):
             for j, lod in enumerate(object_group.lods):
-                if not lod.object.name in bpy.context.scene.objects:
+                if not lod.object in list(bpy.context.scene.objects):
                     object_groups[i].lods.remove(j)
+                    continue
 
                 # Make sure object still matches group name
                 if (
@@ -134,6 +135,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
         total_lods = 0
         for object_group in object_groups:
             for lod in object_group.lods:
+                if lod.object is None:
+                    continue
                 if (
                     not context.scene.multi_exporter_show_hidden_objects
                     and lod.object.hide_get()
@@ -151,6 +154,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                 if (
                     len(object_group.lods) == 1
                 ):  # If we only have one LOD in the group, and it is hidden, then don't render the group
+                    if object_group.lods[0].object is None:
+                        continue
                     if (
                         not context.scene.multi_exporter_show_hidden_objects
                         and object_group.lods[0].object.hide_get()
@@ -173,6 +178,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
 
                         col = box.column()
                         for lod in object_group.lods:
+                            if lod.object is None:
+                                continue
                             if (
                                 not context.scene.multi_exporter_show_hidden_objects
                                 and lod.object.hide_get()
