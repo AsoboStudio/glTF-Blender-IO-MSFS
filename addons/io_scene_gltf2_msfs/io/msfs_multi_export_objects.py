@@ -24,7 +24,7 @@ from .msfs_multi_export import MSFS_OT_MultiExportGLTF2
 class MultiExporterObjectLOD(bpy.types.PropertyGroup):
     object: bpy.props.PointerProperty(name="", type=bpy.types.Object)
     enabled: bpy.props.BoolProperty(name="", default=False)
-    lod_value: bpy.props.IntProperty(name="", default=0, min=0, max=1000)
+    lod_value: bpy.props.IntProperty(name="", default=0, min=0, max=999)
     flatten_on_export: bpy.props.BoolProperty(name="", default=False)
     keep_instances: bpy.props.BoolProperty(name="", default=False)
     file_name: bpy.props.StringProperty(name="", default="")

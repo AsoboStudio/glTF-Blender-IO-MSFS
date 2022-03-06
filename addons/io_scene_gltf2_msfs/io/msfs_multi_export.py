@@ -25,7 +25,11 @@ import xml.etree.ElementTree as etree
 # Scene Properties
 class MSFSMultiExporterProperties:
     bpy.types.Scene.msfs_multi_exporter_current_tab = bpy.props.EnumProperty(
-        items=(("OBJECTS", "Objects", ""), ("PRESETS", " Presets", "")),
+        items=(
+            ("OBJECTS", "Objects", ""),
+            ("PRESETS", " Presets", ""),
+            ("SETTINGS", "Settings", ""),
+        ),
     )
 
 
@@ -33,6 +37,45 @@ class MSFSMultiExporterProperties:
 class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
     bl_idname = "export_scene.multi_export_gltf"
     bl_label = "Multi-Export glTF 2.0"
+
+    @staticmethod
+    def export(file_path):
+        settings = bpy.context.scene.msfs_multi_exporter_presets
+
+        bpy.ops.export_scene.gltf(
+            export_format="GLTF_SEPARATE",
+            use_selection=True,
+            filepath=file_path,
+            export_copyright=settings.export_copyright,
+            export_image_format=settings.export_image_format,
+            export_texture_dir=settings.export_texture_dir,
+            export_keep_originals=settings.export_keep_originals,
+            export_texcoords=settings.export_texcoords,
+            export_normals=settings.export_normals,
+            export_tangents=settings.export_tangents,
+            export_materials=settings.export_materials,
+            export_colors=settings.export_colors,
+            use_mesh_edges=settings.use_mesh_edges,
+            use_mesh_vertices=settings.use_mesh_vertices,
+            export_cameras=settings.export_cameras,
+            use_visible=settings.use_visible,
+            use_renderable=settings.use_renderable,
+            use_active_collection=settings.use_active_collection,
+            export_extras=settings.export_extras,
+            export_yup=settings.export_yup,
+            export_apply=settings.export_apply,
+            export_animations=settings.export_animations,
+            export_frame_range=settings.export_frame_range,
+            export_frame_step=settings.export_frame_step,
+            export_force_sampling=settings.export_force_sampling,
+            export_nla_strips=settings.export_nla_strips,
+            export_def_bones=settings.export_def_bones,
+            export_current_frame=settings.export_current_frame,
+            export_skins=settings.export_skins,
+            export_all_influences=settings.export_all_influences,
+            export_lights=settings.export_lights,
+            export_displacement=settings.export_displacement,
+        )
 
     def execute(self, context):
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
@@ -105,13 +148,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                         select_recursive(lod.object)
 
-                        bpy.ops.export_scene.gltf(
-                            export_format="GLTF_SEPARATE",
-                            use_selection=True,
-                            filepath=os.path.join(
+                        MSFS_OT_MultiExportGLTF2.export(
+                            os.path.join(
                                 object_group.folder_name,
                                 os.path.splitext(lod.file_name)[0],
-                            ),
+                            )
                         )
 
         elif context.scene.msfs_multi_exporter_current_tab == "PRESETS":
@@ -128,13 +169,10 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             for obj in layer.collection.all_objects:
                                 obj.select_set(True)
 
-                    bpy.ops.export_scene.gltf(
-                        export_format="GLTF_SEPARATE",
-                        use_selection=True,
-                        filepath=os.path.join(preset.file_path),
-                    )
+                    MSFS_OT_MultiExportGLTF2.export(os.path.join(preset.file_path))
 
         return {"FINISHED"}
+
 
 class MSFS_OT_ChangeTab(bpy.types.Operator):
     bl_idname = "msfs.multi_export_change_tab"
@@ -145,7 +183,6 @@ class MSFS_OT_ChangeTab(bpy.types.Operator):
     def execute(self, context):
         context.scene.msfs_multi_exporter_current_tab = self.current_tab
         return {"FINISHED"}
-
 
 
 # Panels
@@ -177,6 +214,11 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
             text="Presets",
             depress=(current_tab == "PRESETS"),
         ).current_tab = "PRESETS"
+        row.operator(
+            MSFS_OT_ChangeTab.bl_idname,
+            text="Settings",
+            depress=(current_tab == "SETTINGS"),
+        ).current_tab = "SETTINGS"
 
 
 def register():
