@@ -92,7 +92,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     lod_values = []
 
                     for lod in object_group.lods:
-                        if lod.object is None:
+                        if lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects):
                             continue
                         if (
                             not context.scene.multi_exporter_show_hidden_objects
@@ -128,7 +128,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                 # Export glTF
                 for lod in object_group.lods:
-                    if lod.object is None:
+                    if lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects):
                         continue
                     if (
                         not context.scene.multi_exporter_show_hidden_objects
@@ -142,9 +142,10 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             obj.select_set(False)
 
                         def select_recursive(obj):
-                            obj.select_set(True)
-                            for child in obj.children:
-                                select_recursive(child)
+                            if obj in list(bpy.context.window.view_layer.objects):
+                                obj.select_set(True)
+                                for child in obj.children:
+                                    select_recursive(child)
 
                         select_recursive(lod.object)
 
@@ -167,7 +168,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     for layer in preset.layers:
                         if layer.enabled:
                             for obj in layer.collection.all_objects:
-                                obj.select_set(True)
+                                if obj in list(bpy.context.window.view_layer.objects):
+                                    obj.select_set(True)
 
                     MSFS_OT_MultiExportGLTF2.export(os.path.join(preset.file_path))
 

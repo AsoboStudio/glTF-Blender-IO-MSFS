@@ -135,7 +135,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
         total_lods = 0
         for object_group in object_groups:
             for lod in object_group.lods:
-                if lod.object is None:
+                if lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects):
                     continue
                 if (
                     not context.scene.multi_exporter_show_hidden_objects
@@ -154,7 +154,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                 if (
                     len(object_group.lods) == 1
                 ):  # If we only have one LOD in the group, and it is hidden, then don't render the group
-                    if object_group.lods[0].object is None:
+                    if object_group.lods[0].object is None or object_group.lods[0].object not in list(bpy.context.window.view_layer.objects):
                         continue
                     if (
                         not context.scene.multi_exporter_show_hidden_objects
@@ -178,7 +178,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
 
                         col = box.column()
                         for lod in object_group.lods:
-                            if lod.object is None:
+                            if lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects):
                                 continue
                             if (
                                 not context.scene.multi_exporter_show_hidden_objects
