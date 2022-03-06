@@ -253,7 +253,7 @@ class MSFS_PT_export_main(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
 
         layout.prop(settings, "export_keep_originals")
         if settings.export_keep_originals is False:
@@ -278,7 +278,7 @@ class MSFS_PT_export_include(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
 
         col = layout.column(heading="Limit to", align=True)
         col.prop(settings, "use_selection")
@@ -307,7 +307,7 @@ class MSFS_PT_export_transform(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
 
         layout.prop(settings, "export_yup")
 
@@ -328,7 +328,7 @@ class MSFS_PT_export_geometry(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
 
         layout.prop(settings, "export_apply")
         layout.prop(settings, "export_texcoords")
@@ -364,7 +364,7 @@ class MSFS_PT_export_animation(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
 
         layout.prop(settings, "export_current_frame")
 
@@ -381,7 +381,7 @@ class MSFS_PT_export_animation_export(bpy.types.Panel):
         return context.scene.msfs_multi_exporter_current_tab == "SETTINGS"
 
     def draw_header(self, context):
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
         self.layout.prop(settings, "export_animations", text="")
 
     def draw(self, context):
@@ -389,7 +389,7 @@ class MSFS_PT_export_animation_export(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
 
         layout.active = settings.export_animations
 
@@ -423,7 +423,7 @@ class MSFS_PT_export_animation_skinning(bpy.types.Panel):
         return context.scene.msfs_multi_exporter_current_tab == "SETTINGS"
 
     def draw_header(self, context):
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
         self.layout.prop(settings, "export_skins", text="")
 
     def draw(self, context):
@@ -431,13 +431,13 @@ class MSFS_PT_export_animation_skinning(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        settings = context.scene.msfs_multi_exporter_presets
+        settings = context.scene.msfs_multi_exporter_settings
 
         layout.active = settings.export_skins
         layout.prop(settings, "export_all_influences")
 
 
 def register():
-    bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.PointerProperty(
+    bpy.types.Scene.msfs_multi_exporter_settings = bpy.props.PointerProperty(
         type=MSFS_MultiExporterSettings
     )
