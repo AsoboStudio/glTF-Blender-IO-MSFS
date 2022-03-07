@@ -80,11 +80,5 @@ class Export:
             gltf2_scene.nodes = new_nodes
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
-        if (self.properties.enabled and blender_material.msfs_material_mode != None):
-            if blender_material.msfs_material_mode != 'NONE':
-                if gltf2_material.extensions is None:
-                    gltf2_material.extensions = {}
-                if gltf2_material.extras is None:
-                    gltf2_material.extras = {}
-
-                MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+        if self.properties.enabled:
+            MSFSMaterial.export(gltf2_material, blender_material, export_settings)
