@@ -24,13 +24,15 @@ bl_info = {
     "name": "Microsoft Flight Simulator glTF Extension",
     "author": "Luca Pierabella, Wing42, pepperoni505, ronh991, tml1024, and others",
     "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
-    "blender": (3, 0, 0),
-    "version": (0, 0, 1),
+    "blender": (3, 1, 0),
+    "version": (1, 0, 4),
     "location": "File > Import-Export",
-    "warning": "This version of the addon is work-in-progress. Don't use it in your active development cycle, as it adds variables and objects to the scene that may cause issues further down the line.",
     "category": "Import-Export",
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
 }
+
+def get_version_string():
+    return str(bl_info['version'][0]) + '.' + str(bl_info['version'][1]) + '.' + str(bl_info['version'][2])
 
 class MSFS_ExporterProperties(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(

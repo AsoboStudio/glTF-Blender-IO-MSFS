@@ -1,5 +1,5 @@
 # glTF-Blender-IO-MSFS
-# Copyright (C) 2020-2021 The glTF-Blender-IO-MSFS authors
+# Copyright (C) 2021-2022 The glTF-Blender-IO-MSFS authors
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,3 +13,13 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+from ..msfs_material_function import MSFS_Material
+
+
+class MSFS_Ghost(MSFS_Material):
+    def __init__(self, material, buildTree=False):
+        super().__init__(material, buildTree)
+
+    def customShaderTree(self):
+        super(MSFS_Ghost, self).defaultShaderStree()

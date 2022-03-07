@@ -16,6 +16,7 @@
 
 import os
 import bpy
+from .. import get_version_string
 
 from .msfs_light import MSFSLight
 from .msfs_gizmo import MSFSGizmo
@@ -37,7 +38,9 @@ class Export:
                 required=False
             )
 
-    def gather_gltf_hook(self, gltf2_plan, export_settings):
+            gltf2_asset.generator += " and Asobo Studio MSFS Blender I/O v" + get_version_string()
+
+    def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
         if self.properties.enabled:
             for i, image in enumerate(gltf2_plan.images):
                 image.uri = os.path.basename(image.uri)
@@ -81,14 +84,8 @@ class Export:
             gltf2_scene.nodes = new_nodes
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
-        if (self.properties.enabled and blender_material.msfs_material_mode != None):
-            if blender_material.msfs_material_mode != 'NONE':
-                if gltf2_material.extensions is None:
-                    gltf2_material.extensions = {}
-                if gltf2_material.extras is None:
-                    gltf2_material.extras = {}
-
-                MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+        if self.properties.enabled:
+            MSFSMaterial.export(gltf2_material, blender_material, export_settings)
 
     def gather_actions_hook(self, blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
         MSFSMaterialAnimation.gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings)
