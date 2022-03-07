@@ -430,7 +430,7 @@ class MSFS_Material:
             "ShaderNodeMixRGB",
             {
                 "name": MSFS_ShaderNodes.blendNormalMap.value,
-                "blend_type": "ADD",
+                "blend_type": "MULTIPLY",
                 "location": (200, -1100.0),
             },
         )
