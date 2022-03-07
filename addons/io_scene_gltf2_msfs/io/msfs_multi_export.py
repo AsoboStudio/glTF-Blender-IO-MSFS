@@ -79,11 +79,14 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
     def execute(self, context):
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
-            object_groups = context.scene.msfs_multi_exporter_object_groups
+            from .msfs_multi_export_objects import MSFS_LODGroupUtility
 
-            for object_group in object_groups:
+            lod_groups = context.scene.msfs_multi_exporter_lod_groups
+            sort_by_collection = context.scene.multi_exporter_grouped_by_collections
+
+            for lod_group in lod_groups:
                 # Generate XML if needed
-                if object_group.generate_xml:
+                if lod_group.generate_xml:
                     root = etree.Element(
                         "ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1"
                     )
@@ -91,14 +94,10 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                     lod_values = []
 
-                    for lod in object_group.lods:
-                        if lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects):
+                    for lod in lod_group.lods:
+                        if not MSFS_LODGroupUtility.lod_is_visible(context, lod):
                             continue
-                        if (
-                            not context.scene.multi_exporter_show_hidden_objects
-                            and lod.object.hide_get()
-                        ):
-                            continue
+
                         if lod.enabled:
                             lod_values.append(lod.lod_value)
                     lod_values = sorted(lod_values, reverse=True)
@@ -118,8 +117,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                         with open(
                             os.path.join(
-                                object_group.folder_name,
-                                object_group.group_name + ".xml",
+                                lod_group.folder_name,
+                                lod_group.group_name + ".xml",
                             ),
                             "wb",
                         ) as f:
@@ -127,13 +126,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             f.close()
 
                 # Export glTF
-                for lod in object_group.lods:
-                    if lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects):
-                        continue
-                    if (
-                        not context.scene.multi_exporter_show_hidden_objects
-                        and lod.object.hide_get()
-                    ):
+                for lod in lod_group.lods:
+                    if not MSFS_LODGroupUtility.lod_is_visible(context, lod):
                         continue
 
                     if lod.enabled:
@@ -147,11 +141,15 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                                 for child in obj.children:
                                     select_recursive(child)
 
-                        select_recursive(lod.object)
+                        if sort_by_collection:
+                            for obj in lod.collection.all_objects:
+                                obj.select_set(True)
+                        else:
+                            select_recursive(lod.object)
 
                         MSFS_OT_MultiExportGLTF2.export(
                             os.path.join(
-                                object_group.folder_name,
+                                lod_group.folder_name,
                                 os.path.splitext(lod.file_name)[0],
                             )
                         )
@@ -221,12 +219,6 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
             text="Settings",
             depress=(current_tab == "SETTINGS"),
         ).current_tab = "SETTINGS"
-
-
-def register():
-    bpy.types.Scene.multi_exporter_show_hidden_objects = bpy.props.BoolProperty(
-        name="Show hidden objects", default=True
-    )
 
 
 def register_panel():

@@ -281,7 +281,6 @@ class MSFS_PT_export_include(bpy.types.Panel):
         settings = context.scene.msfs_multi_exporter_settings
 
         col = layout.column(heading="Limit to", align=True)
-        col.prop(settings, "use_selection")
         col.prop(settings, "use_renderable")
         col.prop(settings, "use_active_collection")
 
