@@ -19,7 +19,7 @@ import bpy
 from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_channels
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
-# TODO: somehow centralize all the functions - very hard to keep track of process order
+
 class MSFSMaterialAnimation:
     bl_options = {"UNDO"}
 
@@ -29,14 +29,13 @@ class MSFSMaterialAnimation:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def get_material_from_data_path(blender_object, blender_action, data_path, export_settings):
+    def get_material_from_action(blender_object, blender_action, export_settings):
         """
         EXPORT
-        Utility function to return a blender material from an action, if the action's target is a material
+        Utility function to return a blender material from an action, if the action is a material
 
         :param blender_object: the blender object that is being animated
         :param blender_action: the blender action that is being exported
-        :param data_path: the target path of the action
 
         :return: a blender material, or None
         """
@@ -48,12 +47,7 @@ class MSFSMaterialAnimation:
 
             if material.animation_data is not None:
                 if blender_action == material.animation_data.action:
-                    try: # Only return material if the target is on the material
-                        material.path_resolve(data_path.split(".")[0])
-                    except:
-                        continue
-                    else:
-                        return material
+                    return material
                 elif export_settings['gltf_nla_strips'] is True: # Check if the animation is an NLA strip
                     for track in material.animation_data.nla_tracks:
                         non_muted_strips = [strip for strip in track.strips if strip.action is not None and strip.mute is False]
@@ -61,12 +55,7 @@ class MSFSMaterialAnimation:
                             continue
                         for strip in non_muted_strips:
                             if blender_action == strip.action:
-                                try: # Only return material if the target is on the material
-                                    material.path_resolve(data_path.split(".")[0])
-                                except:
-                                    continue
-                                else:
-                                    return material
+                                return material
 
     @staticmethod
     def gather_actions(blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
@@ -111,26 +100,29 @@ class MSFSMaterialAnimation:
                         action_on_type[strip.action.name] = "MATERIAL"
 
     @staticmethod
-    def replace_channel_target(gltf2_animation_channel, channels, blender_object, action_name, export_settings):
+    def replace_channel_target(gltf2_animation_channel_target, channels, blender_object, export_settings):
         """
         EXPORT
         Replace targets for channels that are material animations. We don't use the target object for material targets, instead we
         have a path to the material index and cooresponding property. Unfortunately, we don't have access to the finalized glTF material tree yet,
         so we need to temporarily keep a reference to the blender material and the value that is being animated. This is properly finalized later.
 
-        :param gltf2_animation_channel: a glTF animation channel
+        :param gltf2_animation_channel_target: a glTF animation channel target
         :param channels: list of channel groups gathered by the Khronos exporter. This has the data_path that we're interested in.
         :param blender_object: the blender object that is being animated
         :param action_name: the name of the blender action being exported
         :return:
         """
         for channel in channels:
-            blender_material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, bpy.data.actions[action_name], channel.data_path, export_settings)
+            blender_material = MSFSMaterialAnimation.get_material_from_action(blender_object, channel.id_data, export_settings)
             if not blender_material:
                 continue
 
-            gltf2_animation_channel.target = blender_material.path_resolve(channel.data_path.split(".")[0])
+            gltf2_animation_channel_target.path = blender_material.path_resolve(channel.data_path.split(".")[0])
 
+            # Set data path to value in order to force the Khronos exporter to gather keyframes
+            channel.data_path = "value"
+    
     @staticmethod
     def add_placeholder_channel(gltf2_animation, blender_action, blender_object, export_settings):
         """
@@ -145,7 +137,7 @@ class MSFSMaterialAnimation:
         :return:
         """
         for fcurve in blender_action.fcurves:
-            material = MSFSMaterialAnimation.get_material_from_data_path(blender_object, blender_action, fcurve.data_path, export_settings)
+            material = MSFSMaterialAnimation.get_material_from_action(blender_object, blender_action, export_settings)
 
             if material is None:
                 # If we actually find a property besides the material animations, we don't need a temp fcurve
@@ -176,15 +168,15 @@ class MSFSMaterialAnimation:
         """
         material_animation_channels = []
         for i, channel in enumerate(gltf2_animation.channels):
-            if not hasattr(channel.target, "id_data"):
+            if not hasattr(channel.target.path, "id_data"):
                 continue
 
-            if type(channel.target.id_data) != bpy.types.Material:
+            if type(channel.target.path.id_data) != bpy.types.Material:
                 continue
 
             material_animation_channels.append({
                 "sampler": channel.sampler,
-                "target": channel.target 
+                "target": channel.target.path
             })
             gltf2_animation.channels.pop(i)
 
@@ -224,16 +216,15 @@ class MSFSMaterialAnimation:
             if material_index is None:
                 continue
 
-            blender_material = channel["target"].id_data
             target_property = channel["target"].path_from_id().split(".")[0]
 
-            if target_property == "msfs_color_albedo_mix":
+            if target_property == "msfs_base_color_factor":
                 channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/baseColorFactor"
-            elif target_property == "msfs_color_emissive_mix":
+            elif target_property == "msfs_emissive_factor":
                 channel["target"] = f"materials/{material_index}/emissiveFactor"
-            elif target_property == "msfs_metallic_scale":
+            elif target_property == "msfs_metallic_factor":
                 channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/metallicFactor"
-            elif target_property == "msfs_roughness_scale":
+            elif target_property == "msfs_roughness_factor":
                 channel["target"] = f"materials/{material_index}/pbrMetallicRoughness/roughnessFactor"
             elif target_property == "msfs_uv_offset_u":
                 channel["target"] = f"materials/{material_index}/extensions/ASOBO_material_UV_options/UVOffsetU"
