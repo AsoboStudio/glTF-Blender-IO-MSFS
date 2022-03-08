@@ -29,8 +29,8 @@ class MSFSGizmo():
             raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def create(gltf_node, blender_object, import_settings):
-        gltf_mesh = import_settings.data.meshes[gltf_node.mesh]
+    def create(gltf2_node, blender_object, import_settings):
+        gltf_mesh = import_settings.data.meshes[gltf2_node.mesh]
         if gltf_mesh.extensions:
             extension = gltf_mesh.extensions.get(MSFSGizmo.extension_name)
             if extension:

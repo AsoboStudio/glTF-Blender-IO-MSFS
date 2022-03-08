@@ -28,9 +28,9 @@ class MSFSLight:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def create(gltf_node, blender_node, blender_light, import_settings):
+    def create(gltf2_node, blender_node, blender_light, import_settings):
         parent_light = import_settings.data.nodes[
-            gltf_node.parent]  # The glTF exporter creates the actual light as a child of the node that has the Asobo extension
+            gltf2_node.parent]  # The glTF exporter creates the actual light as a child of the node that has the Asobo extension
         if parent_light.extensions:
             extension = parent_light.extensions.get(MSFSLight.extension_name)
             if extension:

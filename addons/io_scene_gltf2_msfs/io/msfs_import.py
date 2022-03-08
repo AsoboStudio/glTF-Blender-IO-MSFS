@@ -25,13 +25,13 @@ class Import:
         pass
 
     # Create lights
-    def gather_import_light_after_hook(self, gltf_node, blender_node, blender_light, import_settings):
-        MSFSLight.create(gltf_node, blender_node, blender_light, import_settings)
+    def gather_import_light_after_hook(self, gltf2_node, blender_node, blender_light, import_settings):
+        MSFSLight.create(gltf2_node, blender_node, blender_light, import_settings)
 
     # Create gizmos
-    def gather_import_node_after_hook(self, vnode, gltf_node, blender_object, import_settings):
-        MSFSGizmo.create(gltf_node, blender_object, import_settings)
+    def gather_import_node_after_hook(self, vnode, gltf2_node, blender_object, import_settings):
+        MSFSGizmo.create(gltf2_node, blender_object, import_settings)
 
     # Create materials
-    def gather_import_material_after_hook(self, gltf_material, vertex_color, blender_mat, import_settings):
-        MSFSMaterial.create(gltf_material, blender_mat, import_settings)
+    def gather_import_material_after_hook(self, gltf2_material, vertex_color, blender_material, import_settings):
+        MSFSMaterial.create(gltf2_material, blender_material, import_settings)
