@@ -65,7 +65,8 @@ class AsoboMaterialCommon:
         max=1.0,
         size=4,
         default=Defaults.BaseColorFactor,
-        update=MSFS_Material_Property_Update.update_base_color,
+        get=MSFS_Material_Property_Update.get_base_color,
+        set=MSFS_Material_Property_Update.set_base_color,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_emissive_factor = bpy.props.FloatVectorProperty(
@@ -76,7 +77,8 @@ class AsoboMaterialCommon:
         max=1.0,
         size=3,
         default=Defaults.EmissiveFactor,
-        update=MSFS_Material_Property_Update.update_emissive_color,
+        get=MSFS_Material_Property_Update.get_emissive_color,
+        set=MSFS_Material_Property_Update.set_emissive_color,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_metallic_factor = bpy.props.FloatProperty(
@@ -85,7 +87,8 @@ class AsoboMaterialCommon:
         min=0.0,
         max=1.0,
         default=Defaults.MetallicFactor,
-        update=MSFS_Material_Property_Update.update_metallic_scale,
+        get=MSFS_Material_Property_Update.get_metallic_factor,
+        set=MSFS_Material_Property_Update.set_metallic_factor,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_roughness_factor = bpy.props.FloatProperty(
@@ -94,7 +97,8 @@ class AsoboMaterialCommon:
         min=0.0,
         max=1.0,
         default=Defaults.RoughnessFactor,
-        update=MSFS_Material_Property_Update.update_roughness_scale,
+        get=MSFS_Material_Property_Update.get_roughness_factor,
+        set=MSFS_Material_Property_Update.set_roughness_factor,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_normal_scale = bpy.props.FloatProperty(
@@ -968,7 +972,9 @@ class AsoboMaterialDetail:
             material.msfs_detail_normal_texture = MSFSMaterial.create_image(
                 extension.get("detailNormalTexture"), import_settings
             )
-            if extension.get("detailNormalTexture").get("scale"): # TODO:  check that this works properly
+            if extension.get("detailNormalTexture").get(
+                "scale"
+            ):  # TODO:  check that this works properly
                 material.msfs_detail_normal_scale = extension.get(
                     "detailNormalTexture"
                 ).get("scale")
