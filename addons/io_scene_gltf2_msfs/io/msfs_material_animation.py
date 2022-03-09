@@ -141,11 +141,14 @@ class MSFSMaterialAnimation:
             if not blender_material:
                 continue
 
-            gltf2_animation_channel_target.path = blender_material.path_resolve(
-                channel.data_path.split(".")[0]
-            )
+            # This is a bit "hacky" - we need all of these values in order to export properly, so we're using a dictionary
+            gltf2_animation_channel_target.path = {
+                "material": blender_material,
+                "data_path": channel.data_path,
+                "channels": channels,
+            }
 
-            # Set data path to value in order to force the Khronos exporter to gather keyframes
+            # Temporarily set data path to value in order to force the Khronos exporter to gather keyframes. We undo this later in the export process
             channel.data_path = "value"
 
     @staticmethod
@@ -197,17 +200,22 @@ class MSFSMaterialAnimation:
         :return:
         """
         material_animation_channels = []
-        for i, channel in enumerate(gltf2_animation.channels):
-            if not hasattr(channel.target.path, "id_data"):
+        for channel in list(gltf2_animation.channels):
+            if not type(channel.target.path) == dict:
                 continue
 
-            if type(channel.target.path.id_data) != bpy.types.Material:
+            if type(channel.target.path["material"]) != bpy.types.Material:
                 continue
 
             material_animation_channels.append(
                 {"sampler": channel.sampler, "target": channel.target.path}
             )
-            gltf2_animation.channels.pop(i)
+
+            # Restore proper animation channel paths
+            for blender_channel in channel.target.path["channels"]:
+                blender_channel.data_path = channel.target.path["data_path"]
+
+            gltf2_animation.channels.remove(channel)
 
         if material_animation_channels:
             gltf2_animation.extensions[
@@ -243,14 +251,14 @@ class MSFSMaterialAnimation:
         ]:
             material_index = None
             for j, material in enumerate(gltf2_plan.materials):
-                if material.name == channel["target"].id_data.name:
+                if material.name == channel["target"]["material"].name:
                     material_index = j
                     break
 
             if material_index is None:
                 continue
 
-            target_property = channel["target"].path_from_id().split(".")[0]
+            target_property = channel["target"]["data_path"]
 
             if target_property == "msfs_base_color_factor":
                 channel[
