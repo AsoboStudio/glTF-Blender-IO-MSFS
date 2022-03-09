@@ -151,9 +151,8 @@ class MSFS_PT_Material(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        # Disabled animation UI until material animations are properly implemented
-        # layout.use_property_split = True
-        # layout.use_property_decorate = True
+        layout.use_property_split = True
+        layout.use_property_decorate = True
 
         mat = context.active_object.active_material
 
