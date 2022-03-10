@@ -20,6 +20,23 @@ from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_channels
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
 
+class MSFSMaterialAnimationTarget:
+    """
+    Utility class to help us set the final material animation target. We lose these values during the export process, as the data path needs to be
+    set to 'value' during export in order to get the Khronos exporter to pick up on the animation. The reference to the material is important to
+    find the final glTF material, and channels is used to restore the original data path at the end of export.
+
+    :param material: a blender material
+    :param data_path: string value that contains the prop name
+    :param channels: list of blender fcurves in order for us to restore data path after export
+    """
+
+    def __init__(self, material, data_path, channels):
+        self.material = material
+        self.data_path = data_path
+        self.channels = channels
+
+
 class MSFSMaterialAnimation:
     bl_options = {"UNDO"}
 
@@ -141,12 +158,9 @@ class MSFSMaterialAnimation:
             if not blender_material:
                 continue
 
-            # This is a bit "hacky" - we need all of these values in order to export properly, so we're using a dictionary
-            gltf2_animation_channel_target.path = {
-                "material": blender_material,
-                "data_path": channel.data_path,
-                "channels": channels,
-            }
+            gltf2_animation_channel_target.path = MSFSMaterialAnimationTarget(
+                blender_material, channel.data_path, channels
+            )
 
             # Temporarily set data path to value in order to force the Khronos exporter to gather keyframes. We undo this later in the export process
             channel.data_path = "value"
@@ -201,10 +215,10 @@ class MSFSMaterialAnimation:
         """
         material_animation_channels = []
         for channel in list(gltf2_animation.channels):
-            if not type(channel.target.path) == dict:
+            if not isinstance(channel.target.path, MSFSMaterialAnimationTarget):
                 continue
 
-            if type(channel.target.path["material"]) != bpy.types.Material:
+            if type(channel.target.path.material) != bpy.types.Material:
                 continue
 
             material_animation_channels.append(
@@ -212,8 +226,8 @@ class MSFSMaterialAnimation:
             )
 
             # Restore proper animation channel paths
-            for blender_channel in channel.target.path["channels"]:
-                blender_channel.data_path = channel.target.path["data_path"]
+            for blender_channel in channel.target.path.channels:
+                blender_channel.data_path = channel.target.path.data_path
 
             gltf2_animation.channels.remove(channel)
 
@@ -251,14 +265,14 @@ class MSFSMaterialAnimation:
         ]:
             material_index = None
             for j, material in enumerate(gltf2_plan.materials):
-                if material.name == channel["target"]["material"].name:
+                if material.name == channel["target"].material.name:
                     material_index = j
                     break
 
             if material_index is None:
                 continue
 
-            target_property = channel["target"]["data_path"]
+            target_property = channel["target"].data_path
 
             if target_property == "msfs_base_color_factor":
                 channel[
