@@ -29,6 +29,52 @@ class MSFSGizmo():
             raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
+    def create(gltf2_node, blender_object, import_settings):
+        gltf_mesh = import_settings.data.meshes[gltf2_node.mesh]
+        if gltf_mesh.extensions:
+            extension = gltf_mesh.extensions.get(MSFSGizmo.extension_name)
+            if extension:
+                for gizmo_object in extension.get("gizmo_objects"):
+                    bpy.ops.object.empty_add()
+                    gizmo = bpy.context.object
+
+                    # Set gizmo location
+                    gizmo.location = gizmo_object.get("translation")
+
+                    # Set gizmo type and rename gizmo
+                    type = gizmo_object.get("type")
+                    gizmo.msfs_gizmo_type = type
+
+                    if type == "sphere":
+                        gizmo.name = "Sphere Collision"
+                    elif type == "box":
+                        gizmo.name = "Box Collision"
+                    elif type == "cylinder":
+                        gizmo.name = "Cylinder Collision"
+
+                    # Get gizmo scale
+                    params = gizmo_object.get("params", {})
+                    if type == "sphere":
+                        gizmo.scale[0] = params.get("radius")
+                        gizmo.scale[1] = params.get("radius")
+                        gizmo.scale[2] = params.get("radius")
+                    elif type == "cylinder":
+                        gizmo.scale[0] = params.get("radius")
+                        gizmo.scale[1] = params.get("radius")
+                        gizmo.scale[2] = params.get("height")
+
+                    # Set road collider
+                    if "Road" in gizmo_object.get("extensions", {}).get("ASOBO_tags", {}).get("tags"):
+                        gizmo.msfs_collision_is_road_collider = True
+
+                    gizmo.parent = blender_object
+
+                    # Set collection
+                    for collection in gizmo.users_collection:
+                        collection.objects.unlink(gizmo)
+                    blender_object.users_collection[0].objects.link(gizmo)
+
+    @staticmethod
     def export(gltf2_mesh, blender_mesh):
         gizmo_objects = []
         for object in bpy.context.scene.objects:
