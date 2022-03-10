@@ -15,7 +15,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import bpy
+import numpy as np
 
+from io_scene_gltf2.io.imp.gltf2_io_binary import BinaryData
+from io_scene_gltf2.blender.imp.gltf2_blender_animation_utils import (
+    make_fcurve,
+    simulate_stash,
+)
 from io_scene_gltf2.blender.exp import gltf2_blender_gather_animation_channels
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
@@ -44,6 +50,159 @@ class MSFSMaterialAnimation:
 
     def __new__(cls, *args, **kwargs):
         raise RuntimeError("%s should not be instantiated" % cls)
+
+    @staticmethod
+    def create(import_settings):
+        # NLA tracks are added bottom to top, so create animations in reverse so the first winds up on top
+        for gltf2_animation in reversed(import_settings.data.animations):
+            import_settings.action_cache = {}
+            import_settings.needs_stash = []
+
+            if gltf2_animation.extensions is None:
+                return
+
+            extension = gltf2_animation.extensions.get(
+                MSFSMaterialAnimation.extension_name
+            )
+            if extension is None:
+                return
+
+            for channel in extension.get("channels"):
+                sampler = channel.get("sampler")
+                target = channel.get("target")
+
+                material_idx = int(
+                    target.split("/")[1]
+                )  # The target will look something like "materials/INDEX/PROPERTY", so we use this to get the material index
+                path = target.replace(
+                    f"materials/{material_idx}/", ""
+                )  # Get the actual path from the target - we have to remove the "materials/INDEX/" prefix from the path to get the path
+
+                action = MSFSMaterialAnimation.get_or_create_action(
+                    import_settings, material_idx, gltf2_animation.track_name
+                )
+
+                keys = BinaryData.get_data_from_accessor(
+                    import_settings, gltf2_animation.samplers[sampler].input
+                )
+                values = BinaryData.get_data_from_accessor(
+                    import_settings, gltf2_animation.samplers[sampler].output
+                )
+
+                if gltf2_animation.samplers[sampler].interpolation == "CUBICSPLINE":
+                    values = values[1::3]
+
+                blender_path = None
+                group_name = None
+                num_components = 0
+                if path == "pbrMetallicRoughness/baseColorFactor":
+                    blender_path = "msfs_base_color_factor"
+                    group_name = "Base Color"
+                    num_components = 4
+                elif path == "emissiveFactor":
+                    blender_path = "msfs_emissive_factor"
+                    group_name = "Emissive Color"
+                    num_components = 3
+                elif path == "pbrMetallicRoughness/metallicFactor":
+                    blender_path = "msfs_metallic_factor"
+                    group_name = "Metallic Factor"
+                    num_components = 1
+                elif path == "pbrMetallicRoughness/roughnessFactor":
+                    blender_path = "msfs_roughness_factor"
+                    group_name = "Roughness Factor"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_UV_options/UVOffsetU":
+                    blender_path = "msfs_uv_offset_u"
+                    group_name = "UV Offset U"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_UV_options/UVOffsetV":
+                    blender_path = "msfs_uv_offset_v"
+                    group_name = "UV Offset V"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_UV_options/UVTilingU":
+                    blender_path = "msfs_uv_tiling_u"
+                    group_name = "UV Tiling U"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_UV_options/UVTilingV":
+                    blender_path = "msfs_uv_tiling_v"
+                    group_name = "UV Tiling V"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_UV_options/UVRotation":
+                    blender_path = "msfs_uv_rotation"
+                    group_name = "UV Rotation"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_windshield_v2/wiper1State":
+                    blender_path = "msfs_wiper_1_state"
+                    group_name = "Wiper 1 State"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_windshield_v2/wiper2State":
+                    blender_path = "msfs_wiper_2_state"
+                    group_name = "Wiper 2 State"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_windshield_v2/wiper3State":
+                    blender_path = "msfs_wiper_3_state"
+                    group_name = "Wiper 3 State"
+                    num_components = 1
+                elif path == "extensions/ASOBO_material_windshield_v2/wiper4State":
+                    blender_path = "msfs_wiper_4_state"
+                    group_name = "Wiper 4 State"
+                    num_components = 1
+
+                # Group values by component size
+                values = np.array_split(values, len(values) / num_components)
+
+                # Create action
+                fps = bpy.context.scene.render.fps
+
+                coords = [0] * (2 * len(keys))
+                coords[::2] = (key[0] * fps for key in keys)
+
+                for i in range(0, num_components):
+                    coords[1::2] = (vals[i] for vals in values)
+                    make_fcurve(
+                        action,
+                        coords,
+                        data_path=blender_path,
+                        index=i,
+                        group_name=group_name,
+                        interpolation=gltf2_animation.samplers[sampler].interpolation,
+                    )
+
+            # Push all actions onto NLA tracks
+            for (mat, action) in import_settings.needs_stash:
+                simulate_stash(mat, gltf2_animation.track_name, action)
+
+                # Unmute track TODO: not sure why it gets muted - look into this
+                for track in mat.animation_data.nla_tracks:
+                    if track.name == gltf2_animation.track_name:
+                        track.mute = False
+
+    @staticmethod
+    def get_or_create_action(gltf, material_idx, anim_name):
+        """
+        IMPORT
+        Utility function to create or get a blender action on a material. If the action already exists, we return instead of creating
+
+        :param gltf: the glTF import plan
+        :param material_idx: index of glTF material
+        :param anim_name: name of animation we are importing
+        """
+        mat = gltf.data.materials[material_idx]
+        mat_name = list(mat.blender_material.values())[
+            0
+        ]  # The blender_material dictionary will only have one key-value pair, so we can get the value of the first item, which will be the blender material name
+
+        blender_mat = bpy.data.materials[mat_name]
+
+        action = gltf.action_cache.get(mat_name)
+        if not action:
+            name = anim_name + "_" + mat_name
+            action = bpy.data.actions.new(name)
+            action.id_root = "MATERIAL"
+            gltf.needs_stash.append((blender_mat, action))
+            gltf.action_cache[mat_name] = action
+
+        return action
 
     @staticmethod
     def get_material_from_action(blender_object, blender_action, export_settings):
