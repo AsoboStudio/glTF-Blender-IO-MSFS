@@ -17,16 +17,18 @@
 import bpy
 import math
 
+import msfs_io_utilities
+
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
 
-class MSFSGizmo():
+class MSFSGizmo:
     bl_options = {"UNDO"}
 
     extension_name = "ASOBO_gizmo_object"
 
     def __new__(cls, *args, **kwargs):
-            raise RuntimeError("%s should not be instantiated" % cls)
+        raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
     def create(gltf2_node, blender_object, import_settings):
@@ -64,7 +66,9 @@ class MSFSGizmo():
                         gizmo.scale[2] = params.get("height")
 
                     # Set road collider
-                    if "Road" in gizmo_object.get("extensions", {}).get("ASOBO_tags", {}).get("tags"):
+                    if "Road" in gizmo_object.get("extensions", {}).get(
+                        "ASOBO_tags", {}
+                    ).get("tags"):
                         gizmo.msfs_collision_is_road_collider = True
 
                     gizmo.parent = blender_object
@@ -78,27 +82,39 @@ class MSFSGizmo():
     def export(gltf2_mesh, blender_mesh):
         gizmo_objects = []
         for object in bpy.context.scene.objects:
-            if object.type == "MESH" and bpy.data.meshes[object.data.name] == blender_mesh:
+            if (
+                object.type == "MESH"
+                and bpy.data.meshes[object.data.name] == blender_mesh
+            ):
                 for child in object.children:
-                    if child.type == 'EMPTY' and child.msfs_gizmo_type != "NONE":
+                    if child.type == "EMPTY" and child.msfs_gizmo_type != "NONE":
                         gizmo_object = {}
-                        gizmo_object["translation"] = list(child.location)
+                        gizmo_object["translation"] = list(
+                            msfs_io_utilities.get_flight_sim_location(child, object)
+                        )
+                        rotation = msfs_io_utilities.get_flight_sim_rotation(
+                            child, object
+                        )
+                        if not msfs_io_utilities.is_default_rotation(rotation):
+                            gizmo_object["rotation"] = rotation
                         gizmo_object["type"] = child.msfs_gizmo_type
 
                         if child.msfs_gizmo_type == "sphere":
                             gizmo_object["params"] = {
-                                "radius": abs(child.scale.x * child.scale.y * child.scale.z)
+                                "radius": abs(
+                                    child.scale.x * child.scale.y * child.scale.z
+                                )
                             }
                         elif child.msfs_gizmo_type == "box":
                             gizmo_object["params"] = {
                                 "length": abs(child.scale.x),
                                 "width": abs(child.scale.y),
-                                "height": abs(child.scale.z)
+                                "height": abs(child.scale.z),
                             }
                         elif child.msfs_gizmo_type == "cylinder":
                             gizmo_object["params"] = {
                                 "radius": abs(child.scale.x * child.scale.y),
-                                "height": abs(child.scale.z)
+                                "height": abs(child.scale.z),
                             }
 
                         tags = ["Collision"]
@@ -107,20 +123,16 @@ class MSFSGizmo():
 
                         gizmo_object["extensions"] = {
                             "ASOBO_tags": Extension(
-                                name = "ASOBO_tags",
-                                extension = {
-                                    "tags": tags
-                                },
-                                required = False
+                                name="ASOBO_tags",
+                                extension={"tags": tags},
+                                required=False,
                             )
                         }
                         gizmo_objects.append(gizmo_object)
 
         if gizmo_objects:
             gltf2_mesh.extensions[MSFSGizmo.extension_name] = Extension(
-                name = MSFSGizmo.extension_name,
-                extension = {
-                    "gizmo_objects": gizmo_objects
-                },
-                required = False
+                name=MSFSGizmo.extension_name,
+                extension={"gizmo_objects": gizmo_objects},
+                required=False,
             )
