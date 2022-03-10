@@ -102,8 +102,41 @@ class MSFSMaterial:
         return texture_info
 
     @staticmethod
+    def create(gltf2_material, blender_material, import_settings):
+        extensions = [
+            MSFSMaterialExtensions.AsoboMaterialCommon,
+            MSFSMaterialExtensions.AsoboMaterialGeometryDecal,
+            MSFSMaterialExtensions.AsoboMaterialGhostEffect,
+            MSFSMaterialExtensions.AsoboMaterialDrawOrder,
+            MSFSMaterialExtensions.AsoboDayNightCycle,
+            MSFSMaterialExtensions.AsoboDisableMotionBlur,
+            MSFSMaterialExtensions.AsoboPearlescent,
+            MSFSMaterialExtensions.AsoboAlphaModeDither,
+            MSFSMaterialExtensions.AsoboMaterialInvisible,
+            MSFSMaterialExtensions.AsoboMaterialEnvironmentOccluder,
+            MSFSMaterialExtensions.AsoboMaterialUVOptions,
+            MSFSMaterialExtensions.AsoboMaterialShadowOptions,
+            MSFSMaterialExtensions.AsoboMaterialResponsiveAAOptions,
+            MSFSMaterialExtensions.AsoboMaterialDetail,
+            MSFSMaterialExtensions.AsoboMaterialFakeTerrain,
+            MSFSMaterialExtensions.AsoboMaterialFresnelFade,
+            MSFSMaterialExtensions.AsoboSSS,
+            MSFSMaterialExtensions.AsoboAnisotropic,
+            MSFSMaterialExtensions.AsoboWindshield,
+            MSFSMaterialExtensions.AsoboClearCoat,
+            MSFSMaterialExtensions.AsoboParallaxWindow,
+            MSFSMaterialExtensions.AsoboGlass,
+            MSFSMaterialExtensions.AsoboTags,
+            MSFSMaterialExtensions.AsoboMaterialCode,
+        ]
+
+        for extension in extensions:
+            extension.from_dict(blender_material, gltf2_material, import_settings)
+
+    @staticmethod
     def export(gltf2_material, blender_material, export_settings):
         extensions = [
+            MSFSMaterialExtensions.AsoboMaterialCommon,
             MSFSMaterialExtensions.AsoboMaterialGeometryDecal,
             MSFSMaterialExtensions.AsoboMaterialGhostEffect,
             MSFSMaterialExtensions.AsoboMaterialDrawOrder,

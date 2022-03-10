@@ -28,6 +28,27 @@ class MSFSLight:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
+    def create(gltf2_node, blender_node, blender_light, import_settings):
+        parent_light = import_settings.data.nodes[
+            gltf2_node.parent]  # The glTF exporter creates the actual light as a child of the node that has the Asobo extension
+        if parent_light.extensions:
+            extension = parent_light.extensions.get(MSFSLight.extension_name)
+            if extension:
+                # Set Blender light properties
+                blender_light.color = extension.get("color")
+                blender_light.energy = extension.get("intensity")
+                if blender_light.type == "SPOT":
+                    blender_light.spot_size = extension.get("cone_angle")
+
+                # Set MSFS light properties
+                blender_node.msfs_light_has_symmetry = extension.get("has_symmetry")
+                blender_node.msfs_light_flash_frequency = extension.get("flash_frequency")
+                blender_node.msfs_light_flash_duration = extension.get("flash_duration")
+                blender_node.msfs_light_flash_phase = extension.get("flash_phase")
+                blender_node.msfs_light_rotation_speed = extension.get("rotation_speed")
+                blender_node.msfs_light_day_night_cycle = extension.get("day_night_cycle")
+
+    @staticmethod
     def export(gltf2_object, blender_object):
         angle = 360.0
         if blender_object.data.type == 'SPOT':
