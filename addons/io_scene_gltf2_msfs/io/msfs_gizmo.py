@@ -60,6 +60,10 @@ class MSFSGizmo:
                         gizmo.scale[0] = params.get("radius")
                         gizmo.scale[1] = params.get("radius")
                         gizmo.scale[2] = params.get("radius")
+                    elif type == "box":
+                        gizmo.scale[0] = params.get("length")
+                        gizmo.scale[1] = params.get("width")
+                        gizmo.scale[2] = params.get("height")
                     elif type == "cylinder":
                         gizmo.scale[0] = params.get("radius")
                         gizmo.scale[1] = params.get("radius")
