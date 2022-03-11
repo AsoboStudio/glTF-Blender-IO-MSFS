@@ -17,7 +17,7 @@
 import bpy
 import math
 
-import msfs_io_utilities
+from . import msfs_io_utilities
 
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
@@ -40,8 +40,12 @@ class MSFSGizmo:
                     bpy.ops.object.empty_add()
                     gizmo = bpy.context.object
 
-                    # Set gizmo location
-                    gizmo.location = gizmo_object.get("translation")
+                    if gizmo_object.get("translation"):
+                        parent_center = msfs_io_utilities.get_bounding_box_center(blender_object)
+                        gizmo.location = parent_center + msfs_io_utilities.gltf_location_to_blender(gizmo_object.get("translation"))
+                    if gizmo_object.get("rotation"):
+                        gizmo.rotation_mode = 'QUATERNION'
+                        gizmo.rotation_quaternion = msfs_io_utilities.gltf_rotation_to_blender(gizmo_object.get("rotation"))
 
                     # Set gizmo type and rename gizmo
                     type = gizmo_object.get("type")
