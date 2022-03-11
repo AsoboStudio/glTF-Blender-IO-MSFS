@@ -90,7 +90,7 @@ def gltf_location_to_blender(loc):
 
 def gltf_rotation_to_blender(rot):
     """
-    Covnert glTF rotation to a blender Quaternion
+    Convert glTF rotation to a blender Quaternion
 
     :param rot: glTF rotation
     :return: Quaternion
