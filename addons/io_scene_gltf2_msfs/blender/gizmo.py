@@ -133,7 +133,7 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
         self.custom_shape_edges = edges
 
     def get_matrix(self):
-        # Re-calculate matrix without rotation
+        # Re-calculate matrix with proper scale
         if self.empty.msfs_gizmo_type == "sphere":
             scale = self.empty.scale[0] * self.empty.scale[1] * self.empty.scale[2]
             scale_matrix = Matrix.Scale(scale, 4, (1, 0, 0)) @ Matrix.Scale(scale, 4, (0, 1, 0)) @ Matrix.Scale(scale, 4, (0, 0, 1))
@@ -142,7 +142,10 @@ class MSFSCollisionGizmo(bpy.types.Gizmo):
             scale_matrix = Matrix.Scale(scale_xy, 4, (1, 0, 0)) @ Matrix.Scale(scale_xy, 4, (0, 1, 0)) @ Matrix.Scale(self.empty.scale[2], 4, (0, 0, 1))
         else:
             scale_matrix = Matrix.Scale(self.empty.scale[0], 4, (1, 0, 0)) @ Matrix.Scale(self.empty.scale[1], 4, (0, 1, 0)) @ Matrix.Scale(self.empty.scale[2], 4, (0, 0, 1))
-        matrix = Matrix.Translation(self.empty.matrix_world.translation) @ scale_matrix
+        if self.empty.rotation_mode == "QUATERNION":
+            matrix = Matrix.LocRotScale(self.empty.matrix_world.translation, self.empty.rotation_quaternion, scale_matrix.to_scale())
+        else:
+            matrix = Matrix.LocRotScale(self.empty.matrix_world.translation, self.empty.rotation_euler, scale_matrix.to_scale())
         return matrix
 
     def draw(self, context):

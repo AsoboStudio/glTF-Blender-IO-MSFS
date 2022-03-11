@@ -41,11 +41,16 @@ class MSFSGizmo:
                     gizmo = bpy.context.object
 
                     if gizmo_object.get("translation"):
-                        parent_center = msfs_io_utilities.get_bounding_box_center(blender_object)
-                        gizmo.location = parent_center + msfs_io_utilities.gltf_location_to_blender(gizmo_object.get("translation"))
+                        gizmo.location = msfs_io_utilities.gltf_location_to_blender(
+                            gizmo_object.get("translation")
+                        )
                     if gizmo_object.get("rotation"):
-                        gizmo.rotation_mode = 'QUATERNION'
-                        gizmo.rotation_quaternion = msfs_io_utilities.gltf_rotation_to_blender(gizmo_object.get("rotation"))
+                        gizmo.rotation_mode = "QUATERNION"
+                        gizmo.rotation_quaternion = (
+                            msfs_io_utilities.gltf_rotation_to_blender(
+                                gizmo_object.get("rotation")
+                            )
+                        )
 
                     # Set gizmo type and rename gizmo
                     type = gizmo_object.get("type")
@@ -80,6 +85,7 @@ class MSFSGizmo:
                         gizmo.msfs_collision_is_road_collider = True
 
                     gizmo.parent = blender_object
+                    gizmo.matrix_parent_inverse = blender_object.matrix_world.inverted()
 
                     # Set collection
                     for collection in gizmo.users_collection:
@@ -97,32 +103,27 @@ class MSFSGizmo:
                 for child in object.children:
                     if child.type == "EMPTY" and child.msfs_gizmo_type != "NONE":
                         gizmo_object = {}
-                        gizmo_object["translation"] = list(
-                            msfs_io_utilities.get_flight_sim_location(child, object)
-                        )
-                        rotation = msfs_io_utilities.get_flight_sim_rotation(
-                            child, object
-                        )
-                        if not msfs_io_utilities.is_default_rotation(rotation):
+                        translation, rotation, scale = msfs_io_utilities.get_trs(child)
+                        if translation:
+                            gizmo_object["translation"] = translation
+                        if rotation:
                             gizmo_object["rotation"] = rotation
                         gizmo_object["type"] = child.msfs_gizmo_type
 
                         if child.msfs_gizmo_type == "sphere":
                             gizmo_object["params"] = {
-                                "radius": abs(
-                                    child.scale.x * child.scale.y * child.scale.z
-                                )
+                                "radius": abs(scale[0] * scale[1] * scale[2])
                             }
                         elif child.msfs_gizmo_type == "box":
                             gizmo_object["params"] = {
-                                "length": abs(child.scale.x),
-                                "width": abs(child.scale.y),
-                                "height": abs(child.scale.z),
+                                "length": abs(scale[0]),
+                                "width": abs(scale[1]),
+                                "height": abs(scale[2]),
                             }
                         elif child.msfs_gizmo_type == "cylinder":
                             gizmo_object["params"] = {
-                                "radius": abs(child.scale.x * child.scale.y),
-                                "height": abs(child.scale.z),
+                                "radius": abs(scale[0] * scale[1]),
+                                "height": abs(scale[2]),
                             }
 
                         tags = ["Collision"]

@@ -15,69 +15,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import bpy
-from mathutils import Vector, Quaternion
+from mathutils import Vector, Quaternion, Matrix
 
 from io_scene_gltf2.blender.com.gltf2_blender_math import (
     swizzle_yup_location,
     swizzle_yup_rotation,
 )
-
-
-def get_bounding_box_center(obj):
-    """
-    Calculate the center of a mesh
-
-    :param obj: a blender object
-    :return: a translation Vector
-    """
-    local_bbox_center = 0.125 * sum((Vector(b) for b in obj.bound_box), Vector())
-    global_bbox_center = obj.matrix_world @ local_bbox_center
-
-    return global_bbox_center
-
-
-def get_flight_sim_location(node, parent_node):
-    """
-    For nodes such as a gizmo, we need to calculate location relative to the parent node
-
-    :param node: the blender node we want to get the location of
-    :param parent_node: the parent of the node
-    :return: location as type list
-    """
-    global_bbox_center = get_bounding_box_center(parent_node)
-
-    loc = node.matrix_local.inverted() @ global_bbox_center
-
-    return list(swizzle_yup_location(loc))
-
-
-def get_flight_sim_rotation(node, parent_node):
-    """
-    For nodes such as a gizmo, we need to calculate rotation relative to the parent node
-
-    :param node: the blender node we want to get the rotation of
-    :param parent_node: the parent of the node
-    :return: rotation as type list
-    """
-    transformed_matrix = node.matrix_local @ parent_node.matrix_local.inverted()
-
-    return list(swizzle_yup_rotation(transformed_matrix.to_quaternion()))
-
-
-def is_default_rotation(rotation):
-    """
-    Check if object rotation is default
-
-    :param rotation: a quaternion
-    :return: bool
-    """
-    return (
-        (rotation[0] == 1.0 or rotation[0] == -1.0)
-        and rotation[1] == 0.0
-        and rotation[2] == 0.0
-        and rotation[3] == 0.0
-    )
-
+from io_scene_gltf2.blender.com import gltf2_blender_math
 
 def gltf_location_to_blender(loc):
     """
@@ -97,3 +41,75 @@ def gltf_rotation_to_blender(rot):
     :return: Quaternion
     """
     return Quaternion((rot[3], rot[0], rot[1], rot[2]))
+
+
+def get_trs(node):
+    if node.parent is None:
+        trans, rot, sca = node.matrix_world.decompose()
+    else:
+        # Calculate local matrix
+        trans, rot, sca = (
+            node.parent.matrix_world.inverted_safe() @ node.matrix_world
+        ).decompose()
+
+    rot.normalize()
+
+    trans = convert_swizzle_location(trans)
+    rot = convert_swizzle_rotation(rot)
+    sca = convert_swizzle_scale(sca)
+
+    if node.instance_type == "COLLECTION" and node.instance_collection:
+        offset = convert_swizzle_location(node.instance_collection.instance_offset)
+
+        s = Matrix.Diagonal(sca).to_4x4()
+        r = rot.to_matrix().to_4x4()
+        t = Matrix.Translation(trans).to_4x4()
+        o = Matrix.Translation(offset).to_4x4()
+        m = t @ r @ s @ o
+
+        trans = m.translation
+
+    translation, rotation, scale = (None, None, None)
+    trans[0], trans[1], trans[2] = (
+        gltf2_blender_math.round_if_near(trans[0], 0.0),
+        gltf2_blender_math.round_if_near(trans[1], 0.0),
+        gltf2_blender_math.round_if_near(trans[2], 0.0),
+    )
+    rot[0], rot[1], rot[2], rot[3] = (
+        gltf2_blender_math.round_if_near(rot[0], 1.0),
+        gltf2_blender_math.round_if_near(rot[1], 0.0),
+        gltf2_blender_math.round_if_near(rot[2], 0.0),
+        gltf2_blender_math.round_if_near(rot[3], 0.0),
+    )
+    sca[0], sca[1], sca[2] = (
+        gltf2_blender_math.round_if_near(sca[0], 1.0),
+        gltf2_blender_math.round_if_near(sca[1], 1.0),
+        gltf2_blender_math.round_if_near(sca[2], 1.0),
+    )
+    if trans[0] != 0.0 or trans[1] != 0.0 or trans[2] != 0.0:
+        translation = [trans[0], trans[1], trans[2]]
+    if rot[0] != 1.0 or rot[1] != 0.0 or rot[2] != 0.0 or rot[3] != 0.0:
+        rotation = [rot[1], rot[2], rot[3], rot[0]]
+    if sca[0] != 1.0 or sca[1] != 1.0 or sca[2] != 1.0:
+        scale = [sca[0], sca[1], sca[2]]
+
+    return translation, rotation, scale
+
+
+def convert_swizzle_location(loc):
+    """Convert a location from Blender coordinate system to glTF coordinate system."""
+    return Vector((loc[0], loc[2], -loc[1]))
+
+
+def convert_swizzle_rotation(rot):
+    """
+    Convert a quaternion rotation from Blender coordinate system to glTF coordinate system.
+
+    'w' is still at first position.
+    """
+    return Quaternion((rot[0], rot[1], rot[3], -rot[2]))
+
+
+def convert_swizzle_scale(scale):
+    """Convert a scale from Blender coordinate system to glTF coordinate system."""
+    return Vector((scale[0], scale[2], scale[1]))
