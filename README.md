@@ -2,7 +2,6 @@
 
 FlightSim Blender glTF 2.0 Importer and Exporter
 ======================================
-#### For certain features to work, you need to have Blender version 3.1 Alpha or newer. Download here: https://builder.blender.org/download/daily/
 
 This repository represents an alpha version of the official FlightSim-Blender Import/Export plugin. The flight sim community has already developed and forked the original project many times, and Asobo's intention is to fully support Blender with the contributions of all the developers that already developed many features in different unofficial Blender plugins.
 
