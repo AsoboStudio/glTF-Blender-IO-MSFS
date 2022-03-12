@@ -241,7 +241,7 @@ class MSFSMaterialAnimation:
 
     @staticmethod
     def gather_actions(
-        blender_object, blender_actions, blender_tracks, action_on_type, export_settings
+        blender_object, gathered_actions, export_settings
     ):
         """
         EXPORT
@@ -249,18 +249,20 @@ class MSFSMaterialAnimation:
         if there are any animations on them, and if so, add to the actions list.
 
         :param blender_object: the blender object that is being animated
-        :param blender_actions: list of blender_actions affecting the object
-        :param blender_tracks: dictionary of NLA tracks for the animation
-        :param action_on_type: dictionary of animation type per action
-        :return:
+        :param gathered_actions: list of blender actions already gathered
+        :return: blender_actions, blender_tracks, action_on_type
         """
+        blender_actions = []
+        blender_tracks = {}
+        action_on_type = {}
+
         # First step is to get a list of all material animation actions and NLA tracks (if used)
         if not (
             blender_object.type == "MESH"
             and blender_object.data is not None
             and len(blender_object.material_slots) > 0
         ):
-            return
+            return blender_actions, blender_tracks, action_on_type
 
         for material_slot in blender_object.material_slots:
             material = material_slot.material
@@ -268,7 +270,7 @@ class MSFSMaterialAnimation:
             if material is None or material.animation_data is None:
                 continue
 
-            if material.animation_data.action is not None:
+            if material.animation_data.action is not None and material.animation_data.action not in gathered_actions: # If more than one object shares this material, the action will get exported multiple times. We prevent that by checking if we've already gathered it
                 blender_actions.append(material.animation_data.action)
                 blender_tracks[material.animation_data.action.name] = None
                 action_on_type[material.animation_data.action.name] = "MATERIAL"
@@ -286,13 +288,16 @@ class MSFSMaterialAnimation:
                     if track.strips is None or len(non_muted_strips) != 1:
                         continue
                     for strip in non_muted_strips:
-                        blender_actions.append(strip.action)
-                        blender_tracks[
-                            strip.action.name
-                        ] = (
-                            track.name
-                        )  # Always set after possible active action -> None will be overwrite
-                        action_on_type[strip.action.name] = "MATERIAL"
+                        if strip.action not in gathered_actions:
+                            blender_actions.append(strip.action)
+                            blender_tracks[
+                                strip.action.name
+                            ] = (
+                                track.name
+                            )  # Always set after possible active action -> None will be overwrite
+                            action_on_type[strip.action.name] = "MATERIAL"
+
+        return blender_actions, blender_tracks, action_on_type
 
     @staticmethod
     def replace_channel_target(
