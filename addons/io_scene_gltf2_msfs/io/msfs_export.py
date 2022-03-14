@@ -16,6 +16,8 @@
 
 import os
 import bpy
+import urllib
+
 from .. import get_version_string
 
 from .msfs_light import MSFSLight
@@ -42,7 +44,7 @@ class Export:
     def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
         if self.properties.enabled:
             for i, image in enumerate(gltf2_plan.images):
-                image.uri = os.path.basename(image.uri)
+                image.uri = os.path.basename(urllib.parse.unquote(image.uri))
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         if self.properties.enabled:
