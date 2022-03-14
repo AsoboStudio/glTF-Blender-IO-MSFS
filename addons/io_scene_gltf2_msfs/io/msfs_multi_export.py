@@ -116,9 +116,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         xml_string = dom.toprettyxml(encoding="utf-8")
 
                         with open(
-                            os.path.join(
-                                lod_group.folder_name,
-                                lod_group.group_name + ".xml",
+                            bpy.path.abspath(
+                                os.path.join(
+                                    lod_group.folder_name,
+                                    lod_group.group_name + ".xml",
+                                )
                             ),
                             "wb",
                         ) as f:
@@ -149,7 +151,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
                         MSFS_OT_MultiExportGLTF2.export(
                             os.path.join(
-                                lod_group.folder_name,
+                                bpy.path.abspath(lod_group.folder_name),
                                 os.path.splitext(lod.file_name)[0],
                             )
                         )
@@ -169,7 +171,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                                 if obj in list(bpy.context.window.view_layer.objects):
                                     obj.select_set(True)
 
-                    MSFS_OT_MultiExportGLTF2.export(os.path.join(preset.file_path))
+                    MSFS_OT_MultiExportGLTF2.export(bpy.path.abspath(preset.file_path))
 
         return {"FINISHED"}
 
