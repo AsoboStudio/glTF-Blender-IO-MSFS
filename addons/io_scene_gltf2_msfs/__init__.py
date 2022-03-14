@@ -25,7 +25,7 @@ bl_info = {
     "author": "Luca Pierabella, Wing42, pepperoni505, ronh991, tml1024, and others",
     "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
     "blender": (3, 1, 0),
-    "version": (1, 0, 4),
+    "version": (1, 1, 1),
     "location": "File > Import-Export",
     "category": "Import-Export",
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
