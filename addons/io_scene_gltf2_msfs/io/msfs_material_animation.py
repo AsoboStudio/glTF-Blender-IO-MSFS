@@ -344,6 +344,9 @@ class MSFSMaterialAnimation:
         :param export_settings: dictionary of export settings provided by the Khronos exporter
         :return:
         """
+        if not blender_action.fcurves:
+            return
+
         for fcurve in blender_action.fcurves:
             material = MSFSMaterialAnimation.get_material_from_action(
                 blender_object, blender_action, export_settings
@@ -488,3 +491,6 @@ class MSFSMaterialAnimation:
                 channel[
                     "target"
                 ] = f"materials/{material_index}/extensions/ASOBO_material_windshield_v2/wiper4State"
+            else:
+                # If we somehow have a property animated that isn't supported, set target to None to prevent export error
+                channel["target"] = None
