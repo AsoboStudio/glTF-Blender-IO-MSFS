@@ -91,16 +91,17 @@ class Export:
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
 
     def gather_actions_hook(self, blender_object, blender_actions, blender_tracks, action_on_type, export_settings):
-        # Keep track of what material actions we've already exported - no need to export it more than once. All values passed to the hook get modified by reference
-        found_blender_actions, found_blender_tracks, found_action_on_type = MSFSMaterialAnimation.gather_actions(blender_object, self.material_actions, export_settings)
+        if self.properties.enabled:
+            # Keep track of what material actions we've already exported - no need to export it more than once. All values passed to the hook get modified by reference
+            found_blender_actions, found_blender_tracks, found_action_on_type = MSFSMaterialAnimation.gather_actions(blender_object, self.material_actions, export_settings)
 
-        if found_blender_actions:
-            blender_actions.extend(found_blender_actions)
-            self.material_actions.extend(found_blender_actions)
-        if found_blender_tracks:
-            blender_tracks.update(found_blender_tracks)
-        if found_action_on_type:
-            action_on_type.update(found_action_on_type)
+            if found_blender_actions:
+                blender_actions.extend(found_blender_actions)
+                self.material_actions.extend(found_blender_actions)
+            if found_blender_tracks:
+                blender_tracks.update(found_blender_tracks)
+            if found_action_on_type:
+                action_on_type.update(found_action_on_type)
 
     def gather_animation_channel_target_hook(self, gltf2_animation_channel_target, channels, blender_object, bake_bone, bake_channel, export_settings):
         MSFSMaterialAnimation.replace_channel_target(gltf2_animation_channel_target, channels, blender_object, export_settings)
