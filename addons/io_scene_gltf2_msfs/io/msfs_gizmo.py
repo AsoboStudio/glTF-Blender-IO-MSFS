@@ -128,55 +128,56 @@ class MSFSGizmo:
         """
         for node in nodes:
             collisions = []  # TODO: make sure node is mesh?
-            blender_object = blender_scene.objects.get(
-                node.name
-            )  # The glTF exporter will ALWAYS set the node name as the blender name
+            for child in node.children:
+                blender_object = blender_scene.objects.get(
+                    child.name
+                )  # The glTF exporter will ALWAYS set the node name as the blender name
 
-            if (
-                blender_object.parent is None or blender_object.parent.type != "NONE"
-            ):  # We only need the collision gizmos that are parented to a mesh
-                continue
+                if (
+                    blender_object.parent is None or blender_object.parent.type != "MESH"
+                ):  # We only need the collision gizmos that are parented to a mesh
+                    continue
 
-            if blender_object.msfs_gizmo_type != "NONE":
-                result = {}
-                result["type"] = blender_object.msfs_gizmo_type
-                result["translation"] = node.translation
-                if node.rotation:
-                    result["rotation"] = node.rotation
+                if blender_object.msfs_gizmo_type != "NONE":
+                    result = {}
+                    result["type"] = blender_object.msfs_gizmo_type
+                    result["translation"] = child.translation
+                    if child.rotation:
+                        result["rotation"] = child.rotation
 
-                # Calculate scale per gizmo type
-                scale = {}
-                if blender_object.msfs_gizmo_type == "sphere":
-                    scale["radius"] = abs(node.scale[0] * node.scale[1] * node.scale[2])
-                elif blender_object.msfs_gizmo_type == "box":
-                    scale["length"] = abs(node.scale[0])
-                    scale["width"] = abs(node.scale[1])
-                    scale["height"] = abs(node.scale[2])
-                elif blender_object.msfs_gizmo_type == "cylinder":
-                    scale["radius"] = abs(node.scale[0] * node.scale[1])
-                    scale["height"] = abs(node.scale[2])
+                    # Calculate scale per gizmo type
+                    scale = {}
+                    if blender_object.msfs_gizmo_type == "sphere":
+                        scale["radius"] = abs(child.scale[0] * child.scale[1] * child.scale[2])
+                    elif blender_object.msfs_gizmo_type == "box":
+                        scale["length"] = abs(child.scale[0])
+                        scale["width"] = abs(child.scale[1])
+                        scale["height"] = abs(child.scale[2])
+                    elif blender_object.msfs_gizmo_type == "cylinder":
+                        scale["radius"] = abs(child.scale[0] * child.scale[1])
+                        scale["height"] = abs(child.scale[2])
 
-                result["params"] = scale
+                    result["params"] = scale
 
-                # Collision type
-                tags = ["Collision"]
-                if blender_object.msfs_collision_is_road_collider:
-                    tags.append("Road")
+                    # Collision type
+                    tags = ["Collision"]
+                    if blender_object.msfs_collision_is_road_collider:
+                        tags.append("Road")
 
-                result["extensions"] = {
-                    "ASOBO_tags": Extension(
-                        name="ASOBO_tags", extension={"tags": tags}, required=False
-                    )
-                }
+                    result["extensions"] = {
+                        "ASOBO_tags": Extension(
+                            name="ASOBO_tags", extension={"tags": tags}, required=False
+                        )
+                    }
 
-                collisions.append(result)
-                node.children.remove(node)
+                    collisions.append(result)
+                    node.children.remove(child)
+
+            if collisions:
+                node.mesh.extensions[MSFSGizmo.extension_name] = Extension(
+                    name=MSFSGizmo.extension_name,
+                    extension={"gizmo_objects": collisions},
+                    required=False,
+                )
 
             MSFSGizmo.export(node.children, blender_scene, export_settings)
-
-        if collisions:
-            node.mesh.extensions[MSFSGizmo.extension_name] = Extension(
-                name=MSFSGizmo.extension_name,
-                extension={"gizmo_objects": collisions},
-                required=False,
-            )
