@@ -63,6 +63,9 @@ class MSFSGizmo:
                     scale[1] = params.get("radius")
                     scale[2] = params.get("height")
 
+                # Flip scale (MSFS and Blender are exported with YUP)
+                scale = [scale[0], scale[2], scale[1]]
+
                 placeholder_extension = {
                     "gizmo_blender_data": {
                         "road_collider": "Road"
@@ -144,6 +147,10 @@ class MSFSGizmo:
                     result["translation"] = child.translation
                     if child.rotation:
                         result["rotation"] = child.rotation
+
+                    # Flip scale if we're exporting with YUP
+                    if export_settings["gltf_yup"]:
+                        child.scale = [child.scale[0], child.scale[2], child.scale[1]]
 
                     # Calculate scale per gizmo type
                     scale = {}
