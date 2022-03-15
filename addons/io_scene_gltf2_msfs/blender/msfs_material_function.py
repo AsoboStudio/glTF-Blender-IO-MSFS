@@ -17,6 +17,7 @@
 import bpy
 from enum import Enum
 
+
 class MSFS_MaterialProperties(Enum):
     baseColor = 0, "Base Color"
     emissive = 1, "Emissive"
@@ -122,6 +123,7 @@ class MSFS_Material:
         self.links = material.node_tree.links
         if buildTree:
             self.__buildShaderTree()
+            self.force_update_properties()
 
     def revertToPBRShaderTree(self):
         self.cleanNodeTree()
@@ -130,6 +132,48 @@ class MSFS_Material:
     def __buildShaderTree(self):
         self.cleanNodeTree()
         self.createNodetree()
+
+    def force_update_properties(self):
+        from .msfs_material_prop_update import MSFS_Material_Property_Update
+
+        MSFS_Material_Property_Update.update_base_color_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_comp_texture(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_normal_texture(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_emissive_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_detail_color_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_detail_comp_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_detail_normal_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_blend_mask_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_wetness_ao_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_dirt_texture(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_wiper_mask(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_alpha_mode(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_emissive_scale(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_normal_scale(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_color_sss(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_double_sided(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_alpha_cutoff(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_detail_uv(self.material, bpy.context)
+        # Trigger setters
+        self.material.msfs_base_color_factor = self.material.msfs_base_color_factor
+        self.material.msfs_emissive_factor = self.material.msfs_emissive_factor
+        self.material.msfs_metallic_factor = self.material.msfs_metallic_factor
+        self.material.msfs_roughness_factor = self.material.msfs_roughness_factor
+        self.material.msfs_base_color_factor = self.material.msfs_base_color_factor
 
     def cleanNodeTree(self):
         nodes = self.material.node_tree.nodes
