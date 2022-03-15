@@ -16,6 +16,8 @@
 
 import bpy
 
+from .msfs_material_prop_update import MSFS_Material_Property_Update
+
 
 class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     """This addon changes some of the internal property names. This current material has older properties, and is able to be migrated.\nWARNING: This removes all the old properties from the material"""
@@ -25,7 +27,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
     old_property_to_new_mapping = {
         "msfs_color_albedo_mix": "msfs_base_color_factor",
-        "msfs_color_emissive_mix": "msfs_emissive_factor",
         "msfs_color_sss": "msfs_sss_color",
         "msfs_use_pearl_effect ": "msfs_use_pearl",
         "msfs_decal_blend_factor_color": "msfs_base_color_blend_factor",
@@ -80,6 +81,10 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
                 del mat[old_property]
 
+        # Emissive factor is a special case - old material system had 4 floats, we only need 3
+        if mat.get("msfs_color_emissive_mix"):
+            mat.msfs_emissive_factor = mat.get("msfs_color_emissive_mix")[0:3]
+
         # Do our enums manually as only their index of the value are stored - not the string
         if mat.get("msfs_blend_mode"):
             old_alpha_order = [
@@ -92,7 +97,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
             del mat["msfs_blend_mode"]
 
-        # Do material type last so that the material update call overwrites any values that should change based off material (old addon didn't implement this)
         if mat.get("msfs_material_mode"):
             old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
                 "NONE",
@@ -115,6 +119,8 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
             mat.msfs_material_type = old_material_older[mat["msfs_material_mode"]]
 
             del mat["msfs_material_mode"]
+
+        MSFS_Material_Property_Update.update_msfs_material_type(mat, context)
 
         return {"FINISHED"}
 
