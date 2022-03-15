@@ -18,7 +18,6 @@ import bpy
 from .msfs_light import MSFSLight
 from .msfs_gizmo import MSFSGizmo
 from .msfs_material import MSFSMaterial
-from .msfs_material_animation import MSFSMaterialAnimation
 
 class Import:
 
@@ -36,7 +35,3 @@ class Import:
     # Create materials
     def gather_import_material_after_hook(self, gltf2_material, vertex_color, blender_material, import_settings):
         MSFSMaterial.create(gltf2_material, blender_material, import_settings)
-
-    # Create material animations
-    def gather_import_scene_after_nodes_hook(self, gltf2_scene, blender_scene, import_settings): # TODO: move this to proper animation hook once added
-        MSFSMaterialAnimation.create(import_settings)

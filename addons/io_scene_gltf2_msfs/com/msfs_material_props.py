@@ -65,8 +65,7 @@ class AsoboMaterialCommon:
         max=1.0,
         size=4,
         default=Defaults.BaseColorFactor,
-        get=MSFS_Material_Property_Update.get_base_color,
-        set=MSFS_Material_Property_Update.set_base_color,
+        update=MSFS_Material_Property_Update.update_base_color,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_emissive_factor = bpy.props.FloatVectorProperty(
@@ -77,8 +76,7 @@ class AsoboMaterialCommon:
         max=1.0,
         size=3,
         default=Defaults.EmissiveFactor,
-        get=MSFS_Material_Property_Update.get_emissive_color,
-        set=MSFS_Material_Property_Update.set_emissive_color,
+        update=MSFS_Material_Property_Update.update_emissive_color,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_metallic_factor = bpy.props.FloatProperty(
@@ -87,8 +85,7 @@ class AsoboMaterialCommon:
         min=0.0,
         max=1.0,
         default=Defaults.MetallicFactor,
-        get=MSFS_Material_Property_Update.get_metallic_factor,
-        set=MSFS_Material_Property_Update.set_metallic_factor,
+        update=MSFS_Material_Property_Update.update_metallic_scale,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_roughness_factor = bpy.props.FloatProperty(
@@ -97,8 +94,7 @@ class AsoboMaterialCommon:
         min=0.0,
         max=1.0,
         default=Defaults.RoughnessFactor,
-        get=MSFS_Material_Property_Update.get_roughness_factor,
-        set=MSFS_Material_Property_Update.set_roughness_factor,
+        update=MSFS_Material_Property_Update.update_roughness_scale,
         options={"ANIMATABLE"},
     )
     bpy.types.Material.msfs_normal_scale = bpy.props.FloatProperty(
