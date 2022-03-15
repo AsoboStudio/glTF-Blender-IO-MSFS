@@ -427,9 +427,9 @@ class MSFSMaterialAnimation:
         ):
             return
 
-        for channel in gltf2_animation.extensions[MSFSMaterialAnimation.extension_name][
+        for channel in list(gltf2_animation.extensions[MSFSMaterialAnimation.extension_name][
             "channels"
-        ]:
+        ]):
             material_index = None
             for j, material in enumerate(gltf2_plan.materials):
                 if material.name == channel["target"].material.name:
@@ -492,5 +492,5 @@ class MSFSMaterialAnimation:
                     "target"
                 ] = f"materials/{material_index}/extensions/ASOBO_material_windshield_v2/wiper4State"
             else:
-                # If we somehow have a property animated that isn't supported, set target to None to prevent export error
-                channel["target"] = None
+                # If we somehow have a property animated that isn't supported, remove the channel
+                gltf2_animation.extensions[MSFSMaterialAnimation.extension_name]["channels"].remove(channel)
