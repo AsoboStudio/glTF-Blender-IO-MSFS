@@ -55,16 +55,16 @@ class MSFSGizmo:
                     scale[1] = params.get("radius")
                     scale[2] = params.get("radius")
                 elif gizmo_type == "box":
-                    scale[0] = params.get("length")
-                    scale[1] = params.get("width")
-                    scale[2] = params.get("height")
+                    scale[0] = params.get("length") / 2
+                    scale[1] = params.get("width") / 2
+                    scale[2] = params.get("height") / 2
                 elif gizmo_type == "cylinder":
                     scale[0] = params.get("radius")
                     scale[1] = params.get("radius")
                     scale[2] = params.get("height")
 
-                # Flip scale (MSFS and Blender are exported with YUP)
-                scale = [scale[0], scale[2], scale[1]]
+                # Flip scale to convert from MSFS gizmo scale system
+                scale = [scale[1], scale[2], scale[0]]
 
                 placeholder_extension = {
                     "gizmo_blender_data": {
@@ -148,18 +148,20 @@ class MSFSGizmo:
                     if child.rotation:
                         result["rotation"] = child.rotation
 
-                    # Flip scale if we're exporting with YUP
+                    # Flip scale to match MSFS gizmo scale system
                     if export_settings["gltf_yup"]:
-                        child.scale = [child.scale[0], child.scale[2], child.scale[1]]
+                        child.scale = [child.scale[2], child.scale[0], child.scale[1]]
+                    else:
+                        child.scale = [child.scale[1], child.scale[0], child.scale[2]]
 
                     # Calculate scale per gizmo type
                     scale = {}
                     if blender_object.msfs_gizmo_type == "sphere":
                         scale["radius"] = abs(child.scale[0] * child.scale[1] * child.scale[2])
                     elif blender_object.msfs_gizmo_type == "box":
-                        scale["length"] = abs(child.scale[0])
-                        scale["width"] = abs(child.scale[1])
-                        scale["height"] = abs(child.scale[2])
+                        scale["length"] = abs(child.scale[0]) * 2
+                        scale["width"] = abs(child.scale[1]) * 2
+                        scale["height"] = abs(child.scale[2]) * 2
                     elif blender_object.msfs_gizmo_type == "cylinder":
                         scale["radius"] = abs(child.scale[0] * child.scale[1])
                         scale["height"] = abs(child.scale[2])
