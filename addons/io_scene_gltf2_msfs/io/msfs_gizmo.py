@@ -148,6 +148,9 @@ class MSFSGizmo:
                     if child.rotation:
                         result["rotation"] = child.rotation
 
+                    if child.scale is None: # If the scale is default, it will be exported as None which will raise an error here
+                        child.scale = [1.0, 1.0, 1.0]
+
                     # Flip scale to match MSFS gizmo scale system
                     if export_settings["gltf_yup"]:
                         child.scale = [child.scale[2], child.scale[0], child.scale[1]]
