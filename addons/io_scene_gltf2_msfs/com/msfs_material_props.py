@@ -1678,7 +1678,7 @@ class AsoboMaterialCode:
     class MaterialCode:
         Windshield = "Windshield"
         Porthole = "Porthole"
-        GeoDecalFrosted = ("GeoDecalFrosted",)
+        GeoDecalFrosted = "GeoDecalFrosted"
         ClearCoat = "ClearCoat"
 
     @staticmethod
