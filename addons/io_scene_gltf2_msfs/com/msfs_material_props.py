@@ -857,29 +857,23 @@ class AsoboMaterialUVOptions:
             or blender_material.msfs_uv_rotation
             != AsoboMaterialUVOptions.Defaults.UVRotation
         ):
-            if (blender_material.msfs_ao_use_uv2 == True or blender_material.msfs_uv_clamp_x == True or
-                    blender_material.msfs_uv_clamp_y == True or blender_material.msfs_uv_clamp_z == True):
-                result["AOUseUV2"] = blender_material.msfs_ao_use_uv2
-                result["clampUVX"] = blender_material.msfs_uv_clamp_x
-                result["clampUVY"] = blender_material.msfs_uv_clamp_y
-                result["clampUVZ"] = blender_material.msfs_uv_clamp_z
-            if (blender_material.msfs_uv_offset_u != 0.0 or blender_material.msfs_uv_offset_v != 0.0):
-                result["UVOffsetU"] = blender_material.msfs_uv_offset_u
-                result["UVOffsetV"] = blender_material.msfs_uv_offset_v
-            if (blender_material.msfs_uv_tiling_u != 1.0 or blender_material.msfs_uv_tiling_v != 1.0):
-                result["UVTilingU"] = blender_material.msfs_uv_tiling_u
-                result["UVTilingV"] = blender_material.msfs_uv_tiling_v
-            if (blender_material.msfs_uv_rotation != 0.0):
-                result["UVRotation"] = blender_material.msfs_uv_rotation
-                
-            if len(result) > 0:
-                gltf2_material.extensions[
-                    AsoboMaterialUVOptions.SerializedName
-                ] = Extension(
-                    name=AsoboMaterialUVOptions.SerializedName,
-                    extension=result,
-                    required=False,
-                )
+            result["AOUseUV2"] = blender_material.msfs_ao_use_uv2
+            result["clampUVX"] = blender_material.msfs_clamp_uv_x
+            result["clampUVY"] = blender_material.msfs_clamp_uv_y
+            result["clampUVZ"] = blender_material.msfs_clamp_uv_z
+            result["UVOffsetU"] = blender_material.msfs_uv_offset_u
+            result["UVOffsetV"] = blender_material.msfs_uv_offset_v
+            result["UVTilingU"] = blender_material.msfs_uv_tiling_u
+            result["UVTilingV"] = blender_material.msfs_uv_tiling_v
+            result["UVRotation"] = blender_material.msfs_uv_rotation
+
+            gltf2_material.extensions[
+                AsoboMaterialUVOptions.SerializedName
+            ] = Extension(
+                name=AsoboMaterialUVOptions.SerializedName,
+                extension=result,
+                required=False,
+            )
 
 
 class AsoboMaterialShadowOptions:
