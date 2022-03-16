@@ -549,7 +549,7 @@ class AsoboDisableMotionBlur:
             return
 
         assert isinstance(extensions, dict)
-        extension = extensions.get(AsoboDisableMotionBlur.SerializedName)
+        extension = extensions.get(AsoboDisableMotionBlur.SerializedName, {})
         if extension.get("enabled"):
             blender_material.msfs_disable_motion_blur = True
 
@@ -1678,7 +1678,7 @@ class AsoboMaterialCode:
     class MaterialCode:
         Windshield = "Windshield"
         Porthole = "Porthole"
-        GeoDecalFrosted = ("GeoDecalFrosted",)
+        GeoDecalFrosted = "GeoDecalFrosted"
         ClearCoat = "ClearCoat"
 
     @staticmethod
