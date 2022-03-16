@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from ..msfs_material_function import MSFS_Material
+from enum import Enum
+from ..msfs_material_function import MSFS_Material, MSFS_ShaderNodes, MSFS_AnisotropicNodes
 
 
 class MSFS_Anisotropic(MSFS_Material):
@@ -23,3 +24,6 @@ class MSFS_Anisotropic(MSFS_Material):
 
     def customShaderTree(self):
         super(MSFS_Anisotropic, self).defaultShaderStree()
+        super(MSFS_Anisotropic, self).anisotropicShaderTree()
+
+    
