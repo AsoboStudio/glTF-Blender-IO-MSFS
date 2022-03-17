@@ -384,7 +384,7 @@ class MSFS_Material:
             "ShaderNodeMixRGB",
             {
                 "name": MSFS_ShaderNodes.emissiveMul.value,
-                "operation": "MULTIPLY", 
+                "blend_type": "MULTIPLY", 
                 "location": (0.0, -550.0),
             },
             
