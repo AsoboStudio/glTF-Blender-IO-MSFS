@@ -23,3 +23,5 @@ class MSFS_Hair(MSFS_Material):
 
     def customShaderTree(self):
         super(MSFS_Hair, self).defaultShaderStree()
+        super(MSFS_Hair, self).anisotropicShaderTree()
+    

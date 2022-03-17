@@ -29,8 +29,12 @@ class Import:
         MSFSLight.create(gltf2_node, blender_node, blender_light, import_settings)
 
     # Create gizmos
+    def gather_import_scene_before_hook(self, gltf_scene, blender_scene, import_settings):
+        MSFSGizmo.create(gltf_scene, blender_scene, import_settings)
+
+    # Set proper gizmo blender object properties
     def gather_import_node_after_hook(self, vnode, gltf2_node, blender_object, import_settings):
-        MSFSGizmo.create(gltf2_node, blender_object, import_settings)
+        MSFSGizmo.set_blender_data(gltf2_node, blender_object, import_settings)
 
     # Create materials
     def gather_import_material_after_hook(self, gltf2_material, vertex_color, blender_material, import_settings):

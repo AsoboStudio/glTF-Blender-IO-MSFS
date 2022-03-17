@@ -17,6 +17,7 @@
 import bpy
 from enum import Enum
 
+
 class MSFS_MaterialProperties(Enum):
     baseColor = 0, "Base Color"
     emissive = 1, "Emissive"
@@ -106,6 +107,10 @@ class MSFS_ShaderNodes(Enum):
     blendCompMap = "Blend Occlusion(R) Roughness(G) Metallic(B) Map"
     vertexColor = "Vertex Color"
 
+class MSFS_AnisotropicNodes(Enum):
+    anisotropicTex = "Anisotropic Texture"
+    separateAnisotropic = "Separate Anisotropic"
+
 
 class MSFS_Material:
 
@@ -122,6 +127,7 @@ class MSFS_Material:
         self.links = material.node_tree.links
         if buildTree:
             self.__buildShaderTree()
+            self.force_update_properties()
 
     def revertToPBRShaderTree(self):
         self.cleanNodeTree()
@@ -130,6 +136,48 @@ class MSFS_Material:
     def __buildShaderTree(self):
         self.cleanNodeTree()
         self.createNodetree()
+
+    def force_update_properties(self):
+        from .msfs_material_prop_update import MSFS_Material_Property_Update
+
+        MSFS_Material_Property_Update.update_base_color_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_comp_texture(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_normal_texture(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_emissive_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_detail_color_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_detail_comp_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_detail_normal_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_blend_mask_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_extra_slot1_texture(
+            self.material, bpy.context
+        )
+        MSFS_Material_Property_Update.update_dirt_texture(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_wiper_mask(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_alpha_mode(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_emissive_scale(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_normal_scale(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_color_sss(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_double_sided(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_alpha_cutoff(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_detail_uv(self.material, bpy.context)
+        # Trigger setters
+        self.material.msfs_base_color_factor = self.material.msfs_base_color_factor
+        self.material.msfs_emissive_factor = self.material.msfs_emissive_factor
+        self.material.msfs_metallic_factor = self.material.msfs_metallic_factor
+        self.material.msfs_roughness_factor = self.material.msfs_roughness_factor
+        self.material.msfs_base_color_factor = self.material.msfs_base_color_factor
 
     def cleanNodeTree(self):
         nodes = self.material.node_tree.nodes
@@ -235,13 +283,6 @@ class MSFS_Material:
             "ShaderNodeTexImage",
             {"name": MSFS_ShaderNodes.detailCompTex.value, "location": (-800, -350.0)},
         )
-        self.nodeDetailNormal = self.addNode(
-            "ShaderNodeTexImage",
-            {
-                "name": MSFS_ShaderNodes.detailNormalTex.value,
-                "location": (-500, -1300.0),
-            },
-        )
         self.nodeDetailNormalScale = self.addNode(
             "ShaderNodeValue",
             {
@@ -341,7 +382,12 @@ class MSFS_Material:
         # emissive operators
         mulEmissiveNode = self.addNode(
             "ShaderNodeMixRGB",
-            {"name": MSFS_ShaderNodes.emissiveMul.value, "location": (0.0, -550.0)},
+            {
+                "name": MSFS_ShaderNodes.emissiveMul.value,
+                "operation": "MULTIPLY", 
+                "location": (0.0, -550.0),
+            },
+            
         )
 
         # comp operators
@@ -514,6 +560,42 @@ class MSFS_Material:
             'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveScale.value),
             'nodes["{0}"].inputs[20]'.format(MSFS_ShaderNodes.principledBSDF.value),
         )
+
+    def anisotropicShaderTree(self):
+        self.nodeAnisotropicTex = self.addNode(
+            "ShaderNodeTexImage",
+            {"name": MSFS_AnisotropicNodes.anisotropicTex.value, "location": (-500, -800.0)},
+        )
+        self.nodeSeparateAnisotropic = self.addNode(
+            "ShaderNodeSeparateRGB",
+            {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
+        )
+        self.innerLink(
+                'nodes["{0}"].outputs[0]'.format(MSFS_AnisotropicNodes.anisotropicTex.value),
+                'nodes["{0}"].inputs[0]'.format(MSFS_AnisotropicNodes.separateAnisotropic.value),
+            )
+
+
+    def setAnisotropicTex(self, tex):
+        self.nodeAnisotropicTex = self.getNode(MSFS_AnisotropicNodes.anisotropicTex.value)
+        self.nodeAnisotropicTex.image = tex
+        if not self.nodeAnisotropicTex.image:
+            self.principledBSDF = self.getNode(MSFS_ShaderNodes.principledBSDF.value)
+            self.unLinkNodeInput(self.principledBSDF, 10)
+            self.unLinkNodeInput(self.principledBSDF, 11)
+        elif self.nodeAnisotropicTex.image :
+            self.innerLink(
+                'nodes["{0}"].outputs[0]'.format(
+                    MSFS_AnisotropicNodes.separateAnisotropic.value
+                ),
+                'nodes["{0}"].inputs[10]'.format(MSFS_ShaderNodes.principledBSDF.value),
+            )
+            self.innerLink(
+                'nodes["{0}"].outputs[2]'.format(
+                    MSFS_AnisotropicNodes.separateAnisotropic.value
+                ),
+                'nodes["{0}"].inputs[11]'.format(MSFS_ShaderNodes.principledBSDF.value),
+            )
 
     def setBaseColor(self, color):
         self.nodeBaseColorRGB = self.getNode(MSFS_ShaderNodes.baseColorRGB.value)

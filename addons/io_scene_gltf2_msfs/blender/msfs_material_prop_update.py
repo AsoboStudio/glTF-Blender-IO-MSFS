@@ -107,7 +107,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Invisible(self, buildTree=True)
         elif self.msfs_material_type == "msfs_fake_terrain":
             msfs_mat = MSFS_Fake_Terrain(self, buildTree=True)
-        elif self.msfs_material_type == "msfs_fresnel":
+        elif self.msfs_material_type == "msfs_fresnel_fade":
             msfs_mat = MSFS_Fresnel_Fade(self, buildTree=True)
         elif self.msfs_material_type == "msfs_env_occluder":
             msfs_mat = MSFS_Environment_Occluder(self, buildTree=True)
@@ -210,14 +210,10 @@ class MSFS_Material_Property_Update:
             )
 
     @staticmethod
-    def update_wetness_ao_texture(self, context):
-        if self.node_tree.nodes.get("anisotropic_direction", None) != None:
-            self.node_tree.nodes[
-                "anisotropic_direction"
-            ].image = self.msfs_wetness_ao_texture
-            self.node_tree.nodes[
-                "anisotropic_direction"
-            ].image.colorspace_settings.name = "Non-Color"
+    def update_extra_slot1_texture(self, context):
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if type(msfs) is MSFS_Anisotropic or type(msfs) is MSFS_Hair:
+            msfs.setAnisotropicTex(self.msfs_extra_slot1_texture)
 
     @staticmethod
     def update_dirt_texture(self, context):
