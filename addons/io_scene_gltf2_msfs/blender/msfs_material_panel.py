@@ -26,7 +26,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     bl_label = "Migrate Material Data"
 
     old_property_to_new_mapping = {
-        "msfs_color_albedo_mix": "msfs_base_color_factor",
         "msfs_color_sss": "msfs_sss_color",
         "msfs_use_pearl_effect ": "msfs_use_pearl",
         "msfs_decal_blend_factor_color": "msfs_base_color_blend_factor",
@@ -81,7 +80,14 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
                 del mat[old_property]
 
-        # Emissive factor is a special case - old material system had 4 floats, we only need 3
+        # Base color is a special case - can only have 3 values, we need 4
+        if mat.get("msfs_color_albedo_mix"):
+            base_color = list(mat.get("msfs_color_albedo_mix"))
+            if len(base_color) == 3:
+                base_color.append(1) # Append full alpha
+            mat.msfs_base_color_factor = base_color
+
+        # Emissive factor is also a special case - old material system had 4 floats, we only need 3
         if mat.get("msfs_color_emissive_mix"):
             mat.msfs_emissive_factor = mat.get("msfs_color_emissive_mix")[0:3]
 
