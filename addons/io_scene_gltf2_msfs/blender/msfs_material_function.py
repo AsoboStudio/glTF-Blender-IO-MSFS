@@ -279,13 +279,6 @@ class MSFS_Material:
             "ShaderNodeTexImage",
             {"name": MSFS_ShaderNodes.detailCompTex.value, "location": (-800, -350.0)},
         )
-        self.nodeDetailNormal = self.addNode(
-            "ShaderNodeTexImage",
-            {
-                "name": MSFS_ShaderNodes.detailNormalTex.value,
-                "location": (-500, -1300.0),
-            },
-        )
         self.nodeDetailNormalScale = self.addNode(
             "ShaderNodeValue",
             {
