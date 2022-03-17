@@ -210,14 +210,10 @@ class MSFS_Material_Property_Update:
             )
 
     @staticmethod
-    def update_wetness_ao_texture(self, context):
-        if self.node_tree.nodes.get("anisotropic_direction", None) != None:
-            self.node_tree.nodes[
-                "anisotropic_direction"
-            ].image = self.msfs_wetness_ao_texture
-            self.node_tree.nodes[
-                "anisotropic_direction"
-            ].image.colorspace_settings.name = "Non-Color"
+    def update_extra_slot1_texture(self, context):
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if type(msfs) is MSFS_Anisotropic or type(msfs) is MSFS_Hair:
+            msfs.setAnisotropicTex(self.msfs_extra_slot1_texture)
 
     @staticmethod
     def update_dirt_texture(self, context):
