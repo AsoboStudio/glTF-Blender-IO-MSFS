@@ -82,7 +82,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
         # Base color is a special case - can only have 3 values, we need 4
         if mat.get("msfs_color_albedo_mix"):
-            base_color = mat.get("msfs_color_albedo_mix")
+            base_color = list(mat.get("msfs_color_albedo_mix"))
             if len(base_color) == 3:
                 base_color.append(1) # Append full alpha
             mat.msfs_base_color_factor = base_color
