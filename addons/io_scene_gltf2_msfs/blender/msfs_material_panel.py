@@ -26,7 +26,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     bl_label = "Migrate Material Data"
 
     old_property_to_new_mapping = {
-        "msfs_color_albedo_mix": "msfs_base_color_factor",
         "msfs_color_sss": "msfs_sss_color",
         "msfs_use_pearl_effect ": "msfs_use_pearl",
         "msfs_decal_blend_factor_color": "msfs_base_color_blend_factor",
@@ -57,7 +56,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         "msfs_metallic_texture": "msfs_occlusion_metallic_roughness_texture",
         "msfs_detail_albedo_texture": "msfs_detail_color_texture",
         "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
-        "msfs_anisotropic_direction_texture": "msfs_wetness_ao_texture",
+        "msfs_anisotropic_direction_texture": "msfs_extra_slot1_texture",
         "msfs_clearcoat_texture": "msfs_dirt_texture",
         "msfs_behind_glass_texture": "msfs_detail_color_texture",
     }
@@ -81,7 +80,14 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
                 del mat[old_property]
 
-        # Emissive factor is a special case - old material system had 4 floats, we only need 3
+        # Base color is a special case - can only have 3 values, we need 4
+        if mat.get("msfs_color_albedo_mix"):
+            base_color = list(mat.get("msfs_color_albedo_mix"))
+            if len(base_color) == 3:
+                base_color.append(1) # Append full alpha
+            mat.msfs_base_color_factor = base_color
+
+        # Emissive factor is also a special case - old material system had 4 floats, we only need 3
         if mat.get("msfs_color_emissive_mix"):
             mat.msfs_emissive_factor = mat.get("msfs_color_emissive_mix")[0:3]
 
@@ -439,7 +445,7 @@ class MSFS_PT_Material(bpy.types.Panel):
                     normal_texture_name = "Normal"
                     blend_mask_texture_name = "Blend Mask"
                     dirt_texture_name = "Clearcoat amount (R), Clearcoat rough (G)"
-                    wetness_ao_texture_name = "Wetness AO"
+                    extra_slot1_texture = "Extra Slot 1"
                     emissive_texture_name = "Emissive"
                     detail_color_texture_name = "Secondary Color (RGB), Alpha (A)"
                     detail_occlusion_metallic_roughness_texture_name = (
@@ -456,7 +462,7 @@ class MSFS_PT_Material(bpy.types.Panel):
 
                     if mat.msfs_material_type == "msfs_windshield":
                         emissive_texture_name = "Secondary Details(A)"
-                        wetness_ao_texture_name = "Wiper Mask (RG)"
+                        extra_slot1_texture = "Wiper Mask (RG)"
                         detail_color_texture_name = (
                             "Details Scratch(R), Icing Mask(G), Fingerprints(B)"
                         )
@@ -475,7 +481,7 @@ class MSFS_PT_Material(bpy.types.Panel):
                             "Emissive Ins Window (RGB), offset Time (A)"
                         )
                     elif mat.msfs_material_type in ["msfs_anisotropic", "msfs_hair"]:
-                        wetness_ao_texture_name = "Anisotropic direction (RG)"
+                        extra_slot1_texture = "Anisotropic direction (RG)"
 
                     self.draw_texture_prop(
                         box, mat, "msfs_base_color_texture", text=base_color_tex_name
@@ -544,8 +550,8 @@ class MSFS_PT_Material(bpy.types.Panel):
                         self.draw_texture_prop(
                             box,
                             mat,
-                            "msfs_wetness_ao_texture",
-                            text=wetness_ao_texture_name,
+                            "msfs_extra_slot1_texture",
+                            text=extra_slot1_texture,
                         )
                     if mat.msfs_material_type == "msfs_clearcoat":
                         self.draw_texture_prop(

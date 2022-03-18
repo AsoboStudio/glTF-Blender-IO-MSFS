@@ -189,10 +189,11 @@ class AsoboMaterialCommon:
         type=bpy.types.Image,
         update=MSFS_Material_Property_Update.update_dirt_texture,
     )
-    bpy.types.Material.msfs_wetness_ao_texture = bpy.props.PointerProperty(
-        name="Wetness AO Texture",
+    
+    bpy.types.Material.msfs_extra_slot1_texture = bpy.props.PointerProperty(
+        name="Extra Slot 1 Texture",
         type=bpy.types.Image,
-        update=MSFS_Material_Property_Update.update_wetness_ao_texture,
+        update=MSFS_Material_Property_Update.update_extra_slot1_texture,
     )
     bpy.types.Material.msfs_opacity_texture = bpy.props.PointerProperty(
         name="Opacity Texture", type=bpy.types.Image
@@ -549,7 +550,7 @@ class AsoboDisableMotionBlur:
             return
 
         assert isinstance(extensions, dict)
-        extension = extensions.get(AsoboDisableMotionBlur.SerializedName)
+        extension = extensions.get(AsoboDisableMotionBlur.SerializedName, {})
         if extension.get("enabled"):
             blender_material.msfs_disable_motion_blur = True
 
@@ -1296,7 +1297,7 @@ class AsoboAnisotropic:
             else:
                 blender_material.msfs_material_type = "msfs_anisotropic"
             if extension.get("anisotropicTexture"):
-                blender_material.msfs_wetness_ao_texture = MSFSMaterial.create_image(
+                blender_material.msfs_extra_slot1_texture = MSFSMaterial.create_image(
                     extension.get("anisotropicTexture", {}).get("index"), import_settings
                 )
 
@@ -1308,10 +1309,10 @@ class AsoboAnisotropic:
         if (
             blender_material.msfs_material_type == "msfs_anisotropic"
             or blender_material.msfs_material_type == "msfs_hair"
-        ) and blender_material.msfs_wetness_ao_texture is not None:
+        ) and blender_material.msfs_extra_slot1_texture is not None:
             result["anisotropicTexture"] = MSFSMaterial.export_image(
                 blender_material,
-                blender_material.msfs_wetness_ao_texture,
+                blender_material.msfs_extra_slot1_texture,
                 "DEFAULT",
                 export_settings,
             )
@@ -1391,7 +1392,7 @@ class AsoboWindshield:
             if extension.get("wiper4State"):
                 blender_material.msfs_wiper_4_state = extension.get("wiper4State")
             if extension.get("wiperMaskTexture"):
-                blender_material.msfs_wetness_ao_texture = MSFSMaterial.create_image(
+                blender_material.msfs_extra_slot1_texture = MSFSMaterial.create_image(
                     extension.get("wiperMaskTexture", {}).get("index"), import_settings
                 )
 
@@ -1406,10 +1407,10 @@ class AsoboWindshield:
             result["wiper2State"] = blender_material.msfs_wiper_2_state
             result["wiper3State"] = blender_material.msfs_wiper_3_state
             result["wiper4State"] = blender_material.msfs_wiper_4_state
-            if blender_material.msfs_wetness_ao_texture is not None:
+            if blender_material.msfs_extra_slot1_texture is not None:
                 result["wiperMaskTexture"] = MSFSMaterial.export_image(
                     blender_material,
-                    blender_material.msfs_wetness_ao_texture,
+                    blender_material.msfs_extra_slot1_texture,
                     "DEFAULT",
                     export_settings,
                 )
@@ -1678,7 +1679,7 @@ class AsoboMaterialCode:
     class MaterialCode:
         Windshield = "Windshield"
         Porthole = "Porthole"
-        GeoDecalFrosted = ("GeoDecalFrosted",)
+        GeoDecalFrosted = "GeoDecalFrosted"
         ClearCoat = "ClearCoat"
 
     @staticmethod
