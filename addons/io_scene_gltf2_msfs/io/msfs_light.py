@@ -50,6 +50,11 @@ class MSFSLight:
 
     @staticmethod
     def export(gltf2_object, blender_object):
+        # First, clear all KHR_lights_punctual extensions from children. TODO: remove children?
+        for child in gltf2_object.children:
+            if child.extensions and child.extensions.get("KHR_lights_punctual"):
+                child.extensions.pop("KHR_lights_punctual")
+
         angle = 360.0
         if blender_object.data.type == 'SPOT':
             angle = (180.0 / math.pi) * blender_object.data.spot_size

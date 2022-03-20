@@ -136,6 +136,9 @@ class MSFSGizmo:
                     child.name
                 )  # The glTF exporter will ALWAYS set the node name as the blender name
 
+                if blender_object is None: # However, there are cases where the exporter creates fake nodes that don't exist in the scene
+                    continue
+
                 if (
                     blender_object.parent is None or blender_object.parent.type != "MESH"
                 ):  # We only need the collision gizmos that are parented to a mesh
