@@ -743,11 +743,13 @@ class MSFS_Material:
     def setDetailNormalTex(self, tex):
         self.nodeDetailNormalTex = self.getNode(MSFS_ShaderNodes.detailNormalTex.value)
         self.nodeDetailNormalTex.image = tex
+        self.nodeDetailNormalTex.image.colorspace_settings.name = "Non-Color"
         self.updateNormalLinks()
 
     def setNormalTex(self, tex):
         self.nodeNormalTex = self.getNode(MSFS_ShaderNodes.normalTex.value)
         self.nodeNormalTex.image = tex
+        self.nodeNormalTex.image.colorspace_settings.name = "Non-Color"
         self.updateNormalLinks()
 
     def updateNormalLinks(self):
