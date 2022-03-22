@@ -63,7 +63,7 @@ class MSFS_Material_Property_Update:
             return MSFS_Invisible(mat)
         elif mat.msfs_material_type == "msfs_fake_terrain":
             return MSFS_Fake_Terrain(mat)
-        elif mat.msfs_material_type == "msfs_fresnel":
+        elif mat.msfs_material_type == "msfs_fresnel_fade":
             return MSFS_Fresnel_Fade(mat)
         elif mat.msfs_material_type == "msfs_env_occluder":
             return MSFS_Environment_Occluder(mat)

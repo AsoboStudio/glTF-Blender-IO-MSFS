@@ -92,25 +92,26 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     )
                     lods = etree.SubElement(root, "LODS")
 
-                    lod_values = []
+                    lod_files = {}
 
                     for lod in lod_group.lods:
                         if not MSFS_LODGroupUtility.lod_is_visible(context, lod):
                             continue
 
                         if lod.enabled:
-                            lod_values.append(lod.lod_value)
-                    lod_values = sorted(lod_values, reverse=True)
+                            lod_files[lod.file_name] = lod.lod_value
 
-                    for lod_value in lod_values:
+                    lod_files = sorted(lod_files.items(), reverse=True)
+
+                    for file_name, lod_value in lod_files:
                         etree.SubElement(
                             lods,
                             "LOD",
                             minSize=str(lod_value),
-                            ModelFile=os.path.splitext(lod.file_name)[0] + ".gltf",
+                            ModelFile=os.path.splitext(file_name)[0] + ".gltf",
                         )
 
-                    if lod_values:
+                    if lod_files:
                         # Format XML
                         dom = xml.dom.minidom.parseString(etree.tostring(root))
                         xml_string = dom.toprettyxml(encoding="utf-8")

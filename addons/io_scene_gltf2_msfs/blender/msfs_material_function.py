@@ -205,12 +205,16 @@ class MSFS_Material:
         self.nodebsdf = self.addNode(
             "ShaderNodeBsdfPrincipled", {"location": (500.0, 0.0), "hide": False}
         )
-        gltfSettingsNodeTree = bpy.data.node_groups.new(
-            "glTF Settings", "ShaderNodeTree"
-        )
-        gltfSettingsNodeTree.nodes.new("NodeGroupInput")
-        gltfSettingsNodeTree.inputs.new("NodeSocketFloat", "Occlusion")
-        gltfSettingsNodeTree.inputs[0].default_value = 1.000
+        if bpy.data.node_groups.get(MSFS_ShaderNodes.glTFSettings.value):
+            gltfSettingsNodeTree = bpy.data.node_groups[MSFS_ShaderNodes.glTFSettings.value]
+        else:
+            gltfSettingsNodeTree = bpy.data.node_groups.new(
+                "glTF Settings", "ShaderNodeTree"
+            )
+            gltfSettingsNodeTree.nodes.new("NodeGroupInput")
+            gltfSettingsNodeTree.inputs.new("NodeSocketFloat", "Occlusion")
+            gltfSettingsNodeTree.inputs[0].default_value = 1.000
+
         self.nodeglTFSettings = self.addNode(
             "ShaderNodeGroup",
             {
@@ -743,11 +747,13 @@ class MSFS_Material:
     def setDetailNormalTex(self, tex):
         self.nodeDetailNormalTex = self.getNode(MSFS_ShaderNodes.detailNormalTex.value)
         self.nodeDetailNormalTex.image = tex
+        self.nodeDetailNormalTex.image.colorspace_settings.name = "Non-Color"
         self.updateNormalLinks()
 
     def setNormalTex(self, tex):
         self.nodeNormalTex = self.getNode(MSFS_ShaderNodes.normalTex.value)
         self.nodeNormalTex.image = tex
+        self.nodeNormalTex.image.colorspace_settings.name = "Non-Color"
         self.updateNormalLinks()
 
     def updateNormalLinks(self):
