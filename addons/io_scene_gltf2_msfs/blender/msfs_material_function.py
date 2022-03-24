@@ -726,7 +726,7 @@ class MSFS_Material:
     def setDetailCompTex(self, tex):
         self.nodeDetailCompTex = self.getNode(MSFS_ShaderNodes.detailCompTex.value)
         self.nodeDetailCompTex.image = tex
-        self.nodeCompTex.image.colorspace_settings.name = "Non-Color"
+        self.nodeDetailCompTex.image.colorspace_settings.name = "Non-Color"
         self.updateCompLinks()
 
     def setRoughnessScale(self, scale):
