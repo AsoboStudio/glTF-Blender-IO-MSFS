@@ -101,7 +101,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         if lod.enabled:
                             lod_files[lod.file_name] = lod.lod_value
 
-                    lod_files = sorted(lod_files.items(), reverse=True)
+                    lod_files = sorted(lod_files.items(), reverse=False)
 
                     for file_name, lod_value in lod_files:
                         etree.SubElement(
