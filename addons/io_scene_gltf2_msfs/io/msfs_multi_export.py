@@ -101,15 +101,16 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         if lod.enabled:
                             lod_files[lod.file_name] = lod.lod_value
 
-                    lod_files = sorted(lod_files.items(), reverse=True)
+                    lod_files = sorted(lod_files.items())
+                    last_lod = list(lod_files)[-1]
 
                     for file_name, lod_value in lod_files:
-                        etree.SubElement(
-                            lods,
-                            "LOD",
-                            minSize=str(lod_value),
-                            ModelFile=os.path.splitext(file_name)[0] + ".gltf",
-                        )
+                        lod_element = etree.SubElement(lods,"LOD")
+                        
+                        if file_name != last_lod[0]:
+                            lod_element.set('minSize',str(lod_value))
+
+                        lod_element.set('ModelFile',os.path.splitext(file_name)[0] + ".gltf")
 
                     if lod_files:
                         # Format XML
