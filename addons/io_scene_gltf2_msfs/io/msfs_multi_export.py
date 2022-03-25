@@ -87,9 +87,29 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
             for lod_group in lod_groups:
                 # Generate XML if needed
                 if lod_group.generate_xml:
-                    root = etree.Element(
-                        "ModelInfo", guid="{" + str(uuid.uuid4()) + "}", version="1.1"
+                    xml_path = bpy.path.abspath(
+                        os.path.join(
+                            lod_group.folder_name,
+                            lod_group.group_name + ".xml",
+                        )
                     )
+
+                    found_guid = None
+                    if os.path.exists(xml_path):
+                        tree = etree.parse(xml_path)
+                        found_guid = tree.getroot().attrib.get("guid")
+
+                    if lod_group.overwrite_guid or found_guid is None:
+                        root = etree.Element(
+                            "ModelInfo",
+                            guid="{" + str(uuid.uuid4()) + "}",
+                            version="1.1",
+                        )
+                    else:
+                        root = etree.Element(
+                            "ModelInfo", guid=found_guid, version="1.1"
+                        )
+
                     lods = etree.SubElement(root, "LODS")
 
                     lod_files = {}
@@ -105,12 +125,14 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     last_lod = list(lod_files)[-1]
 
                     for file_name, lod_value in lod_files:
-                        lod_element = etree.SubElement(lods,"LOD")
-                        
-                        if file_name != last_lod[0]:
-                            lod_element.set('minSize',str(lod_value))
+                        lod_element = etree.SubElement(lods, "LOD")
 
-                        lod_element.set('ModelFile',os.path.splitext(file_name)[0] + ".gltf")
+                        if file_name != last_lod[0]:
+                            lod_element.set("minSize", str(lod_value))
+
+                        lod_element.set(
+                            "ModelFile", os.path.splitext(file_name)[0] + ".gltf"
+                        )
 
                     if lod_files:
                         # Format XML
@@ -118,12 +140,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         xml_string = dom.toprettyxml(encoding="utf-8")
 
                         with open(
-                            bpy.path.abspath(
-                                os.path.join(
-                                    lod_group.folder_name,
-                                    lod_group.group_name + ".xml",
-                                )
-                            ),
+                            xml_path,
                             "wb",
                         ) as f:
                             f.write(xml_string)

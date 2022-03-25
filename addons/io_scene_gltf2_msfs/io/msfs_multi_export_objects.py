@@ -37,7 +37,8 @@ class MultiExporterLODGroup(bpy.types.PropertyGroup):
     expanded: bpy.props.BoolProperty(name="", default=True)
     lods: bpy.props.CollectionProperty(type=MultiExporterLOD)
     folder_name: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH")
-    generate_xml: bpy.props.BoolProperty(name="", default=True)
+    generate_xml: bpy.props.BoolProperty(name="", default=False)
+    overwrite_guid: bpy.props.BoolProperty(name="", description="If an XML file already exists in the location to export to, the GUID will be overwritten", default=False)
 
 
 class MSFS_LODGroupUtility:
@@ -239,6 +240,9 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                     )
                     if lod_group.expanded:
                         box.prop(lod_group, "generate_xml", text="Generate XML")
+                        if lod_group.generate_xml:
+                            box.prop(lod_group, "overwrite_guid", text="Overwrite GUID")
+
                         box.prop(lod_group, "folder_name", text="Folder")
 
                         col = box.column()
