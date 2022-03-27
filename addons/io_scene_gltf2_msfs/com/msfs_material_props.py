@@ -239,6 +239,9 @@ class AsoboMaterialCommon:
                 blender_material.msfs_material_type = "msfs_standard"
                 break
 
+        if gltf2_material.alpha_mode == "MASK": # There are cases where the only non-standard material change is the alpha mode
+            blender_material.msfs_material_type = "msfs_standard"
+
         if (
             blender_material.msfs_material_type == "msfs_standard"
         ):  # Only set properties if we are importing a flight sim blender_material
@@ -343,6 +346,8 @@ class AsoboMaterialGeometryDecal:
         extension = extensions.get(
             AsoboMaterialGeometryDecal.SerializedName, {}
         )
+        if extension.get("enabled"):
+            blender_material.msfs_material_type = "msfs_geo_decal"
         if extension.get("baseColorBlendFactor"):
             blender_material.msfs_base_color_blend_factor = extension.get(
                 "baseColorBlendFactor"
@@ -365,6 +370,7 @@ class AsoboMaterialGeometryDecal:
             blender_material.msfs_material_type == "msfs_geo_decal"
             or blender_material.msfs_material_type == "msfs_geo_decal_frosted"
         ):
+            result["enabled"] = True
             result[
                 "baseColorBlendFactor"
             ] = blender_material.msfs_base_color_blend_factor
@@ -1689,15 +1695,15 @@ class AsoboMaterialCode:
             return
 
         assert isinstance(extras, dict)
-        extension = extras.get(AsoboMaterialCode.SerializedName, [])
+        extension = extras.get(AsoboMaterialCode.SerializedName)
         if extension:
-            if AsoboMaterialCode.MaterialCode.Windshield in extension:
+            if extension == AsoboMaterialCode.MaterialCode.Windshield:
                 blender_material.msfs_material_type = "msfs_windshield"
-            elif AsoboMaterialCode.MaterialCode.Porthole in extension:
+            elif extension == AsoboMaterialCode.MaterialCode.Porthole:
                 blender_material.msfs_material_type = "msfs_porthole"
-            elif AsoboMaterialCode.MaterialCode.GeoDecalFrosted in extension:
+            elif extension == AsoboMaterialCode.MaterialCode.GeoDecalFrosted:
                 blender_material.msfs_material_type = "msfs_geo_decal_frosted"
-            elif AsoboMaterialCode.MaterialCode.ClearCoat in extension:
+            elif extension == AsoboMaterialCode.MaterialCode.ClearCoat:
                 blender_material.msfs_material_type = "msfs_clearcoat"
 
     @staticmethod

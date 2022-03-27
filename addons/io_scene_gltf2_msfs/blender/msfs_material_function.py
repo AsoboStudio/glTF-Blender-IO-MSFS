@@ -719,15 +719,17 @@ class MSFS_Material:
 
     def setCompTex(self, tex):
         self.nodeCompTex = self.getNode(MSFS_ShaderNodes.compTex.value)
-        self.nodeCompTex.image = tex
-        self.nodeCompTex.image.colorspace_settings.name = "Non-Color"
-        self.updateCompLinks()
+        if tex is not None:
+            self.nodeCompTex.image = tex
+            self.nodeCompTex.image.colorspace_settings.name = "Non-Color"
+            self.updateCompLinks()
 
     def setDetailCompTex(self, tex):
         self.nodeDetailCompTex = self.getNode(MSFS_ShaderNodes.detailCompTex.value)
-        self.nodeDetailCompTex.image = tex
-        self.nodeDetailCompTex.image.colorspace_settings.name = "Non-Color"
-        self.updateCompLinks()
+        if tex is not None:
+            self.nodeDetailCompTex.image = tex
+            self.nodeDetailCompTex.image.colorspace_settings.name = "Non-Color"
+            self.updateCompLinks()
 
     def setRoughnessScale(self, scale):
         self.nodeRoughnessScale = self.getNode(MSFS_ShaderNodes.roughnessScale.value)
@@ -748,15 +750,17 @@ class MSFS_Material:
 
     def setDetailNormalTex(self, tex):
         self.nodeDetailNormalTex = self.getNode(MSFS_ShaderNodes.detailNormalTex.value)
-        self.nodeDetailNormalTex.image = tex
-        self.nodeDetailNormalTex.image.colorspace_settings.name = "Non-Color"
-        self.updateNormalLinks()
+        if tex is not None:
+            self.nodeDetailNormalTex.image = tex
+            self.nodeDetailNormalTex.image.colorspace_settings.name = "Non-Color"
+            self.updateNormalLinks()
 
     def setNormalTex(self, tex):
         self.nodeNormalTex = self.getNode(MSFS_ShaderNodes.normalTex.value)
-        self.nodeNormalTex.image = tex
-        self.nodeNormalTex.image.colorspace_settings.name = "Non-Color"
-        self.updateNormalLinks()
+        if tex is not None:
+            self.nodeNormalTex.image = tex
+            self.nodeNormalTex.image.colorspace_settings.name = "Non-Color"
+            self.updateNormalLinks()
 
     def updateNormalLinks(self):
         self.nodeNormalTex = self.getNode(MSFS_ShaderNodes.normalTex.value)
