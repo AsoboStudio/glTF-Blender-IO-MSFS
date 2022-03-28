@@ -1331,6 +1331,7 @@ class AsoboAnisotropic:
 class AsoboWindshield:
 
     SerializedName = "ASOBO_material_windshield_v2"
+    AlternateSerializedName = "ASOBO_material_windshield"
 
     class Defaults:
         rainDropScale = 1.0
@@ -1385,6 +1386,9 @@ class AsoboWindshield:
 
         assert isinstance(extensions, dict)
         extension = extensions.get(AsoboWindshield.SerializedName, {})
+        if not extension:
+            extension = extensions.get(AsoboWindshield.AlternateSerializedName, {})
+
         if extension:
             blender_material.msfs_material_type = "msfs_windshield"
             if extension.get("rainDropScale"):
@@ -1572,6 +1576,7 @@ class AsoboParallaxWindow:
 class AsoboGlass:
 
     SerializedName = "ASOBO_material_glass"
+    AlternateSerializedName = "ASOBO_material_kitty_glass"
 
     class Defaults:
         glassReflectionMaskFactor = 0.0
@@ -1600,6 +1605,9 @@ class AsoboGlass:
 
         assert isinstance(extensions, dict)
         extension = extensions.get(AsoboGlass.SerializedName, {})
+        if not extension:
+            extension = extensions.get(AsoboGlass.AlternateSerializedName, {})
+
         if extension:
             blender_material.msfs_material_type = "msfs_glass"
             if extension.get("glassReflectionMaskFactor"):
