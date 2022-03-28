@@ -346,7 +346,7 @@ class AsoboMaterialGeometryDecal:
         extension = extensions.get(
             AsoboMaterialGeometryDecal.SerializedName, {}
         )
-        if extension.get("enabled"):
+        if extension:
             blender_material.msfs_material_type = "msfs_geo_decal"
         if extension.get("baseColorBlendFactor"):
             blender_material.msfs_base_color_blend_factor = extension.get(
@@ -557,7 +557,7 @@ class AsoboDisableMotionBlur:
 
         assert isinstance(extensions, dict)
         extension = extensions.get(AsoboDisableMotionBlur.SerializedName, {})
-        if extension.get("enabled"):
+        if extension:
             blender_material.msfs_disable_motion_blur = True
 
     @staticmethod
@@ -661,7 +661,7 @@ class AsoboAlphaModeDither:
         extension = extensions.get(
             AsoboAlphaModeDither.SerializedName, {}
         )
-        if extension.get("enabled"):
+        if extension:
             blender_material.msfs_alpha_mode = "DITHER"
 
     @staticmethod
@@ -691,7 +691,7 @@ class AsoboMaterialInvisible:
         extension = extensions.get(
             AsoboMaterialInvisible.SerializedName, {}
         )
-        if extension.get("enabled"):
+        if extension:
             blender_material.msfs_material_type = "msfs_invisible"
 
     @staticmethod
@@ -723,7 +723,7 @@ class AsoboMaterialEnvironmentOccluder:
         extension = extensions.get(
             AsoboMaterialEnvironmentOccluder.SerializedName, {}
         )
-        if extension.get("enabled"):
+        if extension:
             blender_material.msfs_material_type = "msfs_environment_occluder"
 
     @staticmethod
@@ -1143,7 +1143,7 @@ class AsoboMaterialFakeTerrain:
         extension = extensions.get(
             AsoboMaterialFakeTerrain.SerializedName, {}
         )
-        if extension.get("enabled"):
+        if extension:
             blender_material.msfs_material_type = "msfs_fake_terrain"
 
     @staticmethod
