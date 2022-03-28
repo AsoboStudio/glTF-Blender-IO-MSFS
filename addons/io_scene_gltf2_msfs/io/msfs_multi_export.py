@@ -102,7 +102,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             lod_files[lod.file_name] = lod.lod_value
 
                     lod_files = sorted(lod_files.items())
-                    last_lod = list(lod_files)[-1]
+                    last_lod = list(lod_files)[-1:]
 
                     for file_name, lod_value in lod_files:
                         lod_element = etree.SubElement(lods,"LOD")
