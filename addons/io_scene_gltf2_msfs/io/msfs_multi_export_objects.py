@@ -218,7 +218,6 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
             box.label(text="No LODs found in scene")
         else:
             for lod_group in lod_groups:
-                row = layout.row()
                 if (
                     len(lod_group.lods) == 1
                 ):  # If we only have one LOD in the group, and it is hidden, then don't render the group
@@ -228,6 +227,8 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                         continue
 
                 if len(lod_group.lods) > 0:
+                    row = layout.row()
+
                     box = row.box()
                     box.prop(
                         lod_group,
