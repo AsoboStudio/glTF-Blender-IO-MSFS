@@ -233,18 +233,10 @@ class AsoboMaterialCommon:
             return
 
         assert isinstance(extensions, dict)
-        # If any Asobo extensions are present, set blender_material to standard. If the blender_material is another type, it will get changed later. This is the only way to see if it's a flight sim blender_material
-        for key in extensions.keys():
-            if key.upper().startswith("ASOBO_"):
-                blender_material.msfs_material_type = "msfs_standard"
-                break
-
-        if gltf2_material.alpha_mode == "MASK": # There are cases where the only non-standard material change is the alpha mode
+        # Every flight sim asset has ASOBO_normal_map_convention, so we check if it's being used to set material. We set blender_material to standard. If the blender_material is another type, it will get changed later.
+        if "ASOBO_normal_map_convention" in import_settings.data.extensions_used:
             blender_material.msfs_material_type = "msfs_standard"
 
-        if (
-            blender_material.msfs_material_type == "msfs_standard"
-        ):  # Only set properties if we are importing a flight sim blender_material
             if gltf2_material.pbr_metallic_roughness is not None:
                 if gltf2_material.pbr_metallic_roughness.base_color_factor is not None:
                     blender_material.msfs_base_color_factor = gltf2_material.pbr_metallic_roughness.base_color_factor
