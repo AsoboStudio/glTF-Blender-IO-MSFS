@@ -123,7 +123,7 @@ class MSFSMaterial:
         if type == "NORMAL":
             nodes.remove(normal_node)
 
-        return texture_info
+        return texture_info.to_dict()
 
     @staticmethod
     def create(gltf2_material, blender_material, import_settings):
