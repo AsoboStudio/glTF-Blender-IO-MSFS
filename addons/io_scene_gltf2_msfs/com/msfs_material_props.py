@@ -1714,7 +1714,7 @@ class AsoboTags:
             return
 
         assert isinstance(extensions, dict)
-        extension = extensions.get(AsoboTags.SerializedName, [])
+        extension = extensions.get(AsoboTags.SerializedName)
         if extension is None:
             return
 
