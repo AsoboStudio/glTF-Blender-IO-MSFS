@@ -67,13 +67,14 @@ class MSFSMaterial:
         pyimg = import_settings.data.images[pytexture.source]
 
         # Find image created
-        if pyimg.name in list(bpy.data.images):
+        blender_images = [image.name for image in bpy.data.images]
+        if pyimg.name in blender_images:
             return bpy.data.images[pyimg.name]
-        elif pyimg.blender_image_name in list(bpy.data.images):
+        elif pyimg.blender_image_name in blender_images:
             return bpy.data.images[pyimg.blender_image_name]
-        elif os.path.basename(pyimg.uri) in list(bpy.data.images):
+        elif os.path.basename(pyimg.uri) in blender_images:
             return bpy.data.images[pyimg.uri]
-        elif "Image_%d" % index in list(bpy.data.images):
+        elif "Image_%d" % index in blender_images:
             return bpy.data.images["Image_%d" % index]
 
     @staticmethod
