@@ -99,7 +99,11 @@ class MSFSMaterial:
         if type == "NORMAL":
             nodes.remove(normal_node)
 
-        return texture_info.to_dict()
+        # Some versions of the Khronos exporter have gather_texture_info return a tuple
+        if isinstance(texture_info, tuple):
+            texture_info = texture_info[0]
+
+        return texture_info
 
     @staticmethod
     def create(gltf2_material, blender_material, import_settings):
