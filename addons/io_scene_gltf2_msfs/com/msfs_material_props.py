@@ -1781,4 +1781,7 @@ class AsoboMaterialCode:
             elif blender_material.msfs_material_type == "msfs_clearcoat":
                 result = AsoboMaterialCode.MaterialCode.ClearCoat
 
+            if gltf2_material.extras is None:
+                gltf2_material.extras = {}
+            
             gltf2_material.extras[AsoboMaterialCode.SerializedName] = result
