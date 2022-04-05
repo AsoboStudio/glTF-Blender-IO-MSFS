@@ -252,22 +252,62 @@ class MSFS_Material_Property_Update:
         msfs_mat = MSFS_Material(self)
         msfs_mat.setBlendMode(self.msfs_alpha_mode)
 
-    # Update functions for the "tint" parameters:
-    @staticmethod
-    def update_base_color(self, context):
-        msfs = MSFS_Material_Property_Update.getMaterial(self)
-        msfs.setBaseColor(self.msfs_base_color_factor)
+    # Getters/setters for animatable properties
+    # The reason we need these instead of update callbacks is because we want to make sure the properties update when scrolling through
+    # the animation timeline. Update is not called unless the value is manually changed, while get/set is called anytime the value is
+    # internally updated, such as in the timeline
 
     @staticmethod
-    def update_emissive_color(self, context):
-        nodes = self.node_tree.nodes
+    def get_base_color(self):
+        return self.get("msfs_base_color_factor", [1.0, 1.0, 1.0, 1.0])
+
+    @staticmethod
+    def set_base_color(self, value):
+        msfs = MSFS_Material_Property_Update.getMaterial(self.id_data)
+        msfs.setBaseColor(value)
+
+        self["msfs_base_color_factor"] = value
+
+    @staticmethod
+    def get_emissive_color(self):
+        return self.get("msfs_emissive_factor", [0.0, 0.0, 0.0])
+
+    @staticmethod
+    def set_emissive_color(self, value):
+        nodes = self.id_data.node_tree.nodes
         nodeEmissiveColorRGB = nodes.get(MSFS_ShaderNodes.emissiveColor.value)
         if not nodeEmissiveColorRGB:
             return
         emissiveValue = nodeEmissiveColorRGB.outputs[0].default_value
-        emissiveValue[0] = self.msfs_emissive_factor[0]
-        emissiveValue[1] = self.msfs_emissive_factor[1]
-        emissiveValue[2] = self.msfs_emissive_factor[2]
+        emissiveValue[0] = value[0]
+        emissiveValue[1] = value[1]
+        emissiveValue[2] = value[2]
+
+        self["msfs_emissive_factor"] = value
+
+    @staticmethod
+    def get_metallic_factor(self):
+        return self.get("msfs_metallic_factor", 1.0)
+
+    @staticmethod
+    def set_metallic_factor(self, value):
+        msfs = MSFS_Material_Property_Update.getMaterial(self.id_data)
+        msfs.setMetallicScale(value)
+
+        self["msfs_metallic_factor"] = value
+
+    @staticmethod
+    def get_roughness_factor(self):
+        return self.get("msfs_roughness_factor", 1.0)
+
+    @staticmethod
+    def set_roughness_factor(self, value):
+        msfs = MSFS_Material_Property_Update.getMaterial(self.id_data)
+        msfs.setRoughnessScale(value)
+
+        self["msfs_roughness_factor"] = value
+
+    # Regular update functions
 
     @staticmethod
     def update_emissive_scale(self, context):
@@ -276,16 +316,6 @@ class MSFS_Material_Property_Update:
         if not emissiveScale:
             return
         emissiveScale.outputs[0].default_value = self.msfs_emissive_scale
-
-    @staticmethod
-    def update_metallic_scale(self, context):
-        msfs = MSFS_Material_Property_Update.getMaterial(self)
-        msfs.setMetallicScale(self.msfs_metallic_factor)
-
-    @staticmethod
-    def update_roughness_scale(self, context):
-        msfs = MSFS_Material_Property_Update.getMaterial(self)
-        msfs.setRoughnessScale(self.msfs_roughness_factor)
 
     @staticmethod
     def update_normal_scale(self, context):
