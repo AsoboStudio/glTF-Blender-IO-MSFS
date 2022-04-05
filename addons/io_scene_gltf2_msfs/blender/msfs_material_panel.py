@@ -75,16 +75,24 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
             old_property,
             new_property,
         ) in MSFS_OT_MigrateMaterialData.old_property_to_new_mapping.items():
-            if mat.get(old_property) is not None and mat.get(new_property) is None:
+            if mat.get(old_property) is not None:
+                # msfs_behind_glass_texture and msfs_detail_albedo_texture are special cases as they are they write to the same property
+                if mat.get("msfs_material_mode") == "msfs_windshield" and old_property == "msfs_behind_glass_texture":
+                    continue
+                if mat.get("msfs_material_mode") == "msfs_parallax" and old_property == "msfs_detail_albedo_texture":
+                    continue
                 mat[new_property] = mat[old_property]
 
                 del mat[old_property]
 
         # Base color is a special case - can only have 3 values, we need 4
-        if mat.get("msfs_color_albedo_mix"):
-            base_color = list(mat.get("msfs_color_albedo_mix"))
+        alpha = 1
+        if mat.msfs_color_alpha_mix:
+            alpha = mat.msfs_color_alpha_mix
+        if mat.msfs_color_albedo_mix:
+            base_color = list(mat.msfs_color_albedo_mix)
             if len(base_color) == 3:
-                base_color.append(1) # Append full alpha
+                base_color.append(alpha) # Append full alpha
             mat.msfs_base_color_factor = base_color
 
         # Emissive factor is also a special case - old material system had 4 floats, we only need 3
