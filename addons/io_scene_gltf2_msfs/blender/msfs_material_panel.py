@@ -75,7 +75,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
             old_property,
             new_property,
         ) in MSFS_OT_MigrateMaterialData.old_property_to_new_mapping.items():
-            if mat.get(old_property) is not None:
+            if mat.get(old_property) is not None and mat.get(new_property) is None:
                 mat[new_property] = mat[old_property]
 
                 del mat[old_property]
