@@ -123,6 +123,8 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_base_color_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is None:
+            return
         if type(msfs) is MSFS_Invisible:
             return
         msfs.setBaseColorTex(self.msfs_base_color_texture)
@@ -130,6 +132,8 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_comp_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is None:
+            return
         if type(msfs) is MSFS_Invisible:
             return
         msfs.setCompTex(self.msfs_occlusion_metallic_roughness_texture)
@@ -137,6 +141,8 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_normal_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is None:
+            return
         if type(msfs) is MSFS_Invisible:
             return
         msfs.setNormalTex(self.msfs_normal_texture)
@@ -153,6 +159,8 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_detail_color_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is None:
+            return
         if type(msfs) is MSFS_Invisible:
             return
         if type(msfs) is MSFS_Parallax:
@@ -185,9 +193,10 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_detail_comp_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if type(msfs) is MSFS_Invisible:
-            return
-        msfs.setDetailCompTex(self.msfs_detail_occlusion_metallic_roughness_texture)
+        if msfs is not None:
+            if type(msfs) is MSFS_Invisible:
+                return
+            msfs.setDetailCompTex(self.msfs_detail_occlusion_metallic_roughness_texture)
 
     @staticmethod
     def update_detail_normal_texture(self, context):
@@ -256,7 +265,8 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_base_color(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        msfs.setBaseColor(self.msfs_base_color_factor)
+        if msfs is not None:
+            msfs.setBaseColor(self.msfs_base_color_factor)
 
     @staticmethod
     def update_emissive_color(self, context):
@@ -280,17 +290,20 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_metallic_scale(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        msfs.setMetallicScale(self.msfs_metallic_factor)
+        if msfs is not None:
+            msfs.setMetallicScale(self.msfs_metallic_factor)
 
     @staticmethod
     def update_roughness_scale(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        msfs.setRoughnessScale(self.msfs_roughness_factor)
+        if msfs is not None:
+            msfs.setRoughnessScale(self.msfs_roughness_factor)
 
     @staticmethod
     def update_normal_scale(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        msfs.setNormalScale(self.msfs_normal_scale)
+        if msfs is not None:
+            msfs.setNormalScale(self.msfs_normal_scale)
 
     @staticmethod
     def update_color_sss(self, context):

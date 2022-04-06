@@ -86,14 +86,16 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                 del mat[old_property]
 
         # Base color is a special case - can only have 3 values, we need 4
+        base_color = [1,1,1,1]
         alpha = 1
-        if mat.msfs_color_alpha_mix:
-            alpha = mat.msfs_color_alpha_mix
-        if mat.msfs_color_albedo_mix:
-            base_color = list(mat.msfs_color_albedo_mix)
+        if mat.get("msfs_color_alpha_mix"):
+            alpha = mat.get("msfs_color_alpha_mix")
+            base_color[3] = alpha
+        if mat.get("msfs_color_albedo_mix"):
+            base_color = list(mat.get("msfs_color_albedo_mix"))
             if len(base_color) == 3:
-                base_color.append(alpha) # Append full alpha
-            mat.msfs_base_color_factor = base_color
+                base_color.append(alpha)
+        mat.msfs_base_color_factor = base_color
 
         # Emissive factor is also a special case - old material system had 4 floats, we only need 3
         if mat.get("msfs_color_emissive_mix"):
