@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from ..msfs_material_function import MSFS_Material
+from ..msfs_material_function import MSFS_Material, MSFS_ShaderNodes
 
 
 class MSFS_Environment_Occluder(MSFS_Material):
@@ -22,4 +22,5 @@ class MSFS_Environment_Occluder(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
-        super(MSFS_Environment_Occluder, self).defaultShaderStree()
+        self.principledBSDF = self.getNode(MSFS_ShaderNodes.principledBSDF.value)
+        self.principledBSDF.inputs[21].default_value = 0

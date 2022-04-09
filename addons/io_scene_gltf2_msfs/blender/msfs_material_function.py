@@ -604,6 +604,10 @@ class MSFS_Material:
     def setBaseColor(self, color):
         self.nodeBaseColorRGB = self.getNode(MSFS_ShaderNodes.baseColorRGB.value)
         self.nodeBaseColorA = self.getNode(MSFS_ShaderNodes.baseColorA.value)
+        if not self.nodeBaseColorA:
+            return
+        if not self.nodeBaseColorRGB:
+            return
         colorValue = self.nodeBaseColorRGB.outputs[0].default_value
         colorValue[0] = color[0]
         colorValue[1] = color[1]
@@ -613,6 +617,8 @@ class MSFS_Material:
 
     def setBaseColorTex(self, tex):
         self.nodeBaseColorTex = self.getNode(MSFS_ShaderNodes.baseColorTex.value)
+        if not self.nodeBaseColorTex:
+            return
         self.nodeBaseColorTex.image = tex
         self.updateColorLinks()
 
@@ -733,11 +739,15 @@ class MSFS_Material:
 
     def setRoughnessScale(self, scale):
         self.nodeRoughnessScale = self.getNode(MSFS_ShaderNodes.roughnessScale.value)
+        if not self.nodeRoughnessScale:
+            return
         self.nodeRoughnessScale.outputs[0].default_value = scale
         self.updateCompLinks()
 
     def setMetallicScale(self, scale):
         self.nodeMetallicScale = self.getNode(MSFS_ShaderNodes.metallicScale.value)
+        if not self.nodeMetallicScale:
+            return
         self.nodeMetallicScale.outputs[0].default_value = scale
         self.updateCompLinks()
 
@@ -745,6 +755,8 @@ class MSFS_Material:
         self.nodeNormalMapSampler = self.getNode(
             MSFS_ShaderNodes.normalMapSampler.value
         )
+        if not self.nodeNormalMapSampler:
+            return
         self.nodeNormalMapSampler.inputs[0].default_value = scale
         self.updateNormalLinks()
 
