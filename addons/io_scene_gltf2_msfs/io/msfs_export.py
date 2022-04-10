@@ -45,12 +45,7 @@ class Export:
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         if self.properties.enabled:
-
-            if gltf2_object.extensions is None:
-                gltf2_object.extensions = {}
-
-            if blender_object.type == 'LIGHT':
-                MSFSLight.export(gltf2_object, blender_object)
+            MSFSLight.export(gltf2_object, blender_object, export_settings)
 
     def gather_scene_hook(self, gltf2_scene, blender_scene, export_settings):
         if self.properties.enabled:
