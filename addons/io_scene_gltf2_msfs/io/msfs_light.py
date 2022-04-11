@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import math
+from ..com import msfs_light_props as MSFSLightExtensions
 
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
@@ -22,57 +22,26 @@ from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 class MSFSLight:
     bl_options = {"UNDO"}
 
-    extension_name = "ASOBO_macro_light"
+    extensions = [
+        MSFSLightExtensions.AsoboMacroLight
+    ]
 
     def __new__(cls, *args, **kwargs):
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def create(gltf2_node, blender_node, blender_light, import_settings):
+    def create(gltf2_node, blender_node, blender_light, import_settings): # TODO: clean up function params
         parent_light = import_settings.data.nodes[
-            gltf2_node.parent]  # The glTF exporter creates the actual light as a child of the node that has the Asobo extension
-        if parent_light.extensions:
-            extension = parent_light.extensions.get(MSFSLight.extension_name)
-            if extension:
-                # Set Blender light properties
-                blender_light.color = extension.get("color")
-                blender_light.energy = extension.get("intensity")
-                if blender_light.type == "SPOT":
-                    blender_light.spot_size = extension.get("cone_angle")
-
-                # Set MSFS light properties
-                blender_node.msfs_light_has_symmetry = extension.get("has_symmetry")
-                blender_node.msfs_light_flash_frequency = extension.get("flash_frequency")
-                blender_node.msfs_light_flash_duration = extension.get("flash_duration")
-                blender_node.msfs_light_flash_phase = extension.get("flash_phase")
-                blender_node.msfs_light_rotation_speed = extension.get("rotation_speed")
-                blender_node.msfs_light_day_night_cycle = extension.get("day_night_cycle")
+            gltf2_node.parent]  # TODO: use blender_light?
+        for extension in MSFSLight.extensions:
+            extension.from_dict(blender_node, parent_light, import_settings)
 
     @staticmethod
-    def export(gltf2_object, blender_object):
-        # First, clear all KHR_lights_punctual extensions from children. TODO: remove children?
+    def export(gltf2_object, blender_object, export_settings):
+        # First, clear all KHR_lights_punctual extensions from children. TODO: handle 3.2 differences
         for child in gltf2_object.children:
             if child.extensions and child.extensions.get("KHR_lights_punctual"):
                 child.extensions.pop("KHR_lights_punctual")
 
-        angle = 360.0
-        if blender_object.data.type == 'SPOT':
-            angle = (180.0 / math.pi) * blender_object.data.spot_size
-
-        extension = {}
-
-        extension["color"] = list(blender_object.data.color)
-        extension["intensity"] = blender_object.data.energy
-        extension["cone_angle"] = angle
-        extension["has_symmetry"] = blender_object.msfs_light_has_symmetry
-        extension["flash_frequency"] = blender_object.msfs_light_flash_frequency
-        extension["flash_duration"] = blender_object.msfs_light_flash_duration
-        extension["flash_phase"] = blender_object.msfs_light_flash_phase
-        extension["rotation_speed"] = blender_object.msfs_light_rotation_speed
-        extension["day_night_cycle"] = blender_object.msfs_light_day_night_cycle
-
-        gltf2_object.extensions[MSFSLight.extension_name] = Extension(
-            name=MSFSLight.extension_name,
-            extension=extension,
-            required=False
-        )
+        for extension in MSFSLight.extensions:
+            extension.to_extension(blender_object, gltf2_object, export_settings)
