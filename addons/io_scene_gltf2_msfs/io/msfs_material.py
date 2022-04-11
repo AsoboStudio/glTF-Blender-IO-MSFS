@@ -30,6 +30,33 @@ from io_scene_gltf2.blender.exp.gltf2_blender_gather_texture_info import (
 class MSFSMaterial:
     bl_options = {"UNDO"}
 
+    extensions = [
+        MSFSMaterialExtensions.AsoboMaterialCommon,
+        MSFSMaterialExtensions.AsoboMaterialGeometryDecal,
+        MSFSMaterialExtensions.AsoboMaterialGhostEffect,
+        MSFSMaterialExtensions.AsoboMaterialDrawOrder,
+        MSFSMaterialExtensions.AsoboDayNightCycle,
+        MSFSMaterialExtensions.AsoboDisableMotionBlur,
+        MSFSMaterialExtensions.AsoboPearlescent,
+        MSFSMaterialExtensions.AsoboAlphaModeDither,
+        MSFSMaterialExtensions.AsoboMaterialInvisible,
+        MSFSMaterialExtensions.AsoboMaterialEnvironmentOccluder,
+        MSFSMaterialExtensions.AsoboMaterialUVOptions,
+        MSFSMaterialExtensions.AsoboMaterialShadowOptions,
+        MSFSMaterialExtensions.AsoboMaterialResponsiveAAOptions,
+        MSFSMaterialExtensions.AsoboMaterialDetail,
+        MSFSMaterialExtensions.AsoboMaterialFakeTerrain,
+        MSFSMaterialExtensions.AsoboMaterialFresnelFade,
+        MSFSMaterialExtensions.AsoboSSS,
+        MSFSMaterialExtensions.AsoboAnisotropic,
+        MSFSMaterialExtensions.AsoboWindshield,
+        MSFSMaterialExtensions.AsoboClearCoat,
+        MSFSMaterialExtensions.AsoboParallaxWindow,
+        MSFSMaterialExtensions.AsoboGlass,
+        MSFSMaterialExtensions.AsoboTags,
+        MSFSMaterialExtensions.AsoboMaterialCode,
+    ]
+
     def __new__(cls, *args, **kwargs):
         raise RuntimeError("%s should not be instantiated" % cls)
 
@@ -40,12 +67,9 @@ class MSFSMaterial:
         pyimg = import_settings.data.images[pytexture.source]
 
         # Find image created
-        if pyimg.name in bpy.data.images:
-            return bpy.data.images[pyimg.name]
-        elif os.path.basename(pyimg.uri) in bpy.data.images:
-            return bpy.data.images[pyimg.uri]
-        elif "Image_%d" % index in bpy.data.images:
-            return bpy.data.images["Image_%d" % index]
+        blender_image_name = pyimg.blender_image_name
+        if blender_image_name:
+            return bpy.data.images[blender_image_name]
 
     @staticmethod
     def export_image(
@@ -99,68 +123,18 @@ class MSFSMaterial:
         if type == "NORMAL":
             nodes.remove(normal_node)
 
+        # Some versions of the Khronos exporter have gather_texture_info return a tuple
+        if isinstance(texture_info, tuple):
+            texture_info = texture_info[0]
+
         return texture_info
 
     @staticmethod
     def create(gltf2_material, blender_material, import_settings):
-        extensions = [
-            MSFSMaterialExtensions.AsoboMaterialCommon,
-            MSFSMaterialExtensions.AsoboMaterialGeometryDecal,
-            MSFSMaterialExtensions.AsoboMaterialGhostEffect,
-            MSFSMaterialExtensions.AsoboMaterialDrawOrder,
-            MSFSMaterialExtensions.AsoboDayNightCycle,
-            MSFSMaterialExtensions.AsoboDisableMotionBlur,
-            MSFSMaterialExtensions.AsoboPearlescent,
-            MSFSMaterialExtensions.AsoboAlphaModeDither,
-            MSFSMaterialExtensions.AsoboMaterialInvisible,
-            MSFSMaterialExtensions.AsoboMaterialEnvironmentOccluder,
-            MSFSMaterialExtensions.AsoboMaterialUVOptions,
-            MSFSMaterialExtensions.AsoboMaterialShadowOptions,
-            MSFSMaterialExtensions.AsoboMaterialResponsiveAAOptions,
-            MSFSMaterialExtensions.AsoboMaterialDetail,
-            MSFSMaterialExtensions.AsoboMaterialFakeTerrain,
-            MSFSMaterialExtensions.AsoboMaterialFresnelFade,
-            MSFSMaterialExtensions.AsoboSSS,
-            MSFSMaterialExtensions.AsoboAnisotropic,
-            MSFSMaterialExtensions.AsoboWindshield,
-            MSFSMaterialExtensions.AsoboClearCoat,
-            MSFSMaterialExtensions.AsoboParallaxWindow,
-            MSFSMaterialExtensions.AsoboGlass,
-            MSFSMaterialExtensions.AsoboTags,
-            MSFSMaterialExtensions.AsoboMaterialCode,
-        ]
-
-        for extension in extensions:
+        for extension in MSFSMaterial.extensions:
             extension.from_dict(blender_material, gltf2_material, import_settings)
 
     @staticmethod
     def export(gltf2_material, blender_material, export_settings):
-        extensions = [
-            MSFSMaterialExtensions.AsoboMaterialCommon,
-            MSFSMaterialExtensions.AsoboMaterialGeometryDecal,
-            MSFSMaterialExtensions.AsoboMaterialGhostEffect,
-            MSFSMaterialExtensions.AsoboMaterialDrawOrder,
-            MSFSMaterialExtensions.AsoboDayNightCycle,
-            MSFSMaterialExtensions.AsoboDisableMotionBlur,
-            MSFSMaterialExtensions.AsoboPearlescent,
-            MSFSMaterialExtensions.AsoboAlphaModeDither,
-            MSFSMaterialExtensions.AsoboMaterialInvisible,
-            MSFSMaterialExtensions.AsoboMaterialEnvironmentOccluder,
-            MSFSMaterialExtensions.AsoboMaterialUVOptions,
-            MSFSMaterialExtensions.AsoboMaterialShadowOptions,
-            MSFSMaterialExtensions.AsoboMaterialResponsiveAAOptions,
-            MSFSMaterialExtensions.AsoboMaterialDetail,
-            MSFSMaterialExtensions.AsoboMaterialFakeTerrain,
-            MSFSMaterialExtensions.AsoboMaterialFresnelFade,
-            MSFSMaterialExtensions.AsoboSSS,
-            MSFSMaterialExtensions.AsoboAnisotropic,
-            MSFSMaterialExtensions.AsoboWindshield,
-            MSFSMaterialExtensions.AsoboClearCoat,
-            MSFSMaterialExtensions.AsoboParallaxWindow,
-            MSFSMaterialExtensions.AsoboGlass,
-            MSFSMaterialExtensions.AsoboTags,
-            MSFSMaterialExtensions.AsoboMaterialCode,
-        ]
-
-        for extension in extensions:
+        for extension in MSFSMaterial.extensions:
             extension.to_extension(blender_material, gltf2_material, export_settings)
