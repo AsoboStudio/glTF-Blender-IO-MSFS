@@ -59,11 +59,11 @@ structure.
 
 Figure 1 Before migration
 
-(misc/BeforeMigration.png)
+[!(misc/BeforeMigration.png)]
 
 Figure 2 After Migration
 
-(misc/AfterMigration.png)
+[!(misc/AfterMigration.png)]
 
 All the settings from the legacy node structure tothe ASOBO exporter shader node structure, 
 but you can see in the pictures the ASOBO node structure is more complete and there are a 
