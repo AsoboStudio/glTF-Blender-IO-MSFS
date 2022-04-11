@@ -59,8 +59,9 @@ Your existing legacy material Type/mode will conovert to the new ASOBO material 
 structure.
 
 Figure 1 Before migration
-
+[![Before](misc/beforemigration.png)]
 Figure 2 After Migration
+[![After](misc/aftermigration.png)]
 
 Every effort has been made to copy all the settings from the legacy node structure to
 the ASOBO exporter shader node structure, but you can see in the pictures the ASOBO node 
