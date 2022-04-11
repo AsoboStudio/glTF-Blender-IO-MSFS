@@ -1,3 +1,4 @@
+# glTF-Blender-IO-MSFS
 # Copyright 2018-2021 The glTF-Blender-IO authors
 # Copyright 2022 The glTF-Blender-IO-MSFS authors
 #
