@@ -33,8 +33,7 @@ Option 2
    Enable the addon by checking the checkbox.
    Close the preferences dialog
 
-Migration of Legacy blend file MSFS Material types/modes 
-to ASOBO exporter MSFS Material types/Modes
+Migration of Legacy blend file MSFS Material types/modes
 ========================================================
 
 Every effort has been made to allow legacy blend files to be used by this exporter.
@@ -66,14 +65,13 @@ Figure 2 After Migration
 
 [![After](misc/AfterMigration.png)]
 
-Every effort has been made to copy all the settings from the legacy node structure to
-the ASOBO exporter shader node structure, but you can see in the pictures the ASOBO node 
-structure is more complete and there are a lot more nodes.  Sometimes developers have made 
-changes to the legacy bsdf node and not reflected those changes in the panel data. A
-lot of the variables that are migrated come from the legacy panel data, so there are
-situations where your material will not look correct.  At this time you need to compare
-your legacy blend file to the new file, so open your legacy blend file in another blender program
-and compare the MSFS Material panel values.  Adjust acordingly.
+All the settings from the legacy node structure tothe ASOBO exporter shader node structure, 
+but you can see in the pictures the ASOBO node structure is more complete and there are a 
+lot more nodes.  Sometimes developers have made changes to the legacy bsdf node and not reflected 
+those changes in the panel data. A lot of the variables that are migrated come from the legacy panel 
+data, so there are situations where your material will not look correct.  At this time you need to 
+compare your legacy blend file to the new file, so open your legacy blend file in another blender 
+program and compare the MSFS Material panel values.  Adjust acordingly.
 
 Each MSFS material will need to be migrated, but any mesh nodes associated to that material 
 will be migrated, so you only have to worry about one material, not all the mesh nodes.
