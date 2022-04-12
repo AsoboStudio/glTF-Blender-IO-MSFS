@@ -40,22 +40,24 @@ Every effort has been made to allow legacy blend files to be used by this export
 The legacy blend files contain data that is used to create gltf ver 2.0 files
 for use in the Microsoft Flight Simulator.  The ASOBO version of the exporter uses the
 Khronos default code and adds hooks to this code for the ASOBO extensions used in the gltf files.
-The legacy exporter had hard coded the required extensions.
-The ASOBO exporter now has a much more complex and versitile material node structure
-seen in the Shader tab/window in Blender.
+The legacy exporter was hard coded with the required extensions.
+The ASOBO exporter has a much more complex and versitile material node structure that is
+seen in the Shader tab/window in Blender.  Your legacy MSFS Material mode/types can be migrated 
+to the new ASOBO MSFS material modes/types with the click of the Migrate Material button
+in the MSFS Material Params panel under the Blender Material Properties. 
 
-Migrate from Legacy Exporter
-============================
+Migrate MSFS Materials from the Legacy Exporter
+===============================================
 
 Open your blend file.
-Select an object/node/mesh
-Open the MSFS Material Panel
-You will see a migrate button above the MSFS Material drop down button.
+Select an node/mesh
+Open the MSFS Material Params Panel in the Material Properties
+You will see a "Migrate Material Data" button above the MSFS Material Params type drop down list.
 DO NOT Select a MSFS Material from the drop down, this will erase the existing legacy
 data and you will lose all your material settings.
-Click on the migrate button
-Your existing legacy material Type/mode will conovert to the new ASOBO material shader node
-structure.
+Click on the "Migrate Material Data" button
+Your existing legacy material type/mode will be conoverted to the new ASOBO MSFS material type 
+shader node structure.
 
 Figure 1 Before migration
 
@@ -65,19 +67,19 @@ Figure 2 After Migration
 
 ![After](misc/AfterMigration.png)
 
-All the settings from the legacy node structure tothe ASOBO exporter shader node structure, 
-but you can see in the pictures the ASOBO node structure is more complete and there are a 
-lot more nodes.  Sometimes developers have made changes to the legacy bsdf node and not reflected 
-those changes in the panel data. A lot of the variables that are migrated come from the legacy panel 
-data, so there are situations where your material will not look correct.  At this time you need to 
-compare your legacy blend file to the new file, so open your legacy blend file in another blender 
-program and compare the MSFS Material panel values.  Adjust acordingly.
+All the settings from the legacy node structure are copied to the ASOBO exporter shader node structure. 
+The pictures show the ASOBO node structure is more complex and there are a lot more nodes.  
+Sometimes some model developers have made changes to the legacy bsdf node that are not reflected 
+in the MSFS Material Params panel data. The variables that are migrated come from the legacy panel 
+data, so there may be situations where your material will not look correct.  You will need to 
+compare your legacy blend file materials to the new blend file Materials. Open your legacy blend file in 
+another blender program and compare the MSFS Material Params panel values.  Adjust the parameters acordingly.
 
-Each MSFS material will need to be migrated, but any mesh nodes associated to that material 
-will be migrated, so you only have to worry about one material, not all the mesh nodes.
+Each MSFS material will need to be migrated, but any mesh/nodes associated to that material 
+will be also have it's MSFS Material Params migrated. 
 
-You may also notice that some material panel parameters show data but cannot be adjusted, this is in
-keeping with the ASOBO 3DS Max exporter.  Raise an issue if this is not to your requirements.
+You may also notice that some MSFS Material Parameters show data but cannot be adjusted. This is in
+keeping with the ASOBO 3DS Max exporter material parameters.  Raise an issue if this is not to your requirements.
 
 WARNING
 =======
