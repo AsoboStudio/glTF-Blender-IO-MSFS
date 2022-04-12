@@ -43,20 +43,20 @@ Khronos default code and adds hooks to this code for the ASOBO extensions used i
 The legacy exporter was hard coded with the required extensions.
 The ASOBO exporter has a much more complex and versitile material node structure that is
 seen in the Shader tab/window in Blender.  Your legacy MSFS Material mode/types can be migrated 
-to the new ASOBO MSFS material modes/types with the click of the Migrate Material button
+to the new ASOBO MSFS material mode/types with the click of the "Migrate Material Data" button
 in the MSFS Material Params panel under the Blender Material Properties. 
 
-Migrate MSFS Materials from the Legacy Exporter
-===============================================
+Steps:
+- 1. Open your blend file.
 
-Open your blend file.
-Select an node/mesh
-Open the MSFS Material Params Panel in the Material Properties
-You will see a "Migrate Material Data" button above the MSFS Material Params type drop down list.
-DO NOT Select a MSFS Material from the drop down, this will erase the existing legacy
+- 2. Select an node/mesh
+
+- 3. Open the MSFS Material Params Panel in the Material Properties
+  - You will see a "Migrate Material Data" button above the MSFS Material Params type drop down list.
+  - DO NOT Select a MSFS Material from the drop down, this will erase the existing legacy
 data and you will lose all your material settings.
-Click on the "Migrate Material Data" button
-Your existing legacy material type/mode will be conoverted to the new ASOBO MSFS material type 
+- 4. Click on the "Migrate Material Data" button
+  - Your existing legacy material type/mode will be conoverted to the new ASOBO MSFS material type 
 shader node structure.
 
 Figure 1 Before migration
