@@ -17,7 +17,7 @@
 import math
 
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
-
+from mathutils import Matrix, Quaternion, Euler
 
 class MSFSLight:
     bl_options = {"UNDO"}
@@ -71,6 +71,13 @@ class MSFSLight:
         extension["rotation_speed"] = blender_object.msfs_light_rotation_speed
         extension["day_night_cycle"] = blender_object.msfs_light_day_night_cycle
 
+        # start quick dirty fix to solve rotationn problem 
+        # this can be removed after blender 3.2 goes out
+        currentRotationQuat = Quaternion((gltf2_object.rotation[3],gltf2_object.rotation[0],gltf2_object.rotation[1],gltf2_object.rotation[2])) if gltf2_object.rotation  else Quaternion()
+        quat_a = Quaternion((1.0, 0.0, 0.0), math.radians(90.0))
+        r =  currentRotationQuat @ quat_a
+        gltf2_object.rotation = [r.x,r.y,r.z,r.w]
+        #end quick fix
         gltf2_object.extensions[MSFSLight.extension_name] = Extension(
             name=MSFSLight.extension_name,
             extension=extension,
