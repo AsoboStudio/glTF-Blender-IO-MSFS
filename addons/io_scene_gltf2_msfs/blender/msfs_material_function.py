@@ -384,7 +384,7 @@ class MSFS_Material:
         )
 
         # emissive operators
-        mulEmissiveNode = self.addNode(
+        self.mulEmissiveNode = self.addNode(
             "ShaderNodeMixRGB",
             {
                 "name": MSFS_ShaderNodes.emissiveMul.value,
@@ -493,6 +493,7 @@ class MSFS_Material:
         self.updateColorLinks()
         self.updateNormalLinks()
         self.updateCompLinks()
+        self.updateEmissiveLinks()
 
         # uv
         self.innerLink(
@@ -530,16 +531,6 @@ class MSFS_Material:
         self.innerLink(
             'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.combineUVOffset.value),
             'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.addUVOffset.value),
-        )
-
-        # emissive
-        self.innerLink(
-            'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveTex.value),
-            'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.emissiveMul.value),
-        )
-        self.innerLink(
-            'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveColor.value),
-            'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.emissiveMul.value),
         )
 
         # detail uv
@@ -751,6 +742,31 @@ class MSFS_Material:
         self.nodeMetallicScale.outputs[0].default_value = scale
         self.updateCompLinks()
 
+    def setEmissiveTexture(self, tex):
+        self.nodeEmissiveTex = self.getNode(MSFS_ShaderNodes.emissiveTex.value)
+        if tex is not None:
+            self.nodeEmissiveTex.image = tex
+            self.nodeEmissiveTex.image.colorspace_settings.name = "Non-Color"
+            self.updateEmissiveLinks()
+
+    def setEmissiveScale(self, scale):
+        self.nodeEmissiveScale = self.getNode(MSFS_ShaderNodes.emissiveScale.value)
+        if not self.nodeEmissiveScale:
+            return
+        self.nodeEmissiveScale.outputs[0].default_value = scale
+        self.updateEmissiveLinks()
+
+    def setEmissiveColor(self, color):
+        self.nodeemissiveColor = self.getNode(MSFS_ShaderNodes.emissiveColor.value)
+        if not self.nodeemissiveColor:
+            return
+        emissiveValue = self.nodeemissiveColor.outputs[0].default_value
+        emissiveValue[0] = color[0]
+        emissiveValue[1] = color[1]
+        emissiveValue[2] = color[2]
+        self.nodeemissiveColor.outputs[0].default_value = emissiveValue
+        self.updateEmissiveLinks()
+
     def setNormalScale(self, scale):
         self.nodeNormalMapSampler = self.getNode(
             MSFS_ShaderNodes.normalMapSampler.value
@@ -829,6 +845,37 @@ class MSFS_Material:
             )
         else:
             self.unLinkNodeInput(self.principledBSDF, 22)
+
+    def updateEmissiveLinks(self):
+        self.nodeEmissiveTex = self.getNode(MSFS_ShaderNodes.emissiveTex.value)
+        self.nodeEmissiveScale = self.getNode(MSFS_ShaderNodes.emissiveScale.value)
+        self.nodeemissiveColor = self.getNode(MSFS_ShaderNodes.emissiveColor.value)
+        self.mulEmissiveNode = self.getNode(MSFS_ShaderNodes.emissiveMul.value)
+        self.principledBSDF = self.getNode(MSFS_ShaderNodes.principledBSDF.value)
+
+        # emissive
+        self.innerLink(
+            'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveTex.value),
+            'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.emissiveMul.value),
+        )
+        self.innerLink(
+            'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveColor.value),
+            'nodes["{0}"].inputs[2]'.format(MSFS_ShaderNodes.emissiveMul.value),
+        )
+
+        self.innerLink(
+                'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveColor.value),
+                'nodes["{0}"].inputs[19]'.format(MSFS_ShaderNodes.principledBSDF.value),
+            )
+
+        if self.nodeEmissiveTex.image:
+            self.innerLink(
+                'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveMul.value),
+                'nodes["{0}"].inputs[19]'.format(MSFS_ShaderNodes.principledBSDF.value),
+            )
+            
+        
+
 
     def updateCompLinks(self):
         self.nodeCompTex = self.getNode(MSFS_ShaderNodes.compTex.value)

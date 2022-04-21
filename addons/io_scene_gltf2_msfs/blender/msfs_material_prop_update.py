@@ -153,12 +153,12 @@ class MSFS_Material_Property_Update:
 
     @staticmethod
     def update_emissive_texture(self, context):
-        nodes = self.node_tree.nodes
-
-        emissiveTex = nodes.get(MSFS_ShaderNodes.emissiveTex.value)
-        if not emissiveTex:
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is None:
             return
-        emissiveTex.image = self.msfs_emissive_texture
+        if type(msfs) is MSFS_Invisible:
+            return
+        msfs.setEmissiveTexture(self.msfs_emissive_texture)
 
     @staticmethod
     def update_detail_color_texture(self, context):
@@ -274,22 +274,15 @@ class MSFS_Material_Property_Update:
 
     @staticmethod
     def update_emissive_color(self, context):
-        nodes = self.node_tree.nodes
-        nodeEmissiveColorRGB = nodes.get(MSFS_ShaderNodes.emissiveColor.value)
-        if not nodeEmissiveColorRGB:
-            return
-        emissiveValue = nodeEmissiveColorRGB.outputs[0].default_value
-        emissiveValue[0] = self.msfs_emissive_factor[0]
-        emissiveValue[1] = self.msfs_emissive_factor[1]
-        emissiveValue[2] = self.msfs_emissive_factor[2]
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is not None:
+            msfs.setEmissiveColor(self.msfs_emissive_factor)
 
     @staticmethod
     def update_emissive_scale(self, context):
-        nodes = self.node_tree.nodes
-        emissiveScale = nodes.get(MSFS_ShaderNodes.emissiveScale.value)
-        if not emissiveScale:
-            return
-        emissiveScale.outputs[0].default_value = self.msfs_emissive_scale
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is not None:
+            msfs.setEmissiveScale(self.msfs_emissive_scale)
 
     @staticmethod
     def update_metallic_scale(self, context):
