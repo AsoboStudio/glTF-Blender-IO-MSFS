@@ -46,10 +46,13 @@ seen in the Shader tab/window in Blender.  Your legacy MSFS Material mode/types 
 to the new ASOBO MSFS material mode/types with the click of the "Migrate Material Data" button
 in the MSFS Material Params panel under the Blender Material Properties. 
 
+You should look at your shader nodes in your original blend file and make sure the bsdf node paramerters 
+are the same as the panel values.  These can get out of synch when you modify the parameters in the "Surface"
+section of the "Material Properties" panel instead of the "MSFS Material Params" section
 Steps:
 - 1. Open your blend file.
 
-- 2. Select an node/mesh
+- 2. Select a node/mesh
 
 - 3. Open the MSFS Material Params Panel in the Material Properties
   - You will see a "Migrate Material Data" button above the MSFS Material Params type drop down list.
