@@ -30,9 +30,9 @@ jobs:
         with:
           find: '"version": \((.*)\)'
           replace: '"version": (${{github.event.inputs.version}})'
-          include: "addons\io_scene_gltf2_msfs\__init__.py"
+          include: "addons\\io_scene_gltf2_msfs\\__init__.py"
       - name: Log File Content
-        run: cat addons\io_scene_gltf2_msfs\__init__.py
+        run: cat addons\\io_scene_gltf2_msfs\\__init__.py
       - name: Setup git config
         run: |
           # setup the username and email.
