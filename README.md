@@ -27,7 +27,7 @@ Option 2
 2. Decompress the file
 3. Open the `addons` folder
 4. Use windows file manager and right-click on the io_scene_gltf2_msfs folder and send to compressed file.
-   Use the zip file as the source for the install in Blender menu Edit Preferences (Add-on) - Install
+   Use the zip file as the source for the install in Blender menu Edit Preferences (Add-on) - Install.
    Select the install option and navigate to the zip file you just created.
    Install this zip file.
    Enable the addon by checking the checkbox.
