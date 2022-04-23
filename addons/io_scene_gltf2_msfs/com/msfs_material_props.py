@@ -285,46 +285,54 @@ class AsoboMaterialGeometryDecal:
 
     SerializedName = "ASOBO_material_blend_gbuffer"
 
+    class Defaults:
+        baseColorBlendFactor = 1.0
+        metallicBlendFactor = 1.0
+        roughnessBlendFactor = 1.0
+        normalBlendFactor = 1.0
+        emissiveBlendFactor = 1.0
+        occlusionBlendFactor = 1.0
+
     bpy.types.Material.msfs_base_color_blend_factor = bpy.props.FloatProperty(
         name="Base Color Blend Factor",
         min=0.0,
         max=1.0,
-        default=0.0,
+        default=Defaults.baseColorBlendFactor,
         options=set(),
     )
     bpy.types.Material.msfs_metallic_blend_factor = bpy.props.FloatProperty(
         name="Metallic Blend Factor",
         min=0.0,
         max=1.0,
-        default=0.0,
+        default=Defaults.metallicBlendFactor,
         options=set(),
     )
     bpy.types.Material.msfs_roughness_blend_factor = bpy.props.FloatProperty(
         name="Roughness Blend Factor",
         min=0.0,
         max=1.0,
-        default=0.0,
+        default=Defaults.roughnessBlendFactor,
         options=set(),
     )
     bpy.types.Material.msfs_normal_blend_factor = bpy.props.FloatProperty(
         name="Normal Blend Factor",
         min=0.0,
         max=1.0,
-        default=0.0,
+        default=Defaults.normalBlendFactor,
         options=set(),
     )
     bpy.types.Material.msfs_emissive_blend_factor = bpy.props.FloatProperty(
         name="Emissive Blend Factor",
         min=0.0,
         max=1.0,
-        default=0.0,
+        default=Defaults.emissiveBlendFactor,
         options=set(),
     )
     bpy.types.Material.msfs_occlusion_blend_factor = bpy.props.FloatProperty(
         name="Occlusion Blend Factor",
         min=0.0,
         max=1.0,
-        default=0.0,
+        default=Defaults.occlusionBlendFactor,
         options=set(),
     )
 
