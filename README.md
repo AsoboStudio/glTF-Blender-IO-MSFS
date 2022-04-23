@@ -48,7 +48,8 @@ in the MSFS Material Params panel under the Blender Material Properties.
 
 You should look at your shader nodes in your original blend file and make sure the bsdf node paramerters 
 are the same as the panel values.  These can get out of synch when you modify the parameters in the "Surface"
-section of the "Material Properties" panel instead of the "MSFS Material Params" section
+section of the "Material Properties" panel instead of the "MSFS Material Params" section.  Pay particular attension
+to Metallic Scale/Factor and Roughness Scale/Factor.
 Steps:
 - 1. Open your blend file.
 
