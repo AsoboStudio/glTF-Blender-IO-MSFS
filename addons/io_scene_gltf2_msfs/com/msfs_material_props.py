@@ -545,7 +545,7 @@ class AsoboDayNightCycle:
             and blender_material.msfs_day_night_cycle
         ):
             gltf2_material.extensions[AsoboDayNightCycle.SerializedName] = Extension(
-                name=AsoboDayNightCycle.SerializedName, extension={}, required=False
+                name=AsoboDayNightCycle.SerializedName, extension={'dummy': None} , required=False
             )
 
 
