@@ -1,0 +1,67 @@
+name: Relase new official MSFS IO 
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number'
+        required: true
+        default: '0,0,0'
+
+jobs:
+  increase_and_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Define Tag
+        run: |
+          v=${{github.event.inputs.version}}
+          version=${v//[,]/.}
+          echo "OFFICIAL_VERSION=$version" >> $GITHUB_ENV
+
+      - name: Print Tag
+        run: echo version is ${{env.OFFICIAL_VERSION}}
+      
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: '"version": \((.*)\)'
+          replace: '"version": (${{github.event.inputs.version}})'
+          include: "addons/io_scene_gltf2_msfs/__init__.py"
+      - name: Log File Content
+        run: cat addons/io_scene_gltf2_msfs/__init__.py
+      - name: Setup git config
+        run: |
+          # setup the username and email.
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+      - name: Commit and push
+        run: |
+          # Stage the file, commit and push
+          git add addons/io_scene_gltf2_msfs/__init__.py
+          git commit -m "updated version"
+          git push origin main
+      - name: Update Release branch
+        run: |
+          # Stage the file, commit and push
+          git checkout release
+          git merge --squash main
+          git push origin release
+          git tag "v${{env.OFFICIAL_VERSION}}"
+          git push origin release --tags
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
+        with:
+          tag_name: ${{env.OFFICIAL_VERSION}}
+          release_name: Release ${{env.OFFICIAL_VERSION}}
+          body: |
+            Official MSFS Blender IO v${{env.OFFICIAL_VERSION}}
+          draft: true
+          prerelease: false
+          
