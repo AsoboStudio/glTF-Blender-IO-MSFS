@@ -853,7 +853,6 @@ class MSFS_Material:
         self.nodeEmissiveScale = self.getNode(MSFS_ShaderNodes.emissiveScale.value)
         self.nodeemissiveColor = self.getNode(MSFS_ShaderNodes.emissiveColor.value)
         self.mulEmissiveNode = self.getNode(MSFS_ShaderNodes.emissiveMul.value)
-        self.principledBSDF = self.getNode(MSFS_ShaderNodes.principledBSDF.value)
 
         # emissive
         self.innerLink(
@@ -867,13 +866,13 @@ class MSFS_Material:
 
         self.innerLink(
                 'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveColor.value),
-                'nodes["{0}"].inputs[19]'.format(MSFS_ShaderNodes.principledBSDF.value),
+                'nodes["{0}"].inputs[19]'.format(self.principledBSDF.name),
             )
 
         if self.nodeEmissiveTex.image:
             self.innerLink(
                 'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.emissiveMul.value),
-                'nodes["{0}"].inputs[19]'.format(MSFS_ShaderNodes.principledBSDF.value),
+                'nodes["{0}"].inputs[19]'.format(self.principledBSDF.name),
             )
             
         
