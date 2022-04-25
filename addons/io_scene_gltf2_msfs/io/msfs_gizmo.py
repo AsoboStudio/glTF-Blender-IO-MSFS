@@ -131,7 +131,7 @@ class MSFSGizmo:
         """
         for node in nodes:
             collisions = []  # TODO: make sure node is mesh?
-            for child in node.children:
+            for child in list(node.children):
                 blender_object = blender_scene.objects.get(
                     child.name
                 )  # The glTF exporter will ALWAYS set the node name as the blender name
