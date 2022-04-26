@@ -9,6 +9,13 @@ Asobo especially thanks:
 
 Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
 
+WARNING
+========
+Shadertree modification directly impact the result of the exporter. 
+
+If you work with a MSFS Material you should never modify the shader tree manually.
+
+The properties of your material must only be modified through the ```MSFS Material Panel``` section
 
 Installation
 ===========
