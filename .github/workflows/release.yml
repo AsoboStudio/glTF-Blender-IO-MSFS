@@ -46,9 +46,12 @@ jobs:
           git push origin main
       - name: Update Release branch
         run: |
-          # Stage the file, commit and push
+          # merge into release and push
           git checkout release
+          git pull
           git merge --squash main
+          git add .
+          git commit -m "merge main into release for v${{env.OFFICIAL_VERSION}}"
           git push origin release
           git tag "v${{env.OFFICIAL_VERSION}}"
           git push origin release --tags
