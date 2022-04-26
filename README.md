@@ -11,9 +11,9 @@ Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [
 
 WARNING
 ========
-Shadertree modification directly impact the result of the exporter. 
+Shadertree modification directly impacts the result of the exporter. 
 
-If you work with a MSFS Material you should never modify the shader tree manually.
+If you work with an MSFS Material you should never modify the shader tree manually.
 
 The properties of your material must only be modified through the ```MSFS Material Panel``` section
 
