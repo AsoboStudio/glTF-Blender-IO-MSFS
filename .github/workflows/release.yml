@@ -46,9 +46,12 @@ jobs:
           git push origin main
       - name: Update Release branch
         run: |
-          # Stage the file, commit and push
+          # merge into release and push
           git checkout release
+          git pull
           git merge --squash main
+          git add .
+          git commit -m "merge main into release for v${{env.OFFICIAL_VERSION}}"
           git push origin release
           git tag "v${{env.OFFICIAL_VERSION}}"
           git push origin release --tags
@@ -58,7 +61,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
         with:
-          tag_name: ${{env.OFFICIAL_VERSION}}
+          tag_name: v${{env.OFFICIAL_VERSION}}
           release_name: Release ${{env.OFFICIAL_VERSION}}
           body: |
             Official MSFS Blender IO v${{env.OFFICIAL_VERSION}}
