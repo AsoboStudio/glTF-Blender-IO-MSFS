@@ -215,7 +215,7 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.scene.msfs_exporter_properties.enabled
+        return context.scene.msfs_exporter_properties
 
     def draw(self, context):
         layout = self.layout

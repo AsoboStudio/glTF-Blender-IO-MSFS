@@ -47,6 +47,12 @@ class MSFS_ExporterProperties(bpy.types.PropertyGroup):
         description='Enable MSFS glTF export extensions',
         default=True
     )
+    useUniqueID: bpy.props.BoolProperty(
+        name='Unique ID',
+        description='use UniqueID extension',
+        default=False
+    )
+    
 
 class GLTF_PT_MSFSImporterExtensionPanel(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
@@ -99,7 +105,8 @@ class GLTF_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
         layout.use_property_decorate = False  # No animation.
 
         layout.prop(props, 'enabled', text="Enabled")
-
+        if props.enabled:
+            layout.prop(props, 'useUniqueID', text="Enable UniqueID extension")
 
 def recursive_module_search(path, root=""):
     for _, name, ispkg in pkgutil.iter_modules([str(path)]):
