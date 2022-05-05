@@ -29,7 +29,7 @@ After completing the process outlined above, you will need to start Blender and 
 
 **NOTE**: You may need to restart Blender again after activating the plugin for all the options to be visible in the IDE.
 
-![Install Add-on](misc/InstallAdd-on.png)
+![Install Add-on](misc/Install_Add_On.png)
 
 <br>
 
