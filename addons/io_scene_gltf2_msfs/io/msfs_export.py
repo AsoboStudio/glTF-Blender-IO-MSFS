@@ -23,7 +23,7 @@ from .. import get_version_string
 from .msfs_light import MSFSLight
 from .msfs_gizmo import MSFSGizmo
 from .msfs_material import MSFSMaterial
-from .msfs_uniqueID import MSFS_UniqueID
+from .msfs_unique_id import MSFS_unique_id
 
 class Export:
     
@@ -50,12 +50,20 @@ class Export:
             if gltf2_object.extensions is None:
                 gltf2_object.extensions = {}
 
-            exporter_props = bpy.context.scene.msfs_exporter_properties
-            if exporter_props.useUniqueID:
-                MSFS_UniqueID.export(gltf2_object, blender_object)
+            if self.properties.use_unique_id:
+                MSFS_unique_id.export(gltf2_object, blender_object)
 
             if blender_object.type == 'LIGHT':
                 MSFSLight.export(gltf2_object, blender_object)
+    
+    def gather_joint_hook(self, gltf2_node, blender_bone, export_settings):
+        if self.properties.enabled:
+
+            if gltf2_node.extensions is None:
+                gltf2_node.extensions = {}
+
+            if self.properties.use_unique_id:
+                MSFS_unique_id.export(gltf2_node, blender_bone)
 
     def gather_scene_hook(self, gltf2_scene, blender_scene, export_settings):
         if self.properties.enabled:

@@ -47,9 +47,9 @@ class MSFS_ExporterProperties(bpy.types.PropertyGroup):
         description='Enable MSFS glTF export extensions',
         default=True
     )
-    useUniqueID: bpy.props.BoolProperty(
-        name='Unique ID',
-        description='use UniqueID extension',
+    use_unique_id: bpy.props.BoolProperty(
+        name='use_unique_id',
+        description='use ASOBO_unique_id extension',
         default=False
     )
     
@@ -106,7 +106,7 @@ class GLTF_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
 
         layout.prop(props, 'enabled', text="Enabled")
         if props.enabled:
-            layout.prop(props, 'useUniqueID', text="Enable UniqueID extension")
+            layout.prop(props, 'use_unique_id', text="Enable ASOBO_unique_id extension")
 
 def recursive_module_search(path, root=""):
     for _, name, ispkg in pkgutil.iter_modules([str(path)]):

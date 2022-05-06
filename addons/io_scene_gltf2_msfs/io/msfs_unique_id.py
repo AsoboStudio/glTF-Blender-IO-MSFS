@@ -19,10 +19,10 @@ import math
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 from mathutils import Matrix, Quaternion, Euler
 
-class MSFS_UniqueID:
+class MSFS_unique_id:
     bl_options = {"UNDO"}
 
-    extension_name = "ASOBO_uniqueID"
+    extension_name = "ASOBO_unique_id"
 
     def __new__(cls, *args, **kwargs):
         raise RuntimeError("%s should not be instantiated" % cls)
@@ -37,8 +37,8 @@ class MSFS_UniqueID:
 
         extension["id"] = blender_object.name
 
-        gltf2_object.extensions[MSFS_UniqueID.extension_name] = Extension(
-            name=MSFS_UniqueID.extension_name,
+        gltf2_object.extensions[MSFS_unique_id.extension_name] = Extension(
+            name=MSFS_unique_id.extension_name,
             extension=extension,
             required=False
         )
