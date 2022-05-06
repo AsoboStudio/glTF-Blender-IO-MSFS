@@ -18,7 +18,7 @@ import math
 
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 from mathutils import Matrix, Quaternion, Euler
-
+import bpy
 class MSFS_unique_id:
     bl_options = {"UNDO"}
 
@@ -35,7 +35,13 @@ class MSFS_unique_id:
     def export(gltf2_object, blender_object):
         extension = {}
 
-        extension["id"] = blender_object.name
+        if type(blender_object) == bpy.types.PoseBone:
+            blender_object = blender_object.bone
+            
+        uniqueID =  blender_object.name
+        if blender_object.msfs_override_unique_id:
+            uniqueID = blender_object.msfs_unique_id
+        extension["id"] = uniqueID
 
         gltf2_object.extensions[MSFS_unique_id.extension_name] = Extension(
             name=MSFS_unique_id.extension_name,
