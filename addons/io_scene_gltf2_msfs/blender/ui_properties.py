@@ -35,7 +35,15 @@ class MSFS_PT_BoneProperties(bpy.types.Panel):
     
     def draw(self, context):
         layout = self.layout
-        box=layout.box()
+
+        if context.mode != 'EDIT_ARMATURE':
+            active_bone = context.active_bone
+            box = layout.box()
+            box.prop(active_bone,"msfs_override_unique_id")
+            if active_bone.msfs_override_unique_id:
+                box.prop(active_bone, "msfs_unique_id")
+
+
         box.label(text = "Behavior list", icon = 'ANIM')
         box.template_list('MSFS_UL_object_behaviorListItem', "", context.object, 'msfs_behavior', context.object, 'msfs_active_behavior')
 
@@ -60,12 +68,18 @@ class MSFS_PT_ObjectProperties(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return (context.object.type in ['LIGHT', 'EMPTY'])
+        return context.object.type
     
     def draw(self, context):
         layout = self.layout
 
         active_object = context.object
+
+        box = layout.box()
+        box.prop(active_object,"msfs_override_unique_id")
+        if active_object.msfs_override_unique_id:
+            box.prop(active_object, "msfs_unique_id")
+            
 
         if active_object.type == 'LIGHT':
             box = layout.box()
@@ -83,6 +97,8 @@ class MSFS_PT_ObjectProperties(bpy.types.Panel):
             box.prop(active_object, "msfs_gizmo_type") # TODO: change to msfs_msfs_gizmo_type
             if active_object.msfs_gizmo_type != "NONE":
                 box.prop(active_object, "msfs_collision_is_road_collider")
+        
+        
 
 
         #if bpy.context.active_object.type == 'ARMATURE':
