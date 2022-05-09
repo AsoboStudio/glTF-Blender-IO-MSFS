@@ -21,7 +21,7 @@ To install the Blender plugin please follow these simple steps:
 3. Decompress the contents of the file to a temporary location.
 4. Go to the `addons` folder and select the `io_scene_gltf2_msfs` then copy it to the clipboard (Ctrl + "C").
 5. Now browse to the Blender `addons` folder, which - by default - can be found in the following locations:
-   - **Windows**: this will usually be in `%AppData%\Blender Foundation\Blender\3.1\scripts\addons`.
+   - **Windows**: this will usually be in `%AppData%\Blender Foundation\Blender\3.1\scripts\addons\`.
    - **Mac OS X**: this will be in your Library (Press the *Option* key when in Finder's `Go` menu to open your Library folder): `\Users\<username>\Library\Application Support\Blender\3.1\scripts\addons\`.
 6. Paste the `io_scene_gltf2_msfs` into the Blender `addons` folder (Ctrl + V).
 
