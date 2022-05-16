@@ -31,6 +31,11 @@ class MSFS_LI_object_properties():
     bpy.types.Object.msfs_behavior = bpy.props.CollectionProperty(type = MSFS_attached_behavior)
     bpy.types.Object.msfs_active_behavior = bpy.props.IntProperty(name="Active behavior",min=0,default=0)
 
+    bpy.types.Object.msfs_override_unique_id = bpy.props.BoolProperty(name='Override Unique ID',default=False)
+    bpy.types.Object.msfs_unique_id = bpy.props.StringProperty(name='ID',default="")
+    bpy.types.Bone.msfs_override_unique_id = bpy.props.BoolProperty(name='Override Unique ID',default=False)
+    bpy.types.Bone.msfs_unique_id = bpy.props.StringProperty(name='ID',default="")
+
     bpy.types.Object.msfs_light_has_symmetry = bpy.props.BoolProperty(name='Has symmetry',default=False)
     bpy.types.Object.msfs_light_flash_frequency = bpy.props.FloatProperty(name='Flash frequency',min=0.0,default=0.0)
     bpy.types.Object.msfs_light_flash_duration = bpy.props.FloatProperty(name='Flash duration',min=0.0,default=0.0)
