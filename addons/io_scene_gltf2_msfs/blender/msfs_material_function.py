@@ -830,7 +830,6 @@ class MSFS_Material:
             'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.normalMapSampler.value),
         )
 
-        # tout ok ici 
         self.innerLink(
             'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMapSampler.value),
             'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendNormalMap.value),
