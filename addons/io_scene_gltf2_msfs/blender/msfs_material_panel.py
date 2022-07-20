@@ -205,6 +205,7 @@ class MSFS_PT_Material(bpy.types.Panel):
                     "msfs_sss",
                     "msfs_fresnel_fade",
                     "msfs_clearcoat",
+                    "msfs_glass",
                 ]
                 self.draw_prop(box, mat, "msfs_alpha_mode")
 
@@ -281,6 +282,7 @@ class MSFS_PT_Material(bpy.types.Panel):
                             "msfs_sss",
                             "msfs_fresnel_fade",
                             "msfs_clearcoat",
+                            "msfs_glass",
                         ]
                         and mat.msfs_alpha_mode == "MASK"
                     ),

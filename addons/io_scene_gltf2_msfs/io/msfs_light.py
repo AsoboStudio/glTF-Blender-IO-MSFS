@@ -39,7 +39,7 @@ class MSFSLight:
                     blender_light.spot_size = extension.get("cone_angle")
 
                 # Set MSFS light properties
-                blender_node.msfs_light_has_symmetry = extension.get("has_symmetry")
+                blender_node.msfs_light_has_symmetry = extension.get("has_simmetry")
                 blender_node.msfs_light_flash_frequency = extension.get("flash_frequency")
                 blender_node.msfs_light_flash_duration = extension.get("flash_duration")
                 blender_node.msfs_light_flash_phase = extension.get("flash_phase")
@@ -62,7 +62,7 @@ class MSFSLight:
         extension["color"] = list(blender_object.data.color)
         extension["intensity"] = blender_object.data.energy
         extension["cone_angle"] = angle
-        extension["has_symmetry"] = blender_object.msfs_light_has_symmetry
+        extension["has_simmetry"] = blender_object.msfs_light_has_symmetry
         extension["flash_frequency"] = blender_object.msfs_light_flash_frequency
         extension["flash_duration"] = blender_object.msfs_light_flash_duration
         extension["flash_phase"] = blender_object.msfs_light_flash_phase
