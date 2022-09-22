@@ -395,8 +395,13 @@ class MSFS_Material:
         )
 
         # comp operators
+        #splitCompNode = self.addNode(
+        #    "ShaderNodeSeparateRGB",
+        #    {"name": MSFS_ShaderNodes.compSeparate.value, "location": (-250.0, -300.0)},
+        #)
+        # comp operators
         splitCompNode = self.addNode(
-            "ShaderNodeSeparateRGB",
+            "ShaderNodeSeparateColor",
             {"name": MSFS_ShaderNodes.compSeparate.value, "location": (-250.0, -300.0)},
         )
         mulOcclNode = self.addNode(
@@ -561,6 +566,10 @@ class MSFS_Material:
             "ShaderNodeTexImage",
             {"name": MSFS_AnisotropicNodes.anisotropicTex.value, "location": (-500, -800.0)},
         )
+        #self.nodeSeparateAnisotropic = self.addNode(
+        #    "ShaderNodeSeparateRGB",
+        #    {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
+        #)
         self.nodeSeparateAnisotropic = self.addNode(
             "ShaderNodeSeparateRGB",
             {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
