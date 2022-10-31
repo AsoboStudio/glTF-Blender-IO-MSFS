@@ -84,7 +84,7 @@ class MSFS_ShaderNodes(Enum):
     emissiveTex = "Emissive Texture"
     emissiveColor = "Emissive RGB"
     emissiveScale = "Emissive Scale"
-    RGBCurves = "RGB Curves"
+    rgbCurves = "RGB Curves"
     emissiveMul = "Emissive Multiplier"
     normalMapSampler = "Normal Map Sampler"
     detailColorTex = "Detail Color(RGBA)"
