@@ -72,7 +72,8 @@ Note that each Microsoft Flight Simulator material will need to be migrated, but
 Finally, you may also notice that some MSFS Material Parameters show data but *cannot* be adjusted. This is in keeping with the ASOBO 3DS Max exporter material parameters.  Please raise an issue if this is not to your requirements.
 
 <br>
-
+## Notes
+After migration or adding in asset groups the gLTF Settings node may have additional gLTF Settings that are numbered gLTF Setting.001, .002 etc. You need to review these node chnges as it will affect the COMP nodes in your project and the exporter will not export COMP nodes as expected.
 ## WARNING
 After migration SAVE YOUR FILE AS A NEW FILE and keep your legacy blend file for future reference.
 
