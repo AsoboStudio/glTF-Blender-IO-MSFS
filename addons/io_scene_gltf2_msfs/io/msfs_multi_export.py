@@ -39,7 +39,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
     @staticmethod
     def export(file_path):
         settings = bpy.context.scene.msfs_multi_exporter_settings
-
+        bpy.data.scenes['Scene'].msfs_exporter_properties.use_unique_id = settings.use_unique_id
+        
         bpy.ops.export_scene.gltf(
             export_format="GLTF_SEPARATE",
             use_selection=True,
