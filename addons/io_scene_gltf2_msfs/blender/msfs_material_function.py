@@ -82,6 +82,7 @@ class MSFS_ShaderNodes(Enum):
     emissiveTex = "Emissive Texture"
     emissiveColor = "Emissive RGB"
     emissiveScale = "Emissive Scale"
+    rgbCurves = "RGB Curves"
     emissiveMul = "Emissive Multiplier"
     normalMapSampler = "Normal Map Sampler"
     detailColorTex = "Detail Color(RGBA)"
@@ -395,8 +396,13 @@ class MSFS_Material:
         )
 
         # comp operators
+        #splitCompNode = self.addNode(
+        #    "ShaderNodeSeparateRGB",
+        #    {"name": MSFS_ShaderNodes.compSeparate.value, "location": (-250.0, -300.0)},
+        #)
+        # comp operators
         splitCompNode = self.addNode(
-            "ShaderNodeSeparateRGB",
+            "ShaderNodeSeparateColor",
             {"name": MSFS_ShaderNodes.compSeparate.value, "location": (-250.0, -300.0)},
         )
         mulOcclNode = self.addNode(
@@ -432,9 +438,22 @@ class MSFS_Material:
             "ShaderNodeNormalMap",
             {
                 "name": MSFS_ShaderNodes.normalMapSampler.value,
-                "location": (0.0, -900.0),
+                "location": (0.0, -1000.0),
+                },
+        )
+
+        # Fix the normal view by reversing the green channel
+        # since blender can only render openGL normal textures
+        nodeRGBCurves = self.addNode(
+            "ShaderNodeRGBCurve",
+            {
+                "name": MSFS_ShaderNodes.RGBCurves.value,
+                "location": (-200, -900.0),
             },
         )
+        curveMapping = nodeRGBCurves.mapping.curves[1]
+        curveMapping.points[0].location = (0,1)
+        curveMapping.points[1].location = (1,0)
 
         # detail alpha Operator
         self.blendAlphaMapNode = self.addNode(
@@ -561,6 +580,10 @@ class MSFS_Material:
             "ShaderNodeTexImage",
             {"name": MSFS_AnisotropicNodes.anisotropicTex.value, "location": (-500, -800.0)},
         )
+        #self.nodeSeparateAnisotropic = self.addNode(
+        #    "ShaderNodeSeparateRGB",
+        #    {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
+        #)
         self.nodeSeparateAnisotropic = self.addNode(
             "ShaderNodeSeparateRGB",
             {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
@@ -806,12 +829,18 @@ class MSFS_Material:
 
         self.innerLink(
             'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalTex.value),
+            'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.RGBCurves.value),
+        )
+
+        self.innerLink(
+            'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.RGBCurves.value),
             'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.normalMapSampler.value),
         )
         self.innerLink(
             'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalMapSampler.value),
             'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.blendNormalMap.value),
         )
+        
         self.innerLink(
             'nodes["{0}"].outputs[0]'.format(
                 MSFS_ShaderNodes.detailNormalMapSampler.value
