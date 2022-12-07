@@ -77,6 +77,16 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_emissive_color,
         options={"ANIMATABLE"},
     )
+    bpy.types.Material.msfs_color_sss = bpy.props.FloatVectorProperty(
+        name="SSS Color", 
+        description = "Use the color picker to set the color of the subsurface scattering.",
+        subtype='COLOR',
+        min=0.0, 
+        max=1.0,
+        size=4, 
+        default=Defaults.BaseColorFactor, 
+        update=MSFS_Material_Property_Update.update_color_sss
+    )
     bpy.types.Material.msfs_metallic_factor = bpy.props.FloatProperty(
         name="Metallic Factor",
         description="The metalness of the material. A value of 1.0 means the material is a metal. A value of 0.0 means the material is a dielectric. Values in between are for blending between metals and dielectrics such as dirty metallic surfaces. This value is linear. If a metallicRoughnessTexture is specified, this value is multiplied with the metallic texel values",
