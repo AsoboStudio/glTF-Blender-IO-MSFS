@@ -447,11 +447,11 @@ class MSFS_Material:
         nodeRGBCurves = self.addNode(
             "ShaderNodeRGBCurve",
             {
-                "name": MSFS_ShaderNodes.RGBCurves.value,
+                "name": MSFS_ShaderNodes.rgbCurves.value,
                 "location": (-200, -900.0),
             },
         )
-        curveMapping = nodeRGBCurves.mapping.curves[1]
+        curveMapping = nodergbCurves.mapping.curves[1]
         curveMapping.points[0].location = (0,1)
         curveMapping.points[1].location = (1,0)
 
@@ -829,11 +829,11 @@ class MSFS_Material:
 
         self.innerLink(
             'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.normalTex.value),
-            'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.RGBCurves.value),
+            'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.rgbCurves.value),
         )
 
         self.innerLink(
-            'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.RGBCurves.value),
+            'nodes["{0}"].outputs[0]'.format(MSFS_ShaderNodes.rgbCurves.value),
             'nodes["{0}"].inputs[1]'.format(MSFS_ShaderNodes.normalMapSampler.value),
         )
         self.innerLink(
