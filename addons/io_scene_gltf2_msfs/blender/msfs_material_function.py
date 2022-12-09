@@ -451,7 +451,7 @@ class MSFS_Material:
                 "location": (-200, -900.0),
             },
         )
-        curveMapping = nodergbCurves.mapping.curves[1]
+        curveMapping = nodeRGBCurves.mapping.curves[1]
         curveMapping.points[0].location = (0,1)
         curveMapping.points[1].location = (1,0)
 
