@@ -108,7 +108,7 @@ class AsoboMaterialCommon:
         name="Emissive Scale",
         description="The roughness of the material. A value of 1.0 means the material is completely rough. A value of 0.0 means the material is completely smooth. This value is linear. If a metallicRoughnessTexture is specified, this value is multiplied with the roughness texel values.",
         min=0.0,
-        max=1.0,
+        max=100.0,
         default=Defaults.EmissiveScale,
         update=MSFS_Material_Property_Update.update_emissive_scale,
         options=set(),
