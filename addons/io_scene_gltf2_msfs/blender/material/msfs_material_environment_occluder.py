@@ -18,10 +18,7 @@ from ..msfs_material_function import MSFS_Material, MSFS_ShaderNodes
 class MSFS_Environment_Occluder(MSFS_Material):
     def __init__(self, material, buildTree=False):
         super().__init__(material, buildTree)
-        self.customShaderTree()
 
     def customShaderTree(self):
         self.principledBSDF = self.getNodesByClassName("ShaderNodeBsdfPrincipled")[0]
-        self.principledBSDF.inputs[21].default_value = 0.1
-        self.principledBSDF.inputs[0].default_value = (0.0, 0.8, 0.0, 0.1)
-        self.principledBSDF.inputs[19].default_value = (0.0, 0.8, 0.0, 1.0)
+        self.principledBSDF.inputs[21].default_value = 0
