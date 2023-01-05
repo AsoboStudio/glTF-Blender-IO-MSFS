@@ -22,7 +22,7 @@ class MSFS_Invisible(MSFS_Material):
 
     def customShaderTree(self):
         self.principledBSDF = self.getNodesByClassName("ShaderNodeBsdfPrincipled")[0]
-        self.principledBSDF.inputs[21].default_value = 0.1
+        self.principledBSDF.inputs[21].default_value = 0
         self.principledBSDF.inputs[0].default_value = (0.8, 0.0, 0.0, 0.1)
         self.principledBSDF.inputs[19].default_value = (0.8, 0.0, 0.0, 1.0)
 
