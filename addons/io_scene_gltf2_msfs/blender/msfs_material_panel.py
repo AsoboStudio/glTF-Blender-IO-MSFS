@@ -185,15 +185,7 @@ class MSFS_PT_Material(bpy.types.Panel):
 
             if mat.msfs_material_type != "NONE":
                 self.draw_prop(layout, mat, "msfs_base_color_factor")
-                self.draw_prop(
-                    layout,
-                    mat,
-                    "msfs_emissive_factor",
-                    enabled=(
-                        mat.msfs_material_type
-                        not in ["msfs_invisible", "msfs_environment_occluder"]
-                    ),
-                )
+                self.draw_prop(layout, mat, "msfs_emissive_factor")
 
                 # Alpha mode
                 box = layout.box()
@@ -372,13 +364,11 @@ class MSFS_PT_Material(bpy.types.Panel):
                         else "",
                     )
 
-                # SSS params - disabled for now
-                # if mat.msfs_material_type in ["msfs_sss", "msfs_hair"]:
-                #     box = layout.box()
-                #     box.label(text="SSS Parameters")
-                #     self.draw_prop(
-                #         box, mat, "msfs_sss_color", enabled=False
-                #     )
+                # SSS params - disabled for now - not disabled
+                #if mat.msfs_material_type in ["msfs_sss", "msfs_hair"]:
+                #    box = layout.box()
+                #    box.label(text="SSS Parameters")
+                #    self.draw_prop(box, mat, "msfs_sss_color", enabled=False)
 
                 # Glass params
                 if mat.msfs_material_type == "msfs_glass":

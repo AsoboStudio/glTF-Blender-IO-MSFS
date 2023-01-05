@@ -105,6 +105,8 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Invisible(self, buildTree=False)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
+            self.msfs_base_color_factor = [0.8, 0.0, 0.0, 0.1]
+            self.msfs_emissive_factor = [0.8, 0.0, 0.0]
         elif self.msfs_material_type == "msfs_fake_terrain":
             msfs_mat = MSFS_Fake_Terrain(self, buildTree=True)
         elif self.msfs_material_type == "msfs_fresnel_fade":
@@ -113,6 +115,8 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Environment_Occluder(self, buildTree=False)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
+            self.msfs_base_color_factor = [0.0, 0.8, 0.0, 0.1]
+            self.msfs_emissive_factor = [0.0, 0.8, 0.0]
         elif self.msfs_material_type == "msfs_ghost":
             msfs_mat = MSFS_Ghost(self, buildTree=True)
             self.msfs_no_cast_shadow = True
