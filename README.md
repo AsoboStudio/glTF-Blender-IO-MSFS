@@ -17,6 +17,8 @@ Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [
 
 To install the Blender plugin please follow these simple steps:
 
+This version 1.3.x is compatable with Blender 3.3.x and below.  This will not work with Blender 3.4 and higher.
+
 1. Close Blender if you have it open.
 2. Download the `glTF-Blender-IO-MSFS-<version>.zip` file.
 3. Decompress the contents of the file to a temporary location.
