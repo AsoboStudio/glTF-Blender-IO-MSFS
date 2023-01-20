@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-
+import bpy
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 from mathutils import Matrix, Quaternion, Euler
 
@@ -50,9 +50,12 @@ class MSFSLight:
     def export(gltf2_object, blender_object):
         # First, clear all KHR_lights_punctual extensions from children. TODO: remove children?
         for child in gltf2_object.children:
-            if child.extensions and child.extensions.get("KHR_lights_punctual"):
+            if type(child.extensions) is dict and ("KHR_lights_punctual" in child.extensions):
                 child.extensions.pop("KHR_lights_punctual")
-
+                
+        if type(gltf2_object.extensions) is dict and ("KHR_lights_punctual" in gltf2_object.extensions):
+            gltf2_object.extensions.pop("KHR_lights_punctual")
+        
         angle = 360.0
         if blender_object.data.type == 'SPOT':
             angle = (180.0 / math.pi) * blender_object.data.spot_size
@@ -72,10 +75,11 @@ class MSFSLight:
         # start quick dirty fix to solve rotationn problem 
         # this can be removed after blender 3.2 goes out
         currentRotationQuat = Quaternion((gltf2_object.rotation[3],gltf2_object.rotation[0],gltf2_object.rotation[1],gltf2_object.rotation[2])) if gltf2_object.rotation  else Quaternion()
-        quat_a = Quaternion((1.0, 0.0, 0.0), math.radians(90.0))
+        quat_a = Quaternion((1.0, 0.0, 0.0), math.radians(90.0 if bpy.app.version < (3, 2, 0) else 180))
         r =  currentRotationQuat @ quat_a
         gltf2_object.rotation = [r.x,r.y,r.z,r.w]
         #end quick fix
+        
         gltf2_object.extensions[MSFSLight.extension_name] = Extension(
             name=MSFSLight.extension_name,
             extension=extension,
