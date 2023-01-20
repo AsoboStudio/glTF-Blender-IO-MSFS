@@ -85,7 +85,7 @@ class MSFS_OT_ReloadLODGroups(bpy.types.Operator):
     @staticmethod
     def get_group_from_name(name):
         matches = re.findall(
-            "(?i)x[0-9]_|_lod[0-9]+", name
+            "^(?i)x[0-9]_|_lod[0-9]+", name
         )  # If an object starts with xN_ or ends with _LODN, treat as an LOD
         if matches:
             # Get base object group name from object
