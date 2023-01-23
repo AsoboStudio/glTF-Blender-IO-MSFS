@@ -23,10 +23,12 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 # How to remove the exporter (If you have not installed a previous version skip this section)
 
 1. If you previously installed the Exporter, remove/delete the older version using the Blender Edit Preferences menu. 
+
 ![Edit Preferences](misc/Edit_Pref.png)
 
 <br>
-2. Select the Install tab. Search for the gltf export add-on program by putting gltf in the seach textbox.  This will show two add-ons.  Delete the msfs one.  DO NOT DELETE THE  "Import Export gltf 2.0 format"
+2. Select the Install tab. Search for the gltf export add-on program by putting gltf in the seach textbox.  This will show two add-ons.  Delete the msfs one.  DO NOT DELETE THE  "Import Export gltf 2.0 format" Add-on
+
 ![Search Remove](misc/Edit_Pref_search_rem.png)
 
 <br>
@@ -37,20 +39,24 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 
 1. Close Blender if you have it open.
 2. Download the `glTF-Blender-IO-MSFS-<version>.zip` file from the releases list on the right side of the ASOBO https://github.com/AsoboStudio/glTF-Blender-IO-MSFS site.
+
 ![Download Release](misc/Download_rel.png)
 
 <br>
 3. Decompress the contents of the file to a temporary location.
 4. Open Blender, Open the Edit Preferences menu.
+
 ![Edit Preferences - Add](misc/Edit_Pref_add.png)
 
 <br>
 5. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons foilder within that folder.
+
 ![Edit Preferences - Install](misc/Edit_Pref_install.png)
 
 <br>
 6. Select the io_scene_gltf2_msfs.zip file.  And click on the Install Add-on button.
 7. Enable the Add-on by clicking on the checkbox.
+
 ![Edit Preferences - Enable](misc/Edit_Pref_enable.png)
 
 <br>
