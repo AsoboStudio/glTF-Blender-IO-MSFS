@@ -396,20 +396,17 @@ class MSFS_Material:
         )
 
         # comp operators
-        
-        version = bpy.app.version_string
-        
-        if(float(version.rsplit('.', 1)[0]) < 3.3):
-            splitCompNode = self.addNode(
-                "ShaderNodeSeparateColor",
-                {"name": MSFS_ShaderNodes.compSeparate.value, "location": (-250.0, -300.0)},
-            )
-        else:
+        if(bpy.app.version < (3, 3, 0)):
             splitCompNode = self.addNode(
                 "ShaderNodeSeparateRGB",
                 {"name": MSFS_ShaderNodes.compSeparate.value, "location": (-250.0, -300.0)},
             )
-
+        else:
+            splitCompNode = self.addNode(
+                "ShaderNodeSeparateColor",
+                {"name": MSFS_ShaderNodes.compSeparate.value, "location": (-250.0, -300.0)},
+            )
+            
         mulOcclNode = self.addNode(
             "ShaderNodeMath",
             {
@@ -586,16 +583,17 @@ class MSFS_Material:
             {"name": MSFS_AnisotropicNodes.anisotropicTex.value, "location": (-500, -800.0)},
         )
         
-        if(float(version.rsplit('.', 1)[0]) < 3.3):
-            self.nodeSeparateAnisotropic = self.addNode(
-                "ShaderNodeSeparateColor",
-                {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
-            )
-        else:
+        if(bpy.app.version < (3, 3, 0)):
             self.nodeSeparateAnisotropic = self.addNode(
                 "ShaderNodeSeparateRGB",
                 {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
             )
+        else:
+            self.nodeSeparateAnisotropic = self.addNode(
+                "ShaderNodeSeparateColor",
+                {"name": MSFS_AnisotropicNodes.separateAnisotropic.value, "location": (-300, -800.0)},
+            )
+            
         self.innerLink(
                 'nodes["{0}"].outputs[0]'.format(MSFS_AnisotropicNodes.anisotropicTex.value),
                 'nodes["{0}"].inputs[0]'.format(MSFS_AnisotropicNodes.separateAnisotropic.value),
