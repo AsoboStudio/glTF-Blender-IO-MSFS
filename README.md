@@ -33,6 +33,7 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 
 <br>
 3. You should now have one gltf add-on left.
+
 4. Close the Blender program.
 
 # How to Install the ASOBO Blender msfs exporter (EDIT PREFERENCES Menu - Preffered)
@@ -46,7 +47,7 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 3. Decompress the contents of the file to a temporary location.
 4. Open Blender, Open the Edit Preferences menu.
 
-![Edit Preferences - Add](misc/Edit_Pref_add.png)
+![Edit Preferences - Add](misc/Edit_pref_add.png)
 
 <br>
 5. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons foilder within that folder.
