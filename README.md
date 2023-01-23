@@ -36,7 +36,7 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 3. You should now have one gltf add-on left.
 4. Close the Blender program.
 
-# How to Install the ASOBO Blender msfs exporter (EDIT PREFERENCES Menu - Preffered)
+# How to Install the ASOBO Blender msfs exporter (EDIT PREFERENCES Menu - Prefered)
 
 1. Close Blender if you have it open.
 2. Download the `glTF-Blender-IO-MSFS-<version>.zip` file from the releases list on the right side of the ASOBO https://github.com/AsoboStudio/glTF-Blender-IO-MSFS site.
@@ -51,7 +51,7 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 ![Edit Preferences - Add](misc/Edit_pref_add.png)
 
 <br>
-5. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons foilder within that folder.
+5. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons folder within that folder.
 
 ![Edit Preferences - Install](misc/Edit_Pref_install.png)
 
@@ -64,7 +64,7 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 
 <br>
 
-# How to Install the ASOBO Blender msfs exporter (Copy Paste to ADDDATA)
+# How to Install the ASOBO Blender msfs exporter (Copy Paste to AppData)
 
 1. Close Blender if you have it open.
 2. Download the `glTF-Blender-IO-MSFS-<version>.zip` file.
