@@ -302,8 +302,8 @@ class MSFS_Material_Property_Update:
 
     @staticmethod
     def update_color_sss(self, context):
-        if self.node_tree.nodes.get("bsdf", None) != None:
-            self.node_tree.nodes["bsdf"].inputs.get(
+        if self.node_tree.nodes.get("Principled BSDF", None) != None:
+            self.node_tree.nodes["Principled BSDF"].inputs.get(
                 "Subsurface Color"
             ).default_value = self.msfs_sss_color
 
