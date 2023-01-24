@@ -34,10 +34,14 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
             )
             if self.file_path != file_path:
                 self.file_path = file_path
+            else:
+               self.name =  os.path.basename(self.file_path)
         elif not os.path.isfile(self.file_path):
             file_path = os.path.join(self.file_path, self.name + ".gltf")
             if self.file_path != file_path:
                 self.file_path = file_path
+            else:
+               self.name =  os.path.splitext(os.path.basename(self.file_path))[0]
 
     def update_name(self, context):
         file_path = os.path.dirname(self.file_path) + "\\" + self.name
@@ -47,6 +51,8 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
             )
         if(self.file_path != file_path):
             self.file_path = file_path
+        else:
+            self.name =  os.path.splitext(os.path.basename(self.file_path))[0]
 
     name: bpy.props.StringProperty(name="", default="", update=update_name)
     file_path: bpy.props.StringProperty(
