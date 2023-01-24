@@ -4,3 +4,4 @@ __pycache__
 .Sandbox/
 *.code-workspace
 .vscode
+.history
