@@ -39,7 +39,7 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 # How to Install the ASOBO Blender msfs exporter (EDIT PREFERENCES Menu - Prefered)
 
 1. Close Blender if you have it open.
-2. Download the `glTF-Blender-IO-MSFS-<version>.zip` file from the releases list on the right side of the ASOBO https://github.com/AsoboStudio/glTF-Blender-IO-MSFS site.
+2. Download the `io_scene_gltf2_msfs.zip` file by clicking on the release on the right side of the ASOBO https://github.com/AsoboStudio/glTF-Blender-IO-MSFS site. Then download the zip file.
 
 ![Download Release](misc/Download_rel.png)
 
