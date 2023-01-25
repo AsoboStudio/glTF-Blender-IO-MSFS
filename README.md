@@ -9,7 +9,9 @@ Asobo would especially like to thank the following people:
 
 Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
 
-**NOTE:** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
+**NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
+<br>
+**NOTE:2** This plugin is NOT compatable with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
 <br>
 <br> 
 
