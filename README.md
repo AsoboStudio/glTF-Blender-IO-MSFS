@@ -45,20 +45,19 @@ This version 1.3.x is compatable with Blender 3.3.x and below.  This will not wo
 
 <br>
 
-3. Decompress the contents of the file to a temporary location.
-4. Open Blender, Open the Edit Preferences menu.
+3. Open Blender, Open the Edit Preferences menu.
 
 ![Edit Preferences - Add](misc/Edit_pref_add.png)
 
 <br>
-5. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons folder within that folder.
+4. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons folder within that folder.
 
 ![Edit Preferences - Install](misc/Edit_Pref_install.png)
 
 <br>
 
-6. Select the io_scene_gltf2_msfs.zip file.  And click on the Install Add-on button.
-7. Enable the Add-on by clicking on the checkbox.
+5. Select the io_scene_gltf2_msfs.zip file.  And click on the Install Add-on button.
+6. Enable the Add-on by clicking on the checkbox.
 
 ![Edit Preferences - Enable](misc/Edit_Pref_enable.png)
 
