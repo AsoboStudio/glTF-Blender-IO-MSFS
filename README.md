@@ -9,15 +9,63 @@ Asobo would especially like to thank the following people:
 
 Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
 
-**NOTE:** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
+**NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
+<br>
+**NOTE:2** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
 <br>
 <br> 
 
 # Installation
 
+You may install the blender export two ways. First using the Edit Preferences menu and Install tab, or copy paste the program files to your APPDATA folder.
 To install the Blender plugin please follow these simple steps:
 
-This version 1.3.x is compatable with Blender 3.3.x and below.  This will not work with Blender 3.4 and higher.
+This version 1.3.x is compatible with Blender 3.3.x and below.  This will not work with Blender 3.4 and higher.
+
+# How to remove the exporter (If you have not installed a previous version skip this section)
+
+1. If you previously installed the Exporter, remove/delete the older version using the Blender Edit Preferences menu. 
+
+![Edit Preferences](misc/Edit_Pref.png)
+
+<br>
+2. Select the Install tab. Search for the gltf export add-on program by putting gltf in the seach textbox.  This will show two add-ons.  Delete the Microsoft Flight Simulator gltf Extension.  DO NOT DELETE THE  "Import Export gltf 2.0 format" Add-on
+
+![Search Remove](misc/Edit_Pref_search_rem.png)
+
+<br>
+
+3. You should now have one gltf add-on left.
+4. Close the Blender program.
+
+# How to Install the ASOBO Blender msfs exporter (EDIT PREFERENCES Menu - Prefered)
+
+1. Close Blender if you have it open.
+2. Download the `io_scene_gltf2_msfs.zip` file by clicking on the release on the right side of the ASOBO https://github.com/AsoboStudio/glTF-Blender-IO-MSFS site. Then download the zip file.
+
+![Download Release](misc/Download_rel.png)
+
+<br>
+
+3. Open Blender, Open the Edit Preferences menu.
+
+![Edit Preferences - Add](misc/Edit_pref_add.png)
+
+<br>
+4. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons folder within that folder.
+
+![Edit Preferences - Install](misc/Edit_Pref_install.png)
+
+<br>
+
+5. Select the io_scene_gltf2_msfs.zip file.  And click on the Install Add-on button.
+6. Enable the Add-on by clicking on the checkbox.
+
+![Edit Preferences - Enable](misc/Edit_Pref_enable.png)
+
+<br>
+
+# How to Install the ASOBO Blender msfs exporter (Copy Paste to AppData)
 
 1. Close Blender if you have it open.
 2. Download the `glTF-Blender-IO-MSFS-<version>.zip` file.
