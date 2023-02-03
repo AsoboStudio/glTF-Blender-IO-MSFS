@@ -372,13 +372,14 @@ class MSFS_PT_Material(bpy.types.Panel):
                         else "",
                     )
 
-                # SSS params - disabled for now
-                # if mat.msfs_material_type in ["msfs_sss", "msfs_hair"]:
-                #     box = layout.box()
-                #     box.label(text="SSS Parameters")
-                #     self.draw_prop(
-                #         box, mat, "msfs_sss_color", enabled=False
-                #     )
+                # SSS params - enabled
+                if mat.msfs_material_type in ["msfs_sss", "msfs_hair"]:
+                    box = layout.box()
+                    box.label(text="SSS Parameters")
+                    box.enabled = (mat.msfs_material_type  == "msfs_sss") or (mat.msfs_material_type == "msfs_hair")
+                    self.draw_prop(
+                        box, mat, "msfs_sss_color", enabled=True
+                    )
 
                 # Glass params
                 if mat.msfs_material_type == "msfs_glass":

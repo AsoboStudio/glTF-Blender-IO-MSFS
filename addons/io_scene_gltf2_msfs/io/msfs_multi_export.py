@@ -76,6 +76,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_skins=settings.export_skins,
                     export_all_influences=settings.export_all_influences,
                     export_lights=settings.export_lights,
+                    export_displacement=settings.export_displacement
             )
         else:
             bpy.ops.export_scene.gltf(
@@ -109,12 +110,9 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_current_frame=settings.export_current_frame,
                     export_skins=settings.export_skins,
                     export_all_influences=settings.export_all_influences,
-                    export_lights=settings.export_lights,
-                    export_displacement=settings.export_displacement
+                    export_lights=settings.export_lights
             )
-        
-       
-            
+
     def execute(self, context):
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":
             from .msfs_multi_export_objects import MSFS_LODGroupUtility

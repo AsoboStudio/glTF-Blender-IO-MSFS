@@ -108,7 +108,7 @@ class AsoboMaterialCommon:
         name="Emissive Scale",
         description="The roughness of the material. A value of 1.0 means the material is completely rough. A value of 0.0 means the material is completely smooth. This value is linear. If a metallicRoughnessTexture is specified, this value is multiplied with the roughness texel values.",
         min=0.0,
-        max=1.0,
+        max=100.0,
         default=Defaults.EmissiveScale,
         update=MSFS_Material_Property_Update.update_emissive_scale,
         options=set(),
@@ -1264,7 +1264,7 @@ class AsoboSSS:
 
     class Defaults:
         SSSColor = [1.0, 1.0, 1.0, 1.0]
-
+    
     bpy.types.Material.msfs_sss_color = bpy.props.FloatVectorProperty(
         name="SSS Color",
         description="The RGBA components of the SSS color of the material. These values are linear. If a SSSTexture is specified, this value is multiplied with the texel values",
@@ -1308,7 +1308,7 @@ class AsoboSSS:
             blender_material.msfs_material_type == "msfs_sss"
             or blender_material.msfs_material_type == "msfs_hair"
         ):
-            result["SSSColor"] = blender_material.msfs_sss_color
+            result["SSSColor"] = list(blender_material.msfs_sss_color)
             if blender_material.msfs_opacity_texture is not None:
                 result["opacityTexture"] = MSFSMaterial.export_image(
                     blender_material,
@@ -1354,10 +1354,8 @@ class AsoboAnisotropic:
         from ..io.msfs_material import MSFSMaterial
 
         result = {}
-        if (
-            blender_material.msfs_material_type == "msfs_anisotropic"
-            or blender_material.msfs_material_type == "msfs_hair"
-        ) and blender_material.msfs_extra_slot1_texture is not None:
+        if ((blender_material.msfs_material_type == "msfs_anisotropic" or blender_material.msfs_material_type == "msfs_hair")
+            and blender_material.msfs_extra_slot1_texture is not None):
             result["anisotropicTexture"] = MSFSMaterial.export_image(
                 blender_material,
                 blender_material.msfs_extra_slot1_texture,
