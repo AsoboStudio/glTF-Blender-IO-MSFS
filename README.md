@@ -9,9 +9,10 @@ Asobo would especially like to thank the following people:
 
 Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
 
-**NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
+:warning: **NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
 <br>
-**NOTE:2** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
+:warning: **NOTE:2** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
+
 <br>
 <br> 
 
@@ -135,3 +136,4 @@ Shadertree modification directly impacts the result of the exporter.
 If you work with an MSFS Material you should never modify the shader tree manually.
 
 The properties of your material must only be modified through the `MSFS Material Panel` section
+
