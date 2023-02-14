@@ -21,7 +21,7 @@ Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [
 You may install the blender export two ways. First using the Edit Preferences menu and Install tab, or copy paste the program files to your APPDATA folder.
 To install the Blender plugin please follow these simple steps:
 
-This version 1.3.x is compatible with Blender 3.3.x and below.  This will not work with Blender 3.4 and higher.
+This version 1.3.x is only compatible with Blender 3.3.x LTS. Other versions are not supported.
 
 # How to remove the exporter (If you have not installed a previous version skip this section)
 
