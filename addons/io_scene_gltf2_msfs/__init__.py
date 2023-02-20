@@ -20,10 +20,10 @@ from pathlib import Path
 
 bl_info = {
     "name": "Microsoft Flight Simulator glTF Extension",
-    "author": "Luca Pierabella, Wing42, pepperoni505, ronh991, tml1024, and others",
+    "author": "Luca Pierabella, y-khodja, Wing42, pepperoni505, ronh991, tml1024, and others",
     "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
-    "blender": (3, 1, 0),
-    "version": (1,3,0),
+    "blender": (3, 3, 0),
+    "version": (1, 3, 0),
     "location": "File > Import-Export",
     "category": "Import-Export",
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
@@ -48,7 +48,7 @@ class MSFS_ExporterProperties(bpy.types.PropertyGroup):
     use_unique_id: bpy.props.BoolProperty(
         name='use_unique_id',
         description='use ASOBO_unique_id extension',
-        default=False
+        default=True
     )
     
 
@@ -113,14 +113,12 @@ def recursive_module_search(path, root=""):
         else:
             yield root, name
 
-
 def modules():
     for root, name in recursive_module_search(Path(__file__).parent):
         if name in locals():
             yield importlib.reload(locals()[name])
         else:
             yield importlib.import_module(f".{name}", package=f"{__package__}{root}")
-
 
 classes = []
 extension_classes = [MSFS_ImporterProperties, MSFS_ExporterProperties]
@@ -138,7 +136,6 @@ def update_class_list():
                     and module.__name__ in str(obj) \
                     and "bpy" in str(inspect.getmro(obj)[1]):
                 classes.append(obj)
-
 
 def register():
     # Refresh the list of classes whenever the addon is reloaded so we can stay up to date with the files on disk.
@@ -181,7 +178,6 @@ def register_panel():
     # If the glTF exporter is disabled, we need to unregister the extension panel
     # Just return a function to the exporter so it can unregister the panel
     return unregister_panel
-
 
 def unregister():
     for cls in classes:

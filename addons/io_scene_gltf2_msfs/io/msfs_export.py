@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-import bpy
 import urllib
 
 from .. import get_version_string
@@ -34,7 +33,6 @@ class Export:
                 extension={"tangent_space_convention": "DirectX"},
                 required=False
             )
-
             gltf2_asset.generator += " and Asobo Studio MSFS Blender I/O v" + get_version_string()
 
     def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
@@ -44,22 +42,17 @@ class Export:
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         if self.properties.enabled:
-
             if gltf2_object.extensions is None:
                 gltf2_object.extensions = {}
-
             if self.properties.use_unique_id:
                 MSFS_unique_id.export(gltf2_object, blender_object)
-
             if blender_object.type == 'LIGHT':
                 MSFSLight.export(gltf2_object, blender_object)
     
     def gather_joint_hook(self, gltf2_node, blender_bone, export_settings):
         if self.properties.enabled:
-
             if gltf2_node.extensions is None:
                 gltf2_node.extensions = {}
-
             if self.properties.use_unique_id:
                 MSFS_unique_id.export(gltf2_node, blender_bone)
 

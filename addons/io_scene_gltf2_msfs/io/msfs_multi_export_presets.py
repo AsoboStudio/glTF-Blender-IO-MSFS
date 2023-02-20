@@ -55,9 +55,7 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
             self.name =  os.path.splitext(os.path.basename(self.file_path))[0]
 
     name: bpy.props.StringProperty(name="", default="", update=update_name)
-    file_path: bpy.props.StringProperty(
-        name="", default="", subtype="FILE_PATH", update=update_file_path
-    )
+    file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
     enabled: bpy.props.BoolProperty(name="", default=False)
     expanded: bpy.props.BoolProperty(name="", default=True)
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
