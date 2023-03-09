@@ -46,7 +46,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
    
     ## Asobo Unique ID Check
     use_unique_id: bpy.props.BoolProperty(
-        name='Use Asbob_unique_id Extension',
+        name='Use Asobo_unique_id Extension',
         description='use ASOBO_unique_id extension',
         default=True
     )

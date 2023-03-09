@@ -9,9 +9,10 @@ Asobo would especially like to thank the following people:
 
 Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
 
-**NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
+:warning: **NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
 <br>
-**NOTE:2** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
+:warning: **NOTE:2** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
+
 <br>
 <br> 
 
@@ -20,7 +21,7 @@ Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [
 You may install the blender export two ways. First using the Edit Preferences menu and Install tab, or copy paste the program files to your APPDATA folder.
 To install the Blender plugin please follow these simple steps:
 
-This version 1.3.x is compatible with Blender 3.3.x and below.  This will not work with Blender 3.4 and higher.
+This version 1.3.x is only compatible with Blender 3.3.x LTS. Other versions are not supported.
 
 # How to remove the exporter (If you have not installed a previous version skip this section)
 
@@ -135,3 +136,4 @@ Shadertree modification directly impacts the result of the exporter.
 If you work with an MSFS Material you should never modify the shader tree manually.
 
 The properties of your material must only be modified through the `MSFS Material Panel` section
+
