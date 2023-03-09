@@ -1370,8 +1370,7 @@ class AsoboAnisotropic:
 
 class AsoboWindshield:
 
-    SerializedName = "ASOBO_material_windshield_v2"
-    AlternateSerializedName = "ASOBO_material_windshield"
+    SerializedName = "ASOBO_material_windshield"
 
     class Defaults:
         rainDropScale = 1.0
@@ -1426,8 +1425,6 @@ class AsoboWindshield:
 
         assert isinstance(extensions, dict)
         extension = extensions.get(AsoboWindshield.SerializedName)
-        if not extension:
-            extension = extensions.get(AsoboWindshield.AlternateSerializedName)
         if extension is None:
             return
 
