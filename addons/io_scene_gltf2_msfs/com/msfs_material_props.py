@@ -106,7 +106,7 @@ class AsoboMaterialCommon:
     )
     bpy.types.Material.msfs_emissive_scale = bpy.props.FloatProperty(
         name="Emissive Scale",
-        description="The roughness of the material. A value of 1.0 means the material is completely rough. A value of 0.0 means the material is completely smooth. This value is linear. If a metallicRoughnessTexture is specified, this value is multiplied with the roughness texel values.",
+        description="Controls the intensity of the emission. A value of 1.0 means that the material is fully emissive. This can be used in addition to an emissive texture and in this case, it will control the emission Strenght of this one.",
         min=0.0,
         max=100.0,
         default=Defaults.EmissiveScale,
