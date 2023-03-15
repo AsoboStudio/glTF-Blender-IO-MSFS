@@ -62,10 +62,6 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
         
         if self.file_path != file_path:
             self.file_path = file_path
-        
-        name = os.path.splitext(os.path.basename(self.file_path))[0]
-        if name != self.name:
-            self.name = os.path.splitext(os.path.basename(self.file_path))[0]
 
     name: bpy.props.StringProperty(name="", default="", update=update_name)
     file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
