@@ -25,6 +25,12 @@ class MultiExporterPresetLayer(bpy.types.PropertyGroup):
 
 
 class MultiExporterPreset(bpy.types.PropertyGroup):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.file_path = ""
+        self.name = ""
+
     def update_file_path(self, context):
         # Make sure file_path always ends in .gltf
         if os.path.basename(self.file_path):
@@ -35,29 +41,30 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
             if self.file_path != file_path:
                 self.file_path = file_path
             else:
-               self.name =  os.path.basename(self.file_path)
+                name = os.path.splitext(os.path.basename(self.file_path))[0]
+                if name != self.name:
+                    self.name =  name 
+
         elif not os.path.isfile(self.file_path):
             file_path = os.path.join(self.file_path, self.name + ".gltf")
             if self.file_path != file_path:
                 self.file_path = file_path
             else:
-               self.name =  os.path.splitext(os.path.basename(self.file_path))[0]
+                name = os.path.splitext(os.path.basename(self.file_path))[0]
+                if name != self.name:
+                    self.name =  name
 
     def update_name(self, context):
-        file_path = os.path.dirname(self.file_path) + "\\" + self.name
         file_path = bpy.path.ensure_ext(
-                os.path.splitext(file_path)[0],
+                os.path.splitext(os.path.dirname(self.file_path) + "\\" + self.name)[0],
                 ".gltf",
             )
-        if(self.file_path != file_path):
+        
+        if self.file_path != file_path:
             self.file_path = file_path
-        else:
-            self.name =  os.path.splitext(os.path.basename(self.file_path))[0]
 
     name: bpy.props.StringProperty(name="", default="", update=update_name)
-    file_path: bpy.props.StringProperty(
-        name="", default="", subtype="FILE_PATH", update=update_file_path
-    )
+    file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
     enabled: bpy.props.BoolProperty(name="", default=False)
     expanded: bpy.props.BoolProperty(name="", default=True)
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
