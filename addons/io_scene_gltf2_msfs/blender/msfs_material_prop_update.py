@@ -12,24 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .msfs_material_function import MSFS_Material, MSFS_ShaderNodes
-
-from .material.msfs_material_standard import MSFS_Standard
-from .material.msfs_material_geo_decal import MSFS_Geo_Decal
-from .material.msfs_material_geo_decal_frosted import MSFS_Geo_Decal_Frosted
-from .material.msfs_material_windshield import MSFS_Windshield
-from .material.msfs_material_porthole import MSFS_Porthole
-from .material.msfs_material_glass import MSFS_Glass
-from .material.msfs_material_clearcoat import MSFS_Clearcoat
-from .material.msfs_material_parallax import MSFS_Parallax
 from .material.msfs_material_anisotropic import MSFS_Anisotropic
-from .material.msfs_material_hair import MSFS_Hair
-from .material.msfs_material_sss import MSFS_SSS
-from .material.msfs_material_invisible import MSFS_Invisible
+from .material.msfs_material_clearcoat import MSFS_Clearcoat
+from .material.msfs_material_environment_occluder import \
+    MSFS_Environment_Occluder
 from .material.msfs_material_fake_terrain import MSFS_Fake_Terrain
 from .material.msfs_material_fresnel_fade import MSFS_Fresnel_Fade
-from .material.msfs_material_environment_occluder import MSFS_Environment_Occluder
+from .material.msfs_material_geo_decal import MSFS_Geo_Decal
+from .material.msfs_material_geo_decal_frosted import MSFS_Geo_Decal_Frosted
 from .material.msfs_material_ghost import MSFS_Ghost
+from .material.msfs_material_glass import MSFS_Glass
+from .material.msfs_material_hair import MSFS_Hair
+from .material.msfs_material_invisible import MSFS_Invisible
+from .material.msfs_material_parallax import MSFS_Parallax
+from .material.msfs_material_porthole import MSFS_Porthole
+from .material.msfs_material_sss import MSFS_SSS
+from .material.msfs_material_standard import MSFS_Standard
+from .material.msfs_material_windshield import MSFS_Windshield
+from .msfs_material_function import MSFS_Material, MSFS_ShaderNodes
 
 
 class MSFS_Material_Property_Update:
@@ -165,30 +165,6 @@ class MSFS_Material_Property_Update:
             return
         if type(msfs) is MSFS_Invisible:
             return
-        if type(msfs) is MSFS_Parallax:
-            nodes = self.node_tree.nodes
-            links = self.node_tree.links
-
-            # Try to generate the links:
-            albedo_detail_mix = nodes.get("albedo_detail_mix")
-            behind_glass = nodes.get("behind_glass")
-
-            if behind_glass != None:
-                self.node_tree.nodes[
-                    "behind_glass"
-                ].image = self.msfs_detail_color_texture
-                if self.msfs_detail_color_texture.name != "":
-                    # Create the link:
-                    if behind_glass != None and albedo_detail_mix != None:
-                        links.new(
-                            behind_glass.outputs["Color"],
-                            albedo_detail_mix.inputs["Color2"],
-                        )
-                else:
-                    # unlink the separator:
-                    if behind_glass != None and albedo_detail_mix != None:
-                        l = albedo_detail_mix.inputs["Color2"].links[0]
-                        links.remove(l)
         else:
             msfs.setDetailColorTex(self.msfs_detail_color_texture)
 
@@ -209,16 +185,10 @@ class MSFS_Material_Property_Update:
 
     @staticmethod
     def update_blend_mask_texture(self, context):
-        nodes = self.node_tree.nodes
-        blendTex = nodes.get(MSFS_ShaderNodes.blendMaskTex.value)
-        if not blendTex:
-            return
-        blendTex.image = self.msfs_blend_mask_texture
-        if self.msfs_material_type == "msfs_standard":
-            msfs_mat = MSFS_Standard(self)
-            msfs_mat = msfs_mat.toggleVertexBlendMapMask(
-                self.msfs_blend_mask_texture is None
-            )
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if type(msfs) is MSFS_Standard:
+            msfs.setBlendMaskTex(self.msfs_blend_mask_texture)
+            msfs.toggleVertexBlendMapMask(self.msfs_blend_mask_texture is None)
 
     @staticmethod
     def update_extra_slot1_texture(self, context):
@@ -228,35 +198,14 @@ class MSFS_Material_Property_Update:
 
     @staticmethod
     def update_dirt_texture(self, context):
-        nodes = self.node_tree.nodes
-        links = self.node_tree.links
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if type(msfs) is MSFS_Clearcoat:
+            msfs.setClearcoatDirtTexture(self.msfs_dirt_texture)
 
-        clearcoat = nodes.get("clearcoat")
-        clearcoat_sep = nodes.get("clearcoat_sep")
-        bsdf_node = nodes.get("bsdf")
-
-        if clearcoat != None:
-            self.node_tree.nodes["clearcoat"].image = self.msfs_dirt_texture
-            self.node_tree.nodes[
-                "clearcoat"
-            ].image.colorspace_settings.name = "Non-Color"
-            if clearcoat_sep != None and bsdf_node != None:
-                if self.msfs_dirt_texture.name != "":
-                    links.new(clearcoat_sep.outputs["R"], bsdf_node.inputs["Clearcoat"])
-                    links.new(
-                        clearcoat_sep.outputs["G"],
-                        bsdf_node.inputs["Clearcoat Roughness"],
-                    )
-                else:
-                    l = bsdf_node.inputs["Clearcoat"].links[0]
-                    links.remove(l)
-                    l = bsdf_node.inputs["Clearcoat Roughness"].links[0]
-                    links.remove(l)
-
-    @staticmethod
-    def update_wiper_mask(self, context):
-        nodes = self.node_tree.nodes
-        links = self.node_tree.links
+    # @staticmethod
+    # def update_wiper_mask(self, context):
+    #     nodes = self.node_tree.nodes
+    #     links = self.node_tree.links
 
     @staticmethod
     def update_alpha_mode(self, context):
@@ -302,10 +251,12 @@ class MSFS_Material_Property_Update:
 
     @staticmethod
     def update_color_sss(self, context):
-        if self.node_tree.nodes.get("Principled BSDF", None) != None:
-            self.node_tree.nodes["Principled BSDF"].inputs.get(
-                "Subsurface Color"
-            ).default_value = self.msfs_sss_color
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is None:
+            return
+        else:
+            if type(msfs) is MSFS_SSS:
+                msfs.setSSSColor(self.msfs_sss_color)
 
     @staticmethod
     def update_double_sided(self, context):
@@ -314,23 +265,10 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_alpha_cutoff(self, context):
         self.alpha_threshold = self.msfs_alpha_cutoff
-
+        
     @staticmethod
     def update_detail_uv(self, context):
-        nodes = self.node_tree.nodes
-        detailUvScaleNode = nodes.get(MSFS_ShaderNodes.detailUVScale.value)
-        detailUvOffsetUNode = nodes.get(MSFS_ShaderNodes.detailUVOffsetU.value)
-        detailUvOffsetVNode = nodes.get(MSFS_ShaderNodes.detailUVOffsetV.value)
-        detailNormalScaleNode = nodes.get(MSFS_ShaderNodes.detailNormalScale.value)
-        if (
-            detailUvScaleNode
-            and detailUvOffsetUNode
-            and detailUvOffsetVNode
-            and detailNormalScaleNode
-        ):
-            detailUvScaleNode.outputs[0].default_value = self.msfs_detail_uv_scale
-            detailUvOffsetUNode.outputs[0].default_value = self.msfs_detail_uv_offset_u
-            detailUvOffsetVNode.outputs[0].default_value = self.msfs_detail_uv_offset_v
-            detailNormalScaleNode.outputs[
-                0
-            ].default_value = self.msfs_detail_normal_scale
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is None:
+            return
+        msfs.setUV(self.msfs_detail_uv_scale, self.msfs_detail_uv_offset_u, self.msfs_detail_uv_offset_v, self.msfs_detail_normal_scale)
