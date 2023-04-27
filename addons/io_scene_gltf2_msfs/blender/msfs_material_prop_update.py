@@ -73,6 +73,7 @@ class MSFS_Material_Property_Update:
         msfs_mat = None
         if self.msfs_material_type == "msfs_standard":
             msfs_mat = MSFS_Standard(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_geo_decal":
             msfs_mat = MSFS_Geo_Decal(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
@@ -84,31 +85,37 @@ class MSFS_Material_Property_Update:
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
         elif self.msfs_material_type == "msfs_porthole":
-            self.msfs_alpha_mode = "OPAQUE"
             msfs_mat = MSFS_Porthole(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_glass":
             msfs_mat = MSFS_Glass(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
         elif self.msfs_material_type == "msfs_clearcoat":
             msfs_mat = MSFS_Clearcoat(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_parallax":
             msfs_mat = MSFS_Parallax(self, buildTree=True)
             self.msfs_alpha_mode = "MASK"
         elif self.msfs_material_type == "msfs_anisotropic":
             msfs_mat = MSFS_Anisotropic(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_hair":
             msfs_mat = MSFS_Hair(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_sss":
             msfs_mat = MSFS_SSS(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_invisible":
             msfs_mat = MSFS_Invisible(self, buildTree=False)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
         elif self.msfs_material_type == "msfs_fake_terrain":
             msfs_mat = MSFS_Fake_Terrain(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_fresnel_fade":
             msfs_mat = MSFS_Fresnel_Fade(self, buildTree=True)
+            self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_environment_occluder":
             msfs_mat = MSFS_Environment_Occluder(self, buildTree=False)
             self.msfs_no_cast_shadow = True
@@ -120,6 +127,7 @@ class MSFS_Material_Property_Update:
         else:
             msfs_mat = MSFS_Material(self)
             msfs_mat.revertToPBRShaderTree()
+            self.msfs_alpha_mode = "OPAQUE"
             return
 
     @staticmethod

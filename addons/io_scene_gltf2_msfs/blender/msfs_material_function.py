@@ -286,6 +286,7 @@ class MSFS_Material:
         baseColorANode.outputs[0].default_value = 1
         
         ## Base Color Multiplier
+        # In[0] : Vertex Color -> Out[1]
         # In[1] : Base Color RGB
         # In[2] : Blend Color Map
         mulBaseColorRGBNode = self.addNode(
@@ -298,6 +299,7 @@ class MSFS_Material:
         )
         
         ## Links
+        self.link(mulBaseColorRGBNode.inputs[0], vertexColorNode.outputs[1])
         self.link(mulBaseColorRGBNode.inputs[1], baseColorRGBNode.outputs[0])
         self.link(mulBaseColorRGBNode.inputs[2], blendColorMapNode.outputs[0])
         
@@ -452,7 +454,7 @@ class MSFS_Material:
         metallicScaleNode = self.addNode(
             name = MSFS_ShaderNodes.metallicScale.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeValue.value,
-            location = (-150.0, 150.0),
+            location = (-150.0, 100.0),
             frame = omrFrame
         )
 
@@ -462,7 +464,7 @@ class MSFS_Material:
         roughnessScaleNode = self.addNode(
             name = MSFS_ShaderNodes.roughnessScale.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeValue.value,
-            location = (-150.0, 100.0), 
+            location = (-150.0, 150.0), 
             frame = omrFrame
         )
         
@@ -575,19 +577,6 @@ class MSFS_Material:
             frame = emissiveFrame
         )
 
-        ## Emissive Multiplier Scale
-        # In[0] : Emissive Multiplier -> Out[0]
-        # In[2] : Emissive Scale (Input node) -> Out[EmissiveScale]
-        # Out[0] : Output -> In["Emission"] 
-        # emissiveMulScaleNode = self.addNode(
-        #     name = MSFS_ShaderNodes.emissiveMulScale.value,
-        #     typeNode = MSFS_ShaderNodesTypes.shaderNodeMath.value,
-        #     operation = "MULTIPLY",
-        #     location = (400.0, -50.0),
-        #     width = 200.0,
-        #     frame = emissiveFrame
-        # )
-
         ## Emissive Color
         emissiveColorNode = self.addNode(
             name = MSFS_ShaderNodes.emissiveColor.value,
@@ -671,7 +660,7 @@ class MSFS_Material:
         blendNormalMapNode = self.addNode(
             name = MSFS_ShaderNodes.blendNormalMap.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeMixRGB.value,
-            blend_type = "MULTIPLY",
+            blend_type = "ADD",
             location = (200.0, -400.0),
             frame = normalFrame
         )
@@ -727,10 +716,10 @@ class MSFS_Material:
 
     def setCompTex(self, tex):
         nodeCompTex = self.getNodeByName(MSFS_ShaderNodes.compTex.value)
+        nodeCompTex.image = tex
         if tex is not None:
-            nodeCompTex.image = tex
             nodeCompTex.image.colorspace_settings.name = "Non-Color"
-            self.updateCompLinks()
+        self.updateCompLinks()
 
     def setDetailCompTex(self, tex):
         nodeDetailCompTex = self.getNodeByName(MSFS_ShaderNodes.detailCompTex.value)
@@ -934,13 +923,13 @@ class MSFS_Material:
 
         elif not nodeCompTex.image and nodeDetailCompTex.image:
             nodeBlendCompMap.blend_type = "ADD"
-            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[nodePrincipledBSDF.roughness.value])
-            self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[nodePrincipledBSDF.metallic.value])
+            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
+            self.link(nodeMetallicScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
         else:
             nodeBlendCompMap.blend_type = "MULTIPLY"
-            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[nodePrincipledBSDF.roughness.value])
-            self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[nodePrincipledBSDF.metallic.value])
+            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
+            self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
         self.link(nodeMulOcclusion.outputs[0], nodeGltfSettings.inputs[0])
 

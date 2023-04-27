@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from ..msfs_material_function import MSFS_Material
-from .utils.msfs_material_enum import MSFS_ShaderNodes
+from .utils.msfs_material_enum import (MSFS_PrincipledBSDFInputs,
+                                       MSFS_ShaderNodes)
 
 
 class MSFS_SSS(MSFS_Material):
@@ -24,4 +25,4 @@ class MSFS_SSS(MSFS_Material):
 
     def setSSSColor(self, color):
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
-        nodePrincipledBSDF.inputs[MSFS_ShaderNodes.subsurfaceColor.value].default_value = color
+        nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.subsurfaceColor.value].default_value = color
