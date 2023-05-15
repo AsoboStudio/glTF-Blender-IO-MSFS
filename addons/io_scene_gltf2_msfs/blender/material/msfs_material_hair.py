@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from ..msfs_material_function import MSFS_Material
+from .msfs_material_anisotropic import MSFS_Anisotropic
 
 
 class MSFS_Hair(MSFS_Material):
@@ -21,5 +21,5 @@ class MSFS_Hair(MSFS_Material):
 
     def customShaderTree(self):
         super(MSFS_Hair, self).defaultShadersTree()
-        super(MSFS_Hair, self).anisotropicShaderTree()
+        MSFS_Anisotropic.anisotropicShaderTree(self)
     

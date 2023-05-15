@@ -20,6 +20,6 @@ class MSFS_Invisible(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
-        self.principledBSDF = self.getNodesByClassName("ShaderNodeBsdfPrincipled")[0]
-        self.principledBSDF.inputs[21].default_value = 0
+        nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
+        nodePrincipledBSDF.inputs[21].default_value = 0
 

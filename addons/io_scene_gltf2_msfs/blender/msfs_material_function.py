@@ -684,7 +684,7 @@ class MSFS_Material:
         nodeAnisotropicTex.image = tex
 
         nodeSeparateAnisotropic = self.getNodeByName(MSFS_AnisotropicNodes.separateAnisotropic.value)
-        nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.groupOutputNode.value)
+        nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
         if nodeAnisotropicTex.image:
             self.link(nodeSeparateAnisotropic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.anisotropic.value])
