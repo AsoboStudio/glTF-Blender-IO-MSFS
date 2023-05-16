@@ -29,7 +29,7 @@ from .material.msfs_material_porthole import MSFS_Porthole
 from .material.msfs_material_sss import MSFS_SSS
 from .material.msfs_material_standard import MSFS_Standard
 from .material.msfs_material_windshield import MSFS_Windshield
-from .msfs_material_function import MSFS_Material, MSFS_ShaderNodes
+from .msfs_material_function import MSFS_Material
 
 
 class MSFS_Material_Property_Update:
@@ -133,87 +133,63 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_base_color_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is None:
-            return
-        if type(msfs) is MSFS_Invisible:
-            return
-        msfs.setBaseColorTex(self.msfs_base_color_texture)
+        if msfs is not None and type(msfs) is not MSFS_Invisible:
+            msfs.setBaseColorTex(self.msfs_base_color_texture)
 
     @staticmethod
     def update_comp_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is None:
-            return
-        if type(msfs) is MSFS_Invisible:
-            return
-        msfs.setCompTex(self.msfs_occlusion_metallic_roughness_texture)
+        if msfs is not None and type(msfs) is not MSFS_Invisible:
+            msfs.setCompTex(self.msfs_occlusion_metallic_roughness_texture)
 
     @staticmethod
     def update_normal_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is None:
-            return
-        if type(msfs) is MSFS_Invisible:
-            return
-        msfs.setNormalTex(self.msfs_normal_texture)
+        if msfs is not None and type(msfs) is not MSFS_Invisible:
+            msfs.setNormalTex(self.msfs_normal_texture)
 
     @staticmethod
     def update_emissive_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is None:
-            return
-        if type(msfs) is MSFS_Invisible:
-            return
-        msfs.setEmissiveTexture(self.msfs_emissive_texture)
+        if msfs is not None and type(msfs) is not MSFS_Invisible:
+            msfs.setEmissiveTexture(self.msfs_emissive_texture)
 
     @staticmethod
     def update_detail_color_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is None:
-            return
-        if type(msfs) is MSFS_Invisible:
-            return
-        else:
+        if msfs is not None and type(msfs) is not MSFS_Invisible:
             msfs.setDetailColorTex(self.msfs_detail_color_texture)
 
     @staticmethod
     def update_detail_comp_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is not None:
-            if type(msfs) is MSFS_Invisible:
-                return
+        if msfs is not None and type(msfs) is not MSFS_Invisible:
             msfs.setDetailCompTex(self.msfs_detail_occlusion_metallic_roughness_texture)
 
     @staticmethod
     def update_detail_normal_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if type(msfs) is MSFS_Invisible:
-            return
-        msfs.setDetailNormalTex(self.msfs_detail_normal_texture)
+        if msfs is not None and type(msfs) is not MSFS_Invisible:
+            msfs.setDetailNormalTex(self.msfs_detail_normal_texture)
 
     @staticmethod
     def update_blend_mask_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if type(msfs) is MSFS_Standard:
+        if msfs is not None and type(msfs) is MSFS_Standard:
             msfs.setBlendMaskTex(self.msfs_blend_mask_texture)
             msfs.toggleVertexBlendMapMask(self.msfs_blend_mask_texture is None)
 
     @staticmethod
     def update_extra_slot1_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if type(msfs) is MSFS_Anisotropic or type(msfs) is MSFS_Hair:
+        if msfs is not None and type(msfs) is MSFS_Anisotropic or type(msfs) is MSFS_Hair:
             msfs.setAnisotropicTex(self.msfs_extra_slot1_texture)
 
     @staticmethod
     def update_dirt_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if type(msfs) is MSFS_Clearcoat:
+        if msfs is not None and type(msfs) is MSFS_Clearcoat:
             msfs.setClearcoatDirtTexture(self.msfs_dirt_texture)
-
-    # @staticmethod
-    # def update_wiper_mask(self, context):
-    #     nodes = self.node_tree.nodes
-    #     links = self.node_tree.links
 
     @staticmethod
     def update_alpha_mode(self, context):
@@ -260,11 +236,8 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_color_sss(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is None:
-            return
-        else:
-            if type(msfs) is MSFS_SSS:
-                msfs.setSSSColor(self.msfs_sss_color)
+        if msfs is not None and type(msfs) is MSFS_SSS:
+            msfs.setSSSColor(self.msfs_sss_color)
 
     @staticmethod
     def update_double_sided(self, context):
@@ -277,6 +250,5 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_detail_uv(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is None:
-            return
-        msfs.setUV(self.msfs_detail_uv_scale, self.msfs_detail_uv_offset_u, self.msfs_detail_uv_offset_v, self.msfs_detail_normal_scale)
+        if msfs is not None:
+            msfs.setUV(self.msfs_detail_uv_scale, self.msfs_detail_uv_offset_u, self.msfs_detail_uv_offset_v, self.msfs_detail_normal_scale)
