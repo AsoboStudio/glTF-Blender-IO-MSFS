@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import bpy
-from ..blender.msfs_material_prop_update import MSFS_Material_Property_Update
-
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
+
+from ..blender.msfs_material_prop_update import MSFS_Material_Property_Update
 
 
 class AsoboMaterialCommon:
