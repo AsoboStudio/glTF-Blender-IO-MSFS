@@ -1,89 +1,75 @@
-[![MSFS](misc/msfs_logo.png)](https://www.flightsimulator.com/)[![ASOBO](misc/asobo_logo.png)](https://www.asobostudio.com/)
-# FlightSim Blender glTF 2.0 Importer and Exporter
+[![MSFS](misc/msfs_logo.png)](https://www.flightsimulator.com/)[![ASOBO](misc/asobo_logo.png)](https://www.asobostudio.com/) <img src="misc/glTF_logo.png" width="180" height="90">
 
-<br>
+# FlightSim Blender glTF 2.0 Importer and Exporter
 
 This repository contains the current version of the official Microsoft Flight Simulator Blender Import/Export plugin. The flight sim community has already developed and forked the original project many times, and Asobo's intention is to fully support Blender with the help and contributions of all the developers that have already implemented features in the different unofficial Blender plugins.
 
-Asobo would especially like to thank the following people:
-
-Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
+>Asobo would especially like to thank the following people: <br>
+>Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
 
 :warning: **NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
 <br>
 :warning: **NOTE:2** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
-
 <br>
-<br> 
+:warning: **NOTE:3** The version 1.3.x is only compatible with Blender 3.3.x LTS. Other versions are not supported.
+
 
 # Installation
 
-You may install the blender export two ways. First using the Edit Preferences menu and Install tab, or copy paste the program files to your APPDATA folder.
-To install the Blender plugin please follow these simple steps:
+There are two ways to install the MSFS Blender exporter. Either using the Edit Preferences menu and Install tab, or copy/paste the addon files to your APPDATA folder. Installation steps are explained down bellow.
 
-This version 1.3.x is only compatible with Blender 3.3.x LTS. Other versions are not supported.
+## How to Install the ASOBO Blender MSFS Importer/Exporter using Blender:
 
-# How to remove the exporter (If you have not installed a previous version skip this section)
-
-1. If you previously installed the Exporter, remove/delete the older version using the Blender Edit Preferences menu. 
-
-![Edit Preferences](misc/Edit_Pref.png)
-
-<br>
-2. Select the Install tab. Search for the gltf export add-on program by putting gltf in the seach textbox.  This will show two add-ons.  Delete the Microsoft Flight Simulator gltf Extension.  DO NOT DELETE THE  "Import Export gltf 2.0 format" Add-on
-
-![Search Remove](misc/Edit_Pref_search_rem.png)
-
-<br>
-
-3. You should now have one gltf add-on left.
-4. Close the Blender program.
-
-# How to Install the ASOBO Blender msfs exporter (EDIT PREFERENCES Menu - Prefered)
-
-1. Close Blender if you have it open.
-2. Download the `io_scene_gltf2_msfs.zip` file by clicking on the release on the right side of the ASOBO https://github.com/AsoboStudio/glTF-Blender-IO-MSFS site. Then download the zip file.
+1. Download the `io_scene_gltf2_msfs.zip` file by clicking on the release on the right side of the ASOBO https://github.com/AsoboStudio/glTF-Blender-IO-MSFS site. Then download the zip file.
 
 ![Download Release](misc/Download_rel.png)
 
-<br>
-
-3. Open Blender, Open the Edit Preferences menu.
+2. Open Blender and go to the Edit > Preferences.
 
 ![Edit Preferences - Add](misc/Edit_pref_add.png)
 
-<br>
-4. Select the Install tab. This will bring up a file dialog, where you navigate to the folder where you decompressed downloaded file. Then navigate to the addons folder within that folder.
+3. Go to Add-ons and click on Install an add-on. This will bring up a file dialog, where you navigate to the folder where you have your `io_scene_gltf2_msfs.zip` downloaded file.
 
 ![Edit Preferences - Install](misc/Edit_Pref_install.png)
 
-<br>
-
-5. Select the io_scene_gltf2_msfs.zip file.  And click on the Install Add-on button.
-6. Enable the Add-on by clicking on the checkbox.
+4. Select the `io_scene_gltf2_msfs.zip` file.  And click on the Install Add-on button.
+5. Enable the Add-on by clicking on the checkbox.
 
 ![Edit Preferences - Enable](misc/Edit_Pref_enable.png)
 
 <br>
 
-# How to Install the ASOBO Blender msfs exporter (Copy Paste to AppData)
+## How to Install the ASOBO Blender msfs exporter by Copy/Paste to AppData
 
 1. Close Blender if you have it open.
 2. Download the `glTF-Blender-IO-MSFS-<version>.zip` file.
 3. Decompress the contents of the file to a temporary location.
-4. Go to the `addons` folder and select the `io_scene_gltf2_msfs` then copy it to the clipboard (Ctrl + "C").
+4. Go to the `addons` folder and select the `io_scene_gltf2_msfs` folder then copy it to the clipboard (Ctrl + "C").
 5. Now browse to the Blender `addons` folder, which - by default - can be found in the following locations:
-   - **Windows**: this will usually be in `%AppData%\Blender Foundation\Blender\3.1\scripts\addons\`.
-   - **Mac OS X**: this will be in your Library (Press the *Option* key when in Finder's `Go` menu to open your Library folder): `\Users\<username>\Library\Application Support\Blender\3.1\scripts\addons\`.
+   - **Windows**: This will usually be in `%AppData%\Blender Foundation\Blender\<blender-version>\scripts\addons\`.
+   - **Mac OS X**: This will be in your Library (Press the *Option* key when in Finder's `Go` menu to open your Library folder): `\Users\<username>\Library\Application Support\Blender\<blender-version>\scripts\addons\`.
 6. Paste the `io_scene_gltf2_msfs` into the Blender `addons` folder (Ctrl + V).
 
-After completing the process outlined above, you will need to start Blender and then activate the plugin. Activation is done from the Blender Preferences, as shown in the image below:
+After completing the process outlined above, you will need to start Blender and then activate the plugin. Activation is done from Edit > Preferences, as shown in the image below:
 
 **NOTE**: You may need to restart Blender again after activating the plugin for all the options to be visible in the IDE.
 
-![Install Add-on](misc/Install_Add_On.png)
+![Install Add-on](misc/Edit_Pref_enable.png)
 
-<br>
+# How to remove the exporter
+
+1. If you previously installed the Exporter, remove/delete the older version using the Blender Edit Preferences menu. 
+
+![Edit Preferences](misc/Edit_Pref.png)
+
+
+2. Select the Install tab. Search for the gltf exporter add-on program by putting gltf in the seach textbox. This will show two add-ons. Delete the "Import-Export: Microsoft Flight Simulator gltf Extension" using the "Remove" button.<br>  
+:warning: DO NOT DELETE THE "Import-Export: gltf 2.0 format" Add-on.
+
+![Search Remove](misc/Edit_Pref_search_rem.png)
+
+3. You should now have only the "Import-Export: gltf 2.0 format" addon left.
+4. Close the Blender program.
 
 # Migration of Legacy Blend File Material Types/Modes
 
@@ -122,18 +108,15 @@ Note that each Microsoft Flight Simulator material will need to be migrated, but
 
 Finally, you may also notice that some MSFS Material Parameters show data but *cannot* be adjusted. This is in keeping with the ASOBO 3DS Max exporter material parameters.  Please raise an issue if this is not to your requirements.
 
-<br>
-
 ## WARNING
 After migration SAVE YOUR FILE AS A NEW FILE and keep your legacy blend file for future reference.
-
-<br>
 
 ## Notes On Shadertree
 
 Shadertree modification directly impacts the result of the exporter. 
-
-If you work with an MSFS Material you should never modify the shader tree manually.
-
 The properties of your material must only be modified through the `MSFS Material Panel` section
+
+:warning: If you work with an MSFS Material you should never modify the shader tree manually.
+
+
 
