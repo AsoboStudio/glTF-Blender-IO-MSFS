@@ -498,8 +498,9 @@ class AsoboMaterialDrawOrder:
     def to_extension(blender_material, gltf2_material, export_settings):
         result = {}
         if (
-            blender_material.msfs_draw_order_offset
-            != AsoboMaterialDrawOrder.Defaults.drawOrderOffset
+            (blender_material.msfs_material_type != "msfs_invisible" 
+            and blender_material.msfs_material_type != "msfs_environment_occluder")
+            and blender_material.msfs_draw_order_offset
         ):
             result["drawOrderOffset"] = blender_material.msfs_draw_order_offset
 
@@ -573,7 +574,8 @@ class AsoboDisableMotionBlur:
     def to_extension(blender_material, gltf2_material, export_settings):
         result = {}
         if (
-            blender_material.msfs_material_type != "msfs_environment_occluder"
+            (blender_material.msfs_material_type != "msfs_invisible" 
+            and blender_material.msfs_material_type != "msfs_environment_occluder")
             and blender_material.msfs_disable_motion_blur
         ):
             result["enabled"] = True
@@ -865,7 +867,7 @@ class AsoboMaterialUVOptions:
     def to_extension(blender_material, gltf2_material, export_settings):
         result = {}
         if (
-            blender_material.msfs_ao_use_uv2
+            (blender_material.msfs_ao_use_uv2
             or blender_material.msfs_clamp_uv_x
             or blender_material.msfs_clamp_uv_y
             or blender_material.msfs_clamp_uv_z
@@ -877,8 +879,9 @@ class AsoboMaterialUVOptions:
                 blender_material.msfs_uv_tiling_u != AsoboMaterialUVOptions.Defaults.UVTilingU
                 or blender_material.msfs_uv_tiling_v != AsoboMaterialUVOptions.Defaults.UVTilingV
             )
-            or blender_material.msfs_uv_rotation
-            != AsoboMaterialUVOptions.Defaults.UVRotation
+            or blender_material.msfs_uv_rotation != AsoboMaterialUVOptions.Defaults.UVRotation)
+            and blender_material.msfs_material_type != "msfs_invisible" 
+            and blender_material.msfs_material_type != "msfs_environment_occluder"
         ):
             result["AOUseUV2"] = blender_material.msfs_ao_use_uv2
             result["clampUVX"] = blender_material.msfs_clamp_uv_x
@@ -1067,20 +1070,18 @@ class AsoboMaterialDetail:
         from ..io.msfs_material import MSFSMaterial
 
         result = {}
-        if blender_material.msfs_material_type != "msfs_parallax" and (
-            blender_material.msfs_detail_color_texture is not None
-            or blender_material.msfs_detail_normal_texture is not None
-            or blender_material.msfs_detail_occlusion_metallic_roughness_texture is not None
-            or blender_material.msfs_blend_mask_texture is not None
-        ):
-            if blender_material.msfs_detail_color_texture is not None:
+        if (blender_material.msfs_material_type != "msfs_parallax" 
+            and blender_material.msfs_material_type != "msfs_invisible" 
+            and blender_material.msfs_material_type != "msfs_environment_occluder"):
+
+            if blender_material.msfs_detail_color_texture:
                 result["detailColorTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_color_texture,
                     "DEFAULT",
                     export_settings,
                 )
-            if blender_material.msfs_detail_normal_texture is not None:
+            if blender_material.msfs_detail_normal_texture:
                 result["detailNormalTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_normal_texture,
@@ -1088,17 +1089,14 @@ class AsoboMaterialDetail:
                     export_settings,
                     normal_scale=blender_material.msfs_detail_normal_scale,
                 )
-            if (
-                blender_material.msfs_detail_occlusion_metallic_roughness_texture
-                is not None
-            ):
+            if blender_material.msfs_detail_occlusion_metallic_roughness_texture:
                 result["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_occlusion_metallic_roughness_texture,
                     "DEFAULT",
                     export_settings,
                 )
-            if blender_material.msfs_blend_mask_texture is not None:
+            if blender_material.msfs_blend_mask_texture:
                 result["blendMaskTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_blend_mask_texture,
@@ -1304,20 +1302,20 @@ class AsoboAnisotropic:
         from ..io.msfs_material import MSFSMaterial
 
         result = {}
-        if (
-            (blender_material.msfs_material_type == "msfs_anisotropic" or blender_material.msfs_material_type == "msfs_hair")
-            and (blender_material.msfs_extra_slot1_texture is not None)
-            ):
-            result["anisotropicTexture"] = MSFSMaterial.export_image(
-                blender_material,
-                blender_material.msfs_extra_slot1_texture,
-                "DEFAULT",
-                export_settings,
-            )
+        if (blender_material.msfs_material_type == "msfs_anisotropic" 
+            or blender_material.msfs_material_type == "msfs_hair"):
 
-            gltf2_material.extensions[AsoboAnisotropic.SerializedName] = Extension(
-                name=AsoboAnisotropic.SerializedName, extension=result, required=False
-            )
+            if blender_material.msfs_extra_slot1_texture:
+                result["anisotropicTexture"] = MSFSMaterial.export_image(
+                    blender_material,
+                    blender_material.msfs_extra_slot1_texture,
+                    "DEFAULT",
+                    export_settings,
+                )
+
+                gltf2_material.extensions[AsoboAnisotropic.SerializedName] = Extension(
+                    name=AsoboAnisotropic.SerializedName, extension=result, required=False
+                )
 
 
 class AsoboWindshield:
