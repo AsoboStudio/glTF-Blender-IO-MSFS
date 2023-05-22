@@ -1070,7 +1070,8 @@ class AsoboMaterialDetail:
         from ..io.msfs_material import MSFSMaterial
 
         result = {}
-        if (blender_material.msfs_material_type != "msfs_parallax" 
+        if (blender_material.msfs_material_type != "NONE" 
+            and blender_material.msfs_material_type != "msfs_parallax" 
             and blender_material.msfs_material_type != "msfs_invisible" 
             and blender_material.msfs_material_type != "msfs_environment_occluder"):
 
