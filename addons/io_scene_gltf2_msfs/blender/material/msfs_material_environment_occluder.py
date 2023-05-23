@@ -20,5 +20,6 @@ class MSFS_Environment_Occluder(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
+        super(MSFS_Environment_Occluder, self).defaultShadersTree()
         self.principledBSDF = self.getNodesByClassName("ShaderNodeBsdfPrincipled")[0]
         self.principledBSDF.inputs[21].default_value = 0
