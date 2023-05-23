@@ -44,12 +44,20 @@ class MSFS_Clearcoat(MSFS_Material):
 
         ## Clearcoat separate
         # In[0] : ClearcoatTexture -> Out[0]
-        clearcoatSeparateNode = self.addNode(
-            name = MSFS_ShaderNodes.clearcoatSeparate.value,
-            typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value,
-            location = (-800.0, -500.0),
-            frame = clearcoatFrame
-        )
+        if(bpy.app.version < (3, 3, 0)):
+            clearcoatSeparateNode = self.addNode(
+                name = MSFS_ShaderNodes.clearcoatSeparate.value,
+                typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateRGB.value,
+                location = (-800.0, -500.0),
+                frame = clearcoatFrame
+            )
+        else:
+            clearcoatSeparateNode = self.addNode(
+                name = MSFS_ShaderNodes.clearcoatSeparate.value,
+                typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value,
+                location = (-800.0, -500.0),
+                frame = clearcoatFrame
+            )
 
         self.link(clearcoatTexNode.outputs[0], clearcoatSeparateNode.inputs[0])
 

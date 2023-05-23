@@ -51,7 +51,7 @@ class MSFS_ShaderNodesTypes(Enum):
     shaderNodeTree = "ShaderNodeTree"
     shaderNodeOutputMaterial = "ShaderNodeOutputMaterial"
     nodeFrame = "NodeFrame"
-    #shaderNodeMixRGB = "ShaderNodeMixRGB" 
+    shaderNodeMix = "ShaderNodeMix" 
     shaderNodeMixRGB = "ShaderNodeMix" 
     nodeGroupOutput = "NodeGroupOutput"
     nodeGroupInput = "NodeGroupInput"

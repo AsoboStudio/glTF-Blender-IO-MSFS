@@ -23,10 +23,14 @@ from .material.utils.msfs_material_enum import (MSFS_AnisotropicNodes,
                                                 MSFS_MixRGBNodeInputs,
                                                 MSFS_MixRGBNodeOutputs)
 
-outputs0 = MSFS_MixRGBNodeOutputs.outputs[1][0]
-inputs0 = MSFS_MixRGBNodeInputs.inputs[1][0]
-inputs1 = MSFS_MixRGBNodeInputs.inputs[1][1]
-inputs2 = MSFS_MixRGBNodeInputs.inputs[1][2]
+index1 = 1
+if(bpy.app.version < (3, 3, 0)):
+    index1 = 0
+		
+outputs0 = MSFS_MixRGBNodeOutputs.outputs[index1][0]
+inputs0 = MSFS_MixRGBNodeInputs.inputs[index1][0]
+inputs1 = MSFS_MixRGBNodeInputs.inputs[index1][1]
+inputs2 = MSFS_MixRGBNodeInputs.inputs[index1][2]
 
 print(outputs0)
 print(inputs0)
