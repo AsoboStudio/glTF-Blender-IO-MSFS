@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import os
-import re
-import bpy
 import uuid
 import xml.dom.minidom
 import xml.etree.ElementTree as etree
+
+import bpy
 
 
 # Scene Properties
@@ -39,12 +39,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
     @staticmethod
     def export(file_path):
         settings = bpy.context.scene.msfs_multi_exporter_settings
-        bpy.data.scenes['Scene'].msfs_exporter_properties.use_unique_id = settings.use_unique_id
+        bpy.context.scene.msfs_exporter_properties.use_unique_id = settings.use_unique_id
         
         if(bpy.app.version < (3, 3, 0)):
-            bpy.ops.export_scene.gltf(
+            gltf = bpy.ops.export_scene.gltf(
                     export_format="GLTF_SEPARATE",
-                    use_selection=True,
                     filepath=file_path,
                     export_copyright=settings.export_copyright,
                     export_image_format=settings.export_image_format,
@@ -58,9 +57,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     use_mesh_edges=settings.use_mesh_edges,
                     use_mesh_vertices=settings.use_mesh_vertices,
                     export_cameras=settings.export_cameras,
+                    use_selection=settings.use_selected,
                     use_visible=settings.use_visible,
                     use_renderable=settings.use_renderable,
                     use_active_collection=settings.use_active_collection,
+                    use_active_scene=settings.use_active_scene,
                     export_extras=settings.export_extras,
                     export_yup=settings.export_yup,
                     export_apply=settings.export_apply,
@@ -69,17 +70,29 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_frame_step=settings.export_frame_step,
                     export_force_sampling=settings.export_force_sampling,
                     export_nla_strips=settings.export_nla_strips,
+                    export_nla_strips_merged_animation_name=settings.export_nla_strips_merged_animation_name,
                     export_def_bones=settings.export_def_bones,
                     export_current_frame=settings.export_current_frame,
                     export_skins=settings.export_skins,
                     export_all_influences=settings.export_all_influences,
                     export_lights=settings.export_lights,
-                    export_displacement=settings.export_displacement
+                    export_displacement=settings.export_displacement,
+                    export_morph=settings.export_morph,
+                    export_morph_normal=settings.export_morph_normal,
+                    export_morph_tangent=settings.export_morph_tangent,
+                    export_draco_mesh_compression_enable=settings.export_draco_mesh_compression_enable,
+                    export_draco_mesh_compression_level=settings.export_draco_mesh_compression_level,
+                    export_draco_position_quantization=settings.export_draco_position_quantization,
+                    export_draco_normal_quantization=settings.export_draco_normal_quantization,
+                    export_draco_texcoord_quantization=settings.export_draco_texcoord_quantization,
+                    export_draco_color_quantization=settings.export_draco_color_quantization,
+                    export_draco_generic_quantization=settings.export_draco_generic_quantization
             )
+            if not gltf:
+                print("[ASOBO] Export failed.")
         else:
-            bpy.ops.export_scene.gltf(
+            gltf = bpy.ops.export_scene.gltf(
                     export_format="GLTF_SEPARATE",
-                    use_selection=True,
                     filepath=file_path,
                     export_copyright=settings.export_copyright,
                     export_image_format=settings.export_image_format,
@@ -93,6 +106,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     use_mesh_edges=settings.use_mesh_edges,
                     use_mesh_vertices=settings.use_mesh_vertices,
                     export_cameras=settings.export_cameras,
+                    use_selection=settings.use_selected,
                     use_visible=settings.use_visible,
                     use_renderable=settings.use_renderable,
                     use_active_collection=settings.use_active_collection,
@@ -104,12 +118,25 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_frame_step=settings.export_frame_step,
                     export_force_sampling=settings.export_force_sampling,
                     export_nla_strips=settings.export_nla_strips,
+                    export_nla_strips_merged_animation_name=settings.export_nla_strips_merged_animation_name,
                     export_def_bones=settings.export_def_bones,
                     export_current_frame=settings.export_current_frame,
                     export_skins=settings.export_skins,
                     export_all_influences=settings.export_all_influences,
-                    export_lights=settings.export_lights
+                    export_lights=settings.export_lights,
+                    export_morph=settings.export_morph,
+                    export_morph_normal=settings.export_morph_normal,
+                    export_morph_tangent=settings.export_morph_tangent,
+                    export_draco_mesh_compression_enable=settings.export_draco_mesh_compression_enable,
+                    export_draco_mesh_compression_level=settings.export_draco_mesh_compression_level,
+                    export_draco_position_quantization=settings.export_draco_position_quantization,
+                    export_draco_normal_quantization=settings.export_draco_normal_quantization,
+                    export_draco_texcoord_quantization=settings.export_draco_texcoord_quantization,
+                    export_draco_color_quantization=settings.export_draco_color_quantization,
+                    export_draco_generic_quantization=settings.export_draco_generic_quantization
             )
+            if not gltf:
+                print("[ASOBO] Export failed.")
 
     def execute(self, context):
         if context.scene.msfs_multi_exporter_current_tab == "OBJECTS":

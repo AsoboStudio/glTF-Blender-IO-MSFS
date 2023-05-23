@@ -41,15 +41,17 @@ class MSFS_ImporterProperties(bpy.types.PropertyGroup):
     )
 
 class MSFS_ExporterProperties(bpy.types.PropertyGroup):
+
     enabled: bpy.props.BoolProperty(
         name='Microsoft Flight Simulator Extensions',
         description='Enable MSFS glTF export extensions',
-        default=True
+        default=True,
     )
+
     use_unique_id: bpy.props.BoolProperty(
-        name='use_unique_id',
-        description='use ASOBO_unique_id extension',
-        default=False
+        name='Use ASOBO Unique ID',
+        description='use ASOBO Unique ID extension',
+        default=True,
     )
     
 
@@ -105,7 +107,7 @@ class GLTF_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
 
         layout.prop(props, 'enabled', text="Enabled")
         if props.enabled:
-            layout.prop(props, 'use_unique_id', text="Enable ASOBO_unique_id extension")
+            layout.prop(props, 'use_unique_id', text="Enable ASOBO Unique ID extension")
 
 def recursive_module_search(path, root=""):
     for _, name, ispkg in pkgutil.iter_modules([str(path)]):
