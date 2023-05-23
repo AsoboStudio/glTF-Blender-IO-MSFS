@@ -41,9 +41,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
         settings = bpy.context.scene.msfs_multi_exporter_settings
         bpy.data.scenes['Scene'].msfs_exporter_properties.use_unique_id = settings.use_unique_id
         
-        version = bpy.app.version_string
-        
-        if(float(version.rsplit('.', 1)[0]) < 3.3):
+        if(bpy.app.version < (3, 3, 0)):
             bpy.ops.export_scene.gltf(
                     export_format="GLTF_SEPARATE",
                     use_selection=True,
