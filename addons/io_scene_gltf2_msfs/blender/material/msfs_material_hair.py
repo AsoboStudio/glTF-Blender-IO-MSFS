@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from ..msfs_material_function import MSFS_Material
+from .msfs_material_anisotropic import MSFS_Anisotropic
 
 
 class MSFS_Hair(MSFS_Material):
@@ -21,5 +22,5 @@ class MSFS_Hair(MSFS_Material):
 
     def customShaderTree(self):
         super(MSFS_Hair, self).defaultShaderStree()
-        super(MSFS_Hair, self).anisotropicShaderTree()
+        MSFS_Anisotropic.anisotropicShaderTree(self)
     
