@@ -43,18 +43,53 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         description="Legal rights and conditions for the model",
         default="",
     )
-   
+
+    ## Remember export settings check
+    remember_export_settings: bpy.props.BoolProperty(
+        name="Remember Export Settings",
+        description="Store glTF export settings in the Blender project.",
+        default=False
+    )
+
+    ## MSFS extensions Check
+    def msfs_enable_msfs_extension_update(self, context):
+        props = bpy.context.scene.msfs_exporter_properties
+        settings = context.scene.msfs_multi_exporter_settings
+        props.enabled = settings.enable_msfs_extension
+
+    enable_msfs_extension: bpy.props.BoolProperty(
+        name='Use Microsoft Flight Simulator Extensions',
+        description='Enable Microsoft Flight Simulator Extensions',
+        default=True,
+        update=msfs_enable_msfs_extension_update
+    )
+
     ## Asobo Unique ID Check
+    def msfs_use_unique_id_extension_update(self, context):
+        props = bpy.context.scene.msfs_exporter_properties
+        settings = context.scene.msfs_multi_exporter_settings
+        props.use_unique_id = settings.use_unique_id
+    
     use_unique_id: bpy.props.BoolProperty(
-        name='Use Asobo_unique_id Extension',
-        description='use ASOBO_unique_id extension',
-        default=True
+        name='Use ASOBO Unique ID Extension',
+        description='Enable ASOBO Unique ID extension',
+        default=True,
+        update=msfs_use_unique_id_extension_update
     )
     
     #### Include Options
+    ## Export Selected Only Check - TODO : See if this works
+    use_selected: bpy.props.BoolProperty(
+        name="Selected Objects", 
+        description="Export selected objects only", 
+        default=True
+    )
+
     ## Export Visible Only Check - TODO : See if this works
     use_visible: bpy.props.BoolProperty(
-        name="Visible Objects", description="Export visible objects only", default=False
+        name="Visible Objects", 
+        description="Export visible objects only", 
+        default=False
     )
 
     ## Export Renderable Objects Check
@@ -70,6 +105,12 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         description="Export objects in the active collection only",
         default=False,
     )
+
+    use_active_scene: bpy.props.BoolProperty(
+        name="Active Scene",
+        description="Export active scene only",
+        default=False,
+    )
     
     ## Export Custom Propreties Check
     export_extras: bpy.props.BoolProperty(
@@ -80,7 +121,9 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     
     ## Export Camera Check
     export_cameras: bpy.props.BoolProperty(
-        name="Cameras", description="Export cameras", default=False
+        name="Cameras", 
+        description="Export cameras", 
+        default=False
     )
 
     ## Export Punctual Lights Check
@@ -192,6 +235,70 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         default="AUTO",
     )
 
+    ## Draco compression check 
+    export_draco_mesh_compression_enable: bpy.props.BoolProperty(
+        name='Draco mesh compression',
+        description=(
+            "Compress mesh using Draco"
+            "WARNING: Draco compression is not supported in Microsoft Flight Simulator"
+        ),
+        default=False
+    )
+
+    ## Draco compression level
+    export_draco_mesh_compression_level: bpy.props.IntProperty(
+        name='Compression level',
+        description='Compression level (0 = most speed, 6 = most compression, higher values currently not supported)',
+        default=6,
+        min=0,
+        max=10
+    )
+
+    ## Draco compression position quatization
+    export_draco_position_quantization: bpy.props.IntProperty(
+        name='Position quantization bits',
+        description='Quantization bits for position values (0 = no quantization)',
+        default=14,
+        min=0,
+        max=30
+    )
+
+    ## Draco compression normal quatization
+    export_draco_normal_quantization: bpy.props.IntProperty(
+        name='Normal quantization bits',
+        description='Quantization bits for normal values (0 = no quantization)',
+        default=10,
+        min=0,
+        max=30
+    )
+
+    ## Draco compression texture coordinate quatization
+    export_draco_texcoord_quantization: bpy.props.IntProperty(
+        name='Texcoord quantization bits',
+        description='Quantization bits for texture coordinate values (0 = no quantization)',
+        default=12,
+        min=0,
+        max=30
+    )
+
+    ## Draco compression vertex color quatization
+    export_draco_color_quantization: bpy.props.IntProperty(
+        name='Color quantization bits',
+        description='Quantization bits for color values (0 = no quantization)',
+        default=10,
+        min=0,
+        max=30
+    )
+
+    ## Draco compression generic quatization
+    export_draco_generic_quantization: bpy.props.IntProperty(
+        name='Generic quantization bits',
+        description='Quantization bits for generic coordinate values like weights or joints (0 = no quantization)',
+        default=12,
+        min=0,
+        max=30
+    )
+
     #### Animation Options
     ## Use Current Frame Check
     export_current_frame: bpy.props.BoolProperty(
@@ -241,6 +348,15 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         default=True,
     )
 
+    ## Export NLA strips merged animation name
+    export_nla_strips_merged_animation_name: bpy.props.StringProperty(
+        name='Merged Animation Name',
+        description=(
+            "Name of single glTF animation to be exported"
+        ),
+        default='Animation'
+    )
+
     ## Optimize Animation Size Check
     optimize_animation_size: bpy.props.BoolProperty(
         name="Optimize Animation Size",
@@ -250,14 +366,47 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         ),
         default=True,
     )
-    
-    ## Deformation Bones Only Check
-    export_def_bones: bpy.props.BoolProperty(
-        name="Export Deformation Bones Only",
-        description="Export Deformation bones only (and needed bones for hierarchy)",
-        default=False,
+
+    ## Export all armature actions check
+    export_all_armature_actions: bpy.props.BoolProperty(
+        name="Export all Armature Actions",
+        description=(
+            "Export all actions, bound to a single armature. "
+            "WARNING: Option does not support exports including multiple armatures"
+        ),
+        default=True
     )
 
+    ## Export Shape Keys check
+    export_morph: bpy.props.BoolProperty(
+        name='Shape Keys',
+        description=(
+            "Export shape keys (morph targets)"
+            "WARNING: Morph targets ar not interpreated by Microsoft Flight Simulator."
+        ),
+        default=False
+    )
+
+    ## Export Shape Keys Normals check
+    export_morph_normal: bpy.props.BoolProperty(
+        name='Shape Key Normals',
+        description=(
+            "Export vertex normals with shape keys (morph targets)"
+            "WARNING: Morph targets ar not interpreated by Microsoft Flight Simulator."
+        ),
+        default=False
+    )
+
+    ## Export Shape Keys Tangent check
+    export_morph_tangent: bpy.props.BoolProperty(
+        name='Shape Key Tangents',
+        description=(
+            "Export vertex tangents with shape keys (morph targets)"
+            "WARNING: Morph targets ar not interpreated by Microsoft Flight Simulator."
+        ),
+        default=False
+    )
+    
     ##* Skinning Option Check
     export_skins: bpy.props.BoolProperty(
         name="Skinning", description="Export skinning (armature) data", default=True
@@ -270,10 +419,21 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         default=False,
     )
 
+    ## Deformation Bones Only Check
+    export_def_bones: bpy.props.BoolProperty(
+        name="Export Deformation Bones Only",
+        description="Export Deformation bones only (and needed bones for hierarchy)",
+        default=False,
+    )
+
+    ## Export displacement Check (works with Blender < 3.3 versions)
     export_displacement: bpy.props.BoolProperty(
         name="Displacement Textures (EXPERIMENTAL)",
-        description="EXPERIMENTAL: Export displacement textures. "
-        'Uses incomplete "KHR_materials_displacement" glTF extension',
+        description=(
+            "EXPERIMENTAL: Export displacement textures. "
+            "Uses incomplete "'KHR_materials_displacement'" glTF extension"
+            "WARNING: works with Blender < 3.3 versions"
+        ),
         default=False,
     )
     
@@ -302,7 +462,34 @@ class MSFS_PT_export_main(bpy.types.Panel):
             layout.prop(settings, "export_texture_dir", icon="FILE_FOLDER")
 
         layout.prop(settings, "export_copyright")
-        layout.prop(settings, "use_unique_id")
+        layout.prop(settings, "remember_export_settings")
+        
+
+class MSFS_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = ""
+    bl_parent_id = "MSFS_PT_MultiExporter"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene.msfs_multi_exporter_current_tab == "SETTINGS"
+
+    def draw_header(self, context):
+        layout = self.layout
+        layout.label(text="Microsoft Flight Simulator Extensions", icon='TOOL_SETTINGS')
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        settings = context.scene.msfs_multi_exporter_settings
+
+        layout.prop(settings, 'enable_msfs_extension', text="Enabled")
+        if settings.enable_msfs_extension:
+            layout.prop(settings, 'use_unique_id', text="Enable ASOBO Unique ID extension")
 
 
 class MSFS_PT_export_include(bpy.types.Panel):
@@ -324,9 +511,11 @@ class MSFS_PT_export_include(bpy.types.Panel):
         settings = context.scene.msfs_multi_exporter_settings
 
         col = layout.column(heading="Limit to", align=True)
+        col.prop(settings, "use_selected")
         col.prop(settings, "use_visible")
         col.prop(settings, "use_renderable")
         col.prop(settings, "use_active_collection")
+        col.prop(settings, "use_active_scene")
 
         col = layout.column(heading="Data", align=True)
         col.prop(settings, "export_extras")
@@ -390,6 +579,41 @@ class MSFS_PT_export_geometry(bpy.types.Panel):
         col.active = settings.export_materials == "EXPORT"
         col.prop(settings, "export_image_format")
 
+class MSFS_PT_export_geometry_compression(bpy.types.Panel):
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_label = "Compression"
+    bl_parent_id = "MSFS_PT_export_geometry"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def __init__(self):
+        from io_scene_gltf2.io.com import gltf2_io_draco_compression_extension
+        self.is_draco_available = gltf2_io_draco_compression_extension.dll_exists(quiet=True)
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene.msfs_multi_exporter_current_tab == "SETTINGS"
+
+    def draw_header(self, context):
+        settings = context.scene.msfs_multi_exporter_settings
+        self.layout.prop(settings, "export_draco_mesh_compression_enable", text="")
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        settings = context.scene.msfs_multi_exporter_settings
+
+        layout.active = settings.export_draco_mesh_compression_enable
+        layout.prop(settings, 'export_draco_mesh_compression_level')
+
+        col = layout.column(align=True)
+        col.prop(settings, 'export_draco_position_quantization', text="Quantize Position")
+        col.prop(settings, 'export_draco_normal_quantization', text="Normal")
+        col.prop(settings, 'export_draco_texcoord_quantization', text="Tex Coord")
+        col.prop(settings, 'export_draco_color_quantization', text="Color")
+        col.prop(settings, 'export_draco_generic_quantization', text="Generic")
 
 class MSFS_PT_export_animation(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
@@ -440,18 +664,40 @@ class MSFS_PT_export_animation_export(bpy.types.Panel):
         layout.prop(settings, "export_frame_step")
         layout.prop(settings, "export_force_sampling")
         layout.prop(settings, "export_nla_strips")
+        if settings.export_nla_strips is False:
+            layout.prop(settings, 'export_nla_strips_merged_animation_name')
         layout.prop(settings, "optimize_animation_size")
+        layout.prop(settings, "export_all_armature_actions")
 
-        row = layout.row()
-        row.active = settings.export_force_sampling
-        row.prop(settings, "export_def_bones")
-        if (
-            settings.export_force_sampling is False
-            and settings.export_def_bones is True
-        ):
-            layout.label(
-                text="Export only deformation bones is not possible when not sampling animation"
-            )
+
+class MSFS_PT_export_animation_shapekeys(bpy.types.Panel):
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_label = "Shape Keys"
+    bl_parent_id = "MSFS_PT_export_animation"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene.msfs_multi_exporter_current_tab == "SETTINGS"
+
+    def draw_header(self, context):
+        settings = context.scene.msfs_multi_exporter_settings
+        self.layout.prop(settings, "export_morph", text="")
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        settings = context.scene.msfs_multi_exporter_settings
+
+        layout.active = settings.export_morph
+
+        layout.prop(settings, 'export_morph_normal')
+        col = layout.column()
+        col.active = settings.export_morph_normal
+        col.prop(settings, 'export_morph_tangent')
 
 
 class MSFS_PT_export_animation_skinning(bpy.types.Panel):
@@ -478,6 +724,12 @@ class MSFS_PT_export_animation_skinning(bpy.types.Panel):
 
         layout.active = settings.export_skins
         layout.prop(settings, "export_all_influences")
+
+        row = layout.row()
+        row.active = settings.export_force_sampling
+        row.prop(settings, 'export_def_bones')
+        if settings.export_force_sampling is False and settings.export_def_bones is True:
+            layout.label(text="Export only deformation bones is not possible when not sampling animation")
 
 
 def register():

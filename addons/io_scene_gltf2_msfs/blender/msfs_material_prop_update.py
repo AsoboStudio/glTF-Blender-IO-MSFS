@@ -107,7 +107,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_SSS(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_invisible":
-            msfs_mat = MSFS_Invisible(self, buildTree=False)
+            msfs_mat = MSFS_Invisible(self, buildTree=True)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
         elif self.msfs_material_type == "msfs_fake_terrain":
@@ -115,9 +115,9 @@ class MSFS_Material_Property_Update:
             self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_fresnel_fade":
             msfs_mat = MSFS_Fresnel_Fade(self, buildTree=True)
-            self.msfs_alpha_mode = "OPAQUE"
+            self.msfs_alpha_mode = "BLEND"
         elif self.msfs_material_type == "msfs_environment_occluder":
-            msfs_mat = MSFS_Environment_Occluder(self, buildTree=False)
+            msfs_mat = MSFS_Environment_Occluder(self, buildTree=True)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
         elif self.msfs_material_type == "msfs_ghost":
@@ -125,10 +125,81 @@ class MSFS_Material_Property_Update:
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
         else:
+            MSFS_Material_Property_Update.reset_material_prop_object(self)
             msfs_mat = MSFS_Material(self)
             msfs_mat.revertToPBRShaderTree()
             self.msfs_alpha_mode = "OPAQUE"
             return
+    
+    @staticmethod
+    def reset_material_prop_object(self):
+        self.msfs_alpha_cutoff = 0.5
+        self.msfs_ao_use_uv2 = False
+        self.msfs_base_color_blend_factor = 1.0
+        self.msfs_base_color_factor = [1.0, 1.0, 1.0, 1.0]
+        self.msfs_base_color_texture = None
+        self.msfs_blend_mask_texture = None
+        self.msfs_clamp_uv_x = False
+        self.msfs_clamp_uv_y = False
+        self.msfs_clamp_uv_z = False
+        self.msfs_collision_material = False
+        self.msfs_day_night_cycle = False
+        self.msfs_detail_blend_threshold = 0.0
+        self.msfs_detail_color_texture = None
+        self.msfs_detail_occlusion_metallic_roughness_texture = None
+        self.msfs_detail_uv_offset_u = 0.0
+        self.msfs_detail_uv_offset_v = 0.0
+        self.msfs_detail_uv_scale = 1.0
+        self.msfs_dirt_texture = None
+        self.msfs_disable_motion_blur = False
+        self.msfs_double_sided = False
+        self.msfs_draw_order_offset = 0
+        self.msfs_emissive_blend_factor = 1.0
+        self.msfs_emissive_factor = [0.0, 0.0, 0.0]
+        self.msfs_emissive_scale = 1.0
+        self.msfs_emissive_texture = None
+        self.msfs_extra_slot1_texture = None
+        self.msfs_fresnel_factor = 1.0
+        self.msfs_fresnel_opacity_offset = 1.0
+        self.msfs_ghost_bias = 1.0
+        self.msfs_ghost_power = 1.0
+        self.msfs_ghost_scale = 1.0
+        self.msfs_glass_deformation_factor = 0.0
+        self.msfs_glass_reflection_mask_factor = 0.0
+        self.msfs_metallic_blend_factor = 0.0
+        self.msfs_metallic_factor = 1.0
+        self.msfs_no_cast_shadow = False
+        self.msfs_normal_blend_factor = 1.0
+        self.msfs_normal_scale = 1.0
+        self.msfs_normal_texture = None
+        self.msfs_occlusion_blend_factor = 1.0
+        self.msfs_occlusion_metallic_roughness_texture = None
+        self.msfs_opacity_texture = None
+        self.msfs_parallax_corridor = False
+        self.msfs_parallax_room_number_xy = 1
+        self.msfs_parallax_room_size_x = 1.0
+        self.msfs_parallax_room_size_y = 1.0
+        self.msfs_parallax_scale = 0.0
+        self.msfs_pearl_brightness = 0.0
+        self.msfs_pearl_range = 0.0
+        self.msfs_pearl_shift = 0.0
+        self.msfs_rain_drop_scale = 1.0
+        self.msfs_responsive_aa = False
+        self.msfs_road_collision_material = False
+        self.msfs_roughness_blend_factor = 1.0
+        self.msfs_roughness_factor = 1.0
+        self.msfs_sss_color = [1.0, 1.0, 1.0, 1.0]
+        self.msfs_use_pearl = False
+        self.msfs_uv_offset_u = 0.0
+        self.msfs_uv_offset_v = 0.0
+        self.msfs_uv_rotation = 0.0
+        self.msfs_uv_tiling_u = 1.0
+        self.msfs_uv_tiling_v = 1.0
+        self.msfs_wiper_1_state = 0.0
+        self.msfs_wiper_2_state = 0.0
+        self.msfs_wiper_3_state = 0.0
+        self.msfs_wiper_4_state = 0.0
+        return
 
     @staticmethod
     def update_base_color_texture(self, context):
@@ -182,7 +253,7 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_extra_slot1_texture(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
-        if msfs is not None and type(msfs) is MSFS_Anisotropic or type(msfs) is MSFS_Hair:
+        if msfs is not None and (type(msfs) is MSFS_Anisotropic or type(msfs) is MSFS_Hair):
             msfs.setAnisotropicTex(self.msfs_extra_slot1_texture)
 
     @staticmethod

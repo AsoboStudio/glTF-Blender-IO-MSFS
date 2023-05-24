@@ -52,7 +52,7 @@ class MSFS_ShaderNodesTypes(Enum):
     shaderNodeOutputMaterial = "ShaderNodeOutputMaterial"
     nodeFrame = "NodeFrame"
     shaderNodeMix = "ShaderNodeMix" 
-    shaderNodeMixRGB = "ShaderNodeMix" 
+    shaderNodeMixRGB = "ShaderNodeMixRGB" 
     nodeGroupOutput = "NodeGroupOutput"
     nodeGroupInput = "NodeGroupInput"
     shadeNodeBsdfPrincipled = "ShaderNodeBsdfPrincipled"
@@ -147,8 +147,8 @@ class MSFS_PrincipledBSDFInputs(Enum):
     alpha = "Alpha"
     normal = "Normal"
 
-class MSFS_MixRGBNodeInputs:
+class MSFS_MixNodeInputs:
     inputs = [[0, 1, 2], [0, 6, 7]]
 
-class MSFS_MixRGBNodeOutputs:
+class MSFS_MixNodeOutputs:
     outputs = [[0], [2]]

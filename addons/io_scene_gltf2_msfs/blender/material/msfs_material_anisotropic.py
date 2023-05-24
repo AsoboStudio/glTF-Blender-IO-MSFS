@@ -14,7 +14,7 @@
 from ..msfs_material_function import MSFS_Material
 from .utils.msfs_material_enum import (MSFS_AnisotropicNodes, MSFS_FrameNodes,
                                        MSFS_ShaderNodesTypes)
-
+import bpy
 
 class MSFS_Anisotropic(MSFS_Material):
     def __init__(self, material, buildTree=False):
