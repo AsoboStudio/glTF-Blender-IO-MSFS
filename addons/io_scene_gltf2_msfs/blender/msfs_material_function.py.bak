@@ -149,7 +149,7 @@ class MSFS_Material:
     def customShaderTree(self):
         raise NotImplementedError()
 
-    def defaultShadersTree(self):
+    def defaultShaderStree(self):
         principledBSDFNode = self.getNodesByClassName(MSFS_ShaderNodesTypes.shadeNodeBsdfPrincipled.value)[0]
         ################## Textures
         ## Texture Frame                

@@ -22,7 +22,7 @@ class MSFS_SSS(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
-        super(MSFS_SSS, self).defaultShaderStree()
+        super(MSFS_SSS, self).defaultShadersTree()
 
     def setSSSColor(self, color):
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)

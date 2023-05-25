@@ -24,7 +24,7 @@ class MSFS_Clearcoat(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
-        super(MSFS_Clearcoat, self).defaultShaderStree()
+        super(MSFS_Clearcoat, self).defaultShadersTree()
         self.clearcoatShaderTree()
 
     def clearcoatShaderTree(self):

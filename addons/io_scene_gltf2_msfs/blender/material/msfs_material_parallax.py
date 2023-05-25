@@ -23,7 +23,7 @@ class MSFS_Parallax(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
-        super(MSFS_Parallax, self).defaultShaderStree()
+        super(MSFS_Parallax, self).defaultShadersTree()
         self.parallaxShaderTree()
 
     def parallaxShaderTree(self):

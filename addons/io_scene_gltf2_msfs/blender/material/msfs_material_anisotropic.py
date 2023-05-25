@@ -21,7 +21,7 @@ class MSFS_Anisotropic(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
-        super(MSFS_Anisotropic, self).defaultShaderStree()
+        super(MSFS_Anisotropic, self).defaultShadersTree()
         self.anisotropicShaderTree()
     
     def anisotropicShaderTree(self):
