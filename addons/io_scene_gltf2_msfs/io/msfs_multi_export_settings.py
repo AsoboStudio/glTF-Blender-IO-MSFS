@@ -144,8 +144,10 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Apply Modifiers Check
     export_apply: bpy.props.BoolProperty(
         name="Apply Modifiers",
-        description="Apply modifiers (excluding Armatures) to mesh objects -"
-        "WARNING: prevents exporting shape keys",
+        description=(
+            "Apply modifiers (excluding Armatures) to mesh objects. "
+            "WARNING: prevents exporting shape keys"
+        ),
         default=False,
     )
     
@@ -239,7 +241,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_draco_mesh_compression_enable: bpy.props.BoolProperty(
         name='Draco mesh compression',
         description=(
-            "Compress mesh using Draco"
+            "Compress mesh using Draco. "
             "WARNING: Draco compression is not supported in Microsoft Flight Simulator"
         ),
         default=False
@@ -381,7 +383,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_morph: bpy.props.BoolProperty(
         name='Shape Keys',
         description=(
-            "Export shape keys (morph targets)"
+            "Export shape keys (morph targets). "
             "WARNING: Morph targets ar not interpreated by Microsoft Flight Simulator."
         ),
         default=False
@@ -391,7 +393,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_morph_normal: bpy.props.BoolProperty(
         name='Shape Key Normals',
         description=(
-            "Export vertex normals with shape keys (morph targets)"
+            "Export vertex normals with shape keys (morph targets). "
             "WARNING: Morph targets ar not interpreated by Microsoft Flight Simulator."
         ),
         default=False
@@ -401,7 +403,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_morph_tangent: bpy.props.BoolProperty(
         name='Shape Key Tangents',
         description=(
-            "Export vertex tangents with shape keys (morph targets)"
+            "Export vertex tangents with shape keys (morph targets). "
             "WARNING: Morph targets ar not interpreated by Microsoft Flight Simulator."
         ),
         default=False
@@ -431,7 +433,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         name="Displacement Textures (EXPERIMENTAL)",
         description=(
             "EXPERIMENTAL: Export displacement textures. "
-            "Uses incomplete "'KHR_materials_displacement'" glTF extension"
+            "Uses incomplete "'KHR_materials_displacement'" glTF extension. "
             "WARNING: works with Blender < 3.3 versions"
         ),
         default=False,

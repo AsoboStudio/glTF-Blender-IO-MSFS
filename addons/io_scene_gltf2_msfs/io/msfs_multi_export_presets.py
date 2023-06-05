@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+
 import bpy
 
 from .msfs_multi_export import MSFS_OT_MultiExportGLTF2
@@ -20,9 +21,8 @@ from .msfs_multi_export import MSFS_OT_MultiExportGLTF2
 
 class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
-    enabled: bpy.props.BoolProperty(name="", default=False)
+    enabled: bpy.props.BoolProperty(name="", default=False, description="Enable/Disable the collection for the preset")
     expanded: bpy.props.BoolProperty(name="", default=True)
-
 
 class MultiExporterPreset(bpy.types.PropertyGroup):
 
@@ -33,42 +33,33 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
 
     def update_file_path(self, context):
         # Make sure file_path always ends in .gltf
-        if os.path.basename(self.file_path):
-            file_path = bpy.path.ensure_ext(
+        file_path = bpy.path.ensure_ext(
                 os.path.splitext(self.file_path)[0],
                 ".gltf",
-            )
-            if self.file_path != file_path:
+        )
+        
+        if self.file_path != file_path:
                 self.file_path = file_path
-            else:
-                name = os.path.splitext(os.path.basename(self.file_path))[0]
-                if name != self.name:
-                    self.name =  name 
+        else:
+            name = os.path.splitext(os.path.basename(bpy.path.abspath(self.file_path)))[0]
+            if name != self.name:
+                self.name =  name
 
-        elif not os.path.isfile(self.file_path):
-            file_path = os.path.join(self.file_path, self.name + ".gltf")
-            if self.file_path != file_path:
-                self.file_path = file_path
-            else:
-                name = os.path.splitext(os.path.basename(self.file_path))[0]
-                if name != self.name:
-                    self.name =  name
 
     def update_name(self, context):
         file_path = bpy.path.ensure_ext(
-                os.path.splitext(os.path.dirname(self.file_path) + "\\" + self.name)[0],
+                os.path.join(os.path.dirname(self.file_path), self.name),
                 ".gltf",
             )
         
         if self.file_path != file_path:
             self.file_path = file_path
 
-    name: bpy.props.StringProperty(name="", default="", update=update_name)
-    file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path)
-    enabled: bpy.props.BoolProperty(name="", default=False)
-    expanded: bpy.props.BoolProperty(name="", default=True)
+    name: bpy.props.StringProperty(name="", default="", update=update_name, description="Name of the glTF to export")
+    file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path, description="Path where you want your model to be exported")
+    enabled: bpy.props.BoolProperty(name="", default=False, description="Enable/Disable the preset for the export")
+    expanded: bpy.props.BoolProperty(name="", default=True, description="Expand/Collapse preset.")
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
-
 
 class MSFS_OT_AddPreset(bpy.types.Operator):
     bl_idname = "msfs.multi_export_add_preset"
@@ -78,14 +69,19 @@ class MSFS_OT_AddPreset(bpy.types.Operator):
         presets = bpy.context.scene.msfs_multi_exporter_presets
         preset = presets.add()
         preset.name = f"Preset {len(presets)}"
-        preset.file_path = preset.name + ".gltf"
+        if bpy.data.is_saved:
+            directory = os.path.dirname(bpy.data.filepath)
+            preset_path = os.path.join(directory, preset.name + ".gltf")
+            preset.file_path = bpy.path.relpath(preset_path, start = directory)
+        else:
+            preset.file_path = bpy.path.relpath(preset.name + ".gltf")
 
         return {"FINISHED"}
-
 
 class MSFS_OT_RemovePreset(bpy.types.Operator):
     bl_idname = "msfs.multi_export_remove_preset"
     bl_label = "Remove preset"
+    bl_description = "Remove the preset from the preset list"
 
     preset_index: bpy.props.IntProperty()
 
@@ -95,10 +91,10 @@ class MSFS_OT_RemovePreset(bpy.types.Operator):
 
         return {"FINISHED"}
 
-
 class MSFS_OT_EditLayers(bpy.types.Operator):
     bl_idname = "msfs.multi_export_edit_layers"
     bl_label = "Edit layers"
+    bl_description = "Edit layers to be enabled or disabled for the preset"
 
     preset_index: bpy.props.IntProperty()
 
@@ -165,7 +161,6 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
 
         drawTree(layout, self.collection_tree[bpy.context.scene.collection])
 
-
 class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
     bl_label = ""
     bl_parent_id = "MSFS_PT_MultiExporter"
@@ -200,20 +195,12 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
                 box.prop(preset, "enabled", text="Enabled")
                 box.prop(preset, "name", text="Name")
                 box.prop(preset, "file_path", text="Export Path")
-
-                box.operator(
-                    MSFS_OT_EditLayers.bl_idname, text="Edit Layers"
-                ).preset_index = i
-
-                box.operator(
-                    MSFS_OT_RemovePreset.bl_idname, text="Remove"
-                ).preset_index = i
+                box.operator(MSFS_OT_EditLayers.bl_idname, text="Edit Layers").preset_index = i
+                box.operator(MSFS_OT_RemovePreset.bl_idname, text="Remove").preset_index = i
 
         row = layout.row()
         row.operator(MSFS_OT_MultiExportGLTF2.bl_idname, text="Export")
 
 
 def register():
-    bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(
-        type=MultiExporterPreset
-    )
+    bpy.types.Scene.msfs_multi_exporter_presets = bpy.props.CollectionProperty(type=MultiExporterPreset)
