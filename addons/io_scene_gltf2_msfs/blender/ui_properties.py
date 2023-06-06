@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import bpy
-import os
 
 # from .func_properties import *
 
