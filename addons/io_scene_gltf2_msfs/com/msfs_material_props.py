@@ -20,10 +20,10 @@ from ..blender.msfs_material_prop_update import MSFS_Material_Property_Update
 
 class AsoboMaterialCommon:
     class Defaults:
-        BaseColorFactor = [1.0, 1.0, 1.0, 1.0]
+        BaseColorFactor = [0.8, 0.8, 0.8, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
-        MetallicFactor = 1.0
-        RoughnessFactor = 1.0
+        MetallicFactor = 0.0
+        RoughnessFactor = 0.5
         NormalScale = 1.0
         EmissiveScale = 1.0
         AlphaMode = "OPAQUE"
@@ -1212,7 +1212,7 @@ class AsoboSSS:
     SerializedName = "ASOBO_material_SSS"  # This entire extension is disabled for the time being. Keeping just in case
 
     class Defaults:
-        SSSColor = [1.0, 1.0, 1.0, 1.0]
+        SSSColor = [0.8, 0.8, 0.8, 1.0]
     
     bpy.types.Material.msfs_sss_color = bpy.props.FloatVectorProperty(
         name="SSS Color",
