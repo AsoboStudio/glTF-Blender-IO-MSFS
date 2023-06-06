@@ -48,10 +48,11 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
 
     def update_name(self, context):
         file_path = bpy.path.ensure_ext(
-                os.path.join(os.path.dirname(self.file_path), self.name),
+                os.path.join(os.path.dirname(self.file_path[2:]), self.name),
                 ".gltf",
             )
-        
+        file_path = os.path.join("//", file_path)
+
         if self.file_path != file_path:
             self.file_path = file_path
 
