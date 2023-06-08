@@ -28,7 +28,7 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
 
     def __init__(self) -> None:
         super().__init__()
-        self.file_path = ""
+        self.file_path = "\\"
         self.name = ""
 
     def update_file_path(self, context):
@@ -47,11 +47,14 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
 
 
     def update_name(self, context):
+        directory, filename = os.path.split(self.file_path)
+        if directory == '':
+            directory = '\\'
         file_path = bpy.path.ensure_ext(
-                os.path.join(os.path.dirname(self.file_path[2:]), self.name),
+                os.path.join(directory, self.name),
                 ".gltf",
             )
-        file_path = os.path.join("//", file_path)
+        file_path = "//" + file_path
 
         if self.file_path != file_path:
             self.file_path = file_path
@@ -70,12 +73,7 @@ class MSFS_OT_AddPreset(bpy.types.Operator):
         presets = bpy.context.scene.msfs_multi_exporter_presets
         preset = presets.add()
         preset.name = f"Preset {len(presets)}"
-        if bpy.data.is_saved:
-            directory = os.path.dirname(bpy.data.filepath)
-            preset_path = os.path.join(directory, preset.name + ".gltf")
-            preset.file_path = bpy.path.relpath(preset_path, start = directory)
-        else:
-            preset.file_path = bpy.path.relpath(preset.name + ".gltf")
+        preset.file_path = os.path.join("//" + "\\" + preset.name + ".gltf")
 
         return {"FINISHED"}
 
