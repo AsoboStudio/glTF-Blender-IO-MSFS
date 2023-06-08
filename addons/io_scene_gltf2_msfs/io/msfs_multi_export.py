@@ -215,8 +215,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                                 obj.select_set(True)
                         else:
                             select_recursive(lod.object)
-
-                        MSFS_OT_MultiExportGLTF2.export(os.path.join(bpy.path.abspath(lod_group.folder_name), os.path.splitext(lod.file_name)[0]))
+                        exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(lod_group.folder_name), os.path.splitext(lod.file_name)[0]), ".gltf")
+                        MSFS_OT_MultiExportGLTF2.export(exportPath)
 
         elif context.scene.msfs_multi_exporter_current_tab == "PRESETS":
             presets = bpy.context.scene.msfs_multi_exporter_presets
@@ -232,8 +232,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             for obj in layer.collection.all_objects:
                                 if obj in list(bpy.context.window.view_layer.objects):
                                     obj.select_set(True)
-
-                    MSFS_OT_MultiExportGLTF2.export(bpy.path.abspath(preset.file_path))
+                    exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(preset.file_path), preset.name), ".gltf")
+                    MSFS_OT_MultiExportGLTF2.export(exportPath)
 
         return {"FINISHED"}
 

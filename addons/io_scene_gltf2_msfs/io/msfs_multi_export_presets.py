@@ -28,39 +28,9 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
 
     def __init__(self) -> None:
         super().__init__()
-        self.file_path = "\\"
-        self.name = ""
 
-    def update_file_path(self, context):
-        # Make sure file_path always ends in .gltf
-        file_path = bpy.path.ensure_ext(
-                os.path.splitext(self.file_path)[0],
-                ".gltf",
-        )
-        
-        if self.file_path != file_path:
-                self.file_path = file_path
-        else:
-            name = os.path.splitext(os.path.basename(bpy.path.abspath(self.file_path)))[0]
-            if name != self.name:
-                self.name =  name
-
-
-    def update_name(self, context):
-        directory, filename = os.path.split(self.file_path)
-        if directory == '':
-            directory = '\\'
-        file_path = bpy.path.ensure_ext(
-                os.path.join(directory, self.name),
-                ".gltf",
-            )
-        file_path = "//" + file_path
-
-        if self.file_path != file_path:
-            self.file_path = file_path
-
-    name: bpy.props.StringProperty(name="", default="", update=update_name, description="Name of the glTF to export")
-    file_path: bpy.props.StringProperty(name="", default="", subtype="FILE_PATH", update=update_file_path, description="Path where you want your model to be exported")
+    name: bpy.props.StringProperty(name="", default="", description="Name of the glTF to export")
+    file_path: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH", description="Path to the directory where you want your model to be exported")
     enabled: bpy.props.BoolProperty(name="", default=False, description="Enable/Disable the preset for the export")
     expanded: bpy.props.BoolProperty(name="", default=True, description="Expand/Collapse preset.")
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
@@ -73,7 +43,7 @@ class MSFS_OT_AddPreset(bpy.types.Operator):
         presets = bpy.context.scene.msfs_multi_exporter_presets
         preset = presets.add()
         preset.name = f"Preset {len(presets)}"
-        preset.file_path = os.path.join("//" + "\\" + preset.name + ".gltf")
+        preset.file_path = ""
 
         return {"FINISHED"}
 
