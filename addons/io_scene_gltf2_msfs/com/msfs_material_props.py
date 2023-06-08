@@ -1106,7 +1106,7 @@ class AsoboMaterialDetail:
                 )
             if (blender_material.msfs_detail_uv_scale != AsoboMaterialDetail.Defaults.UVScale):
                 result["UVScale"] = blender_material.msfs_detail_uv_scale
-            if (blender_material.msfs_detail_blend_threshold != AsoboMaterialDetail.Defaults.blendThreshold):
+            if (blender_material.msfs_detail_blend_threshold != AsoboMaterialDetail.Defaults.blendThreshold and blender_material.msfs_blend_mask_texture is not None):
                 result["blendThreshold"] = blender_material.msfs_detail_blend_threshold
             if (
                 blender_material.msfs_detail_uv_offset_u != AsoboMaterialDetail.Defaults.UVOffset[0]
