@@ -137,7 +137,7 @@ class MSFS_Material_Property_Update:
         self.msfs_alpha_cutoff = 0.5
         self.msfs_ao_use_uv2 = False
         self.msfs_base_color_blend_factor = 1.0
-        self.msfs_base_color_factor = [0.8, 0.8, 0.8, 0.8]
+        self.msfs_base_color_factor = [0.8, 0.8, 0.8, 1.0]
         self.msfs_base_color_texture = None
         self.msfs_blend_mask_texture = None
         self.msfs_clamp_uv_x = False
