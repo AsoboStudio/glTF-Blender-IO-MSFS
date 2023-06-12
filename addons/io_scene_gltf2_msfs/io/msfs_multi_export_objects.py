@@ -218,7 +218,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                         if lod_group.generate_xml:
                             box.prop(lod_group, "overwrite_guid", text="Overwrite GUID")
 
-                        box.prop(lod_group, "folder_name", text="Folder")
+                        box.prop(lod_group, "folder_name", text="Export Path")
 
                         col = box.column()
                         for lod in lod_group.lods:
