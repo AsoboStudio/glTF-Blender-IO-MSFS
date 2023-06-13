@@ -116,7 +116,7 @@ class MSFS_Material_Property_Update:
             self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_fresnel_fade":
             msfs_mat = MSFS_Fresnel_Fade(self, buildTree=True)
-            self.msfs_alpha_mode = "OPAQUE"
+            self.msfs_alpha_mode = "BLEND"
         elif self.msfs_material_type == "msfs_environment_occluder":
             msfs_mat = MSFS_Environment_Occluder(self, buildTree=True)
             self.msfs_no_cast_shadow = True
