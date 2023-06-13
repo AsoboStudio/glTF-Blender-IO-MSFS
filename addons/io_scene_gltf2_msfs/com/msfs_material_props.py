@@ -1068,21 +1068,23 @@ class AsoboMaterialDetail:
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
         from ..io.msfs_material import MSFSMaterial
-
+        hasTexture = False
         result = {}
         if (blender_material.msfs_material_type != "NONE" 
             and blender_material.msfs_material_type != "msfs_parallax" 
             and blender_material.msfs_material_type != "msfs_invisible" 
             and blender_material.msfs_material_type != "msfs_environment_occluder"):
 
-            if blender_material.msfs_detail_color_texture:
+            if blender_material.msfs_detail_color_texture is not None:
                 result["detailColorTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_color_texture,
                     "DEFAULT",
                     export_settings,
                 )
-            if blender_material.msfs_detail_normal_texture:
+                hasTexture = True
+
+            if blender_material.msfs_detail_normal_texture is not None:
                 result["detailNormalTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_normal_texture,
@@ -1090,35 +1092,41 @@ class AsoboMaterialDetail:
                     export_settings,
                     normal_scale=blender_material.msfs_detail_normal_scale,
                 )
-            if blender_material.msfs_detail_occlusion_metallic_roughness_texture:
+                hasTexture = True
+
+            if blender_material.msfs_detail_occlusion_metallic_roughness_texture is not None:
                 result["detailMetalRoughAOTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_detail_occlusion_metallic_roughness_texture,
                     "DEFAULT",
                     export_settings,
                 )
-            if blender_material.msfs_blend_mask_texture:
+                hasTexture = True
+
+            if blender_material.msfs_blend_mask_texture is not None:
                 result["blendMaskTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_blend_mask_texture,
                     "DEFAULT",
                     export_settings,
                 )
-            if (blender_material.msfs_detail_uv_scale != AsoboMaterialDetail.Defaults.UVScale):
-                result["UVScale"] = blender_material.msfs_detail_uv_scale
-            if (blender_material.msfs_detail_blend_threshold != AsoboMaterialDetail.Defaults.blendThreshold and blender_material.msfs_blend_mask_texture is not None):
-                result["blendThreshold"] = blender_material.msfs_detail_blend_threshold
-            if (
-                blender_material.msfs_detail_uv_offset_u != AsoboMaterialDetail.Defaults.UVOffset[0]
-                or blender_material.msfs_detail_uv_offset_v != AsoboMaterialDetail.Defaults.UVOffset[1]
-            ):
-                result["UVOffset"] = (blender_material.msfs_detail_uv_offset_u, blender_material.msfs_detail_uv_offset_v)
-
-            gltf2_material.extensions[AsoboMaterialDetail.SerializedName] = Extension(
-                name=AsoboMaterialDetail.SerializedName,
-                extension=result,
-                required=False,
-            )
+                hasTexture = True
+            
+            if hasTexture:
+                if (blender_material.msfs_detail_uv_scale != AsoboMaterialDetail.Defaults.UVScale):
+                    result["UVScale"] = blender_material.msfs_detail_uv_scale
+                if (blender_material.msfs_detail_blend_threshold != AsoboMaterialDetail.Defaults.blendThreshold):
+                    result["blendThreshold"] = blender_material.msfs_detail_blend_threshold
+                if (blender_material.msfs_detail_uv_offset_u != AsoboMaterialDetail.Defaults.UVOffset[0]
+                    or blender_material.msfs_detail_uv_offset_v != AsoboMaterialDetail.Defaults.UVOffset[1]):
+                    result["UVOffset"] = (blender_material.msfs_detail_uv_offset_u, blender_material.msfs_detail_uv_offset_v)
+            
+            if result:
+                gltf2_material.extensions[AsoboMaterialDetail.SerializedName] = Extension(
+                    name=AsoboMaterialDetail.SerializedName,
+                    extension=result,
+                    required=False,
+                )
 
 
 class AsoboMaterialFakeTerrain:
@@ -1257,7 +1265,9 @@ class AsoboSSS:
             blender_material.msfs_material_type == "msfs_sss"
             or blender_material.msfs_material_type == "msfs_hair"
         ):
-            result["SSSColor"] = list(blender_material.msfs_sss_color)
+            if blender_material.msfs_sss_color:
+                result["SSSColor"] = list(blender_material.msfs_sss_color)
+
             if blender_material.msfs_opacity_texture is not None:
                 result["opacityTexture"] = MSFSMaterial.export_image(
                     blender_material,
@@ -1266,9 +1276,10 @@ class AsoboSSS:
                     export_settings,
                 )
 
-            gltf2_material.extensions[AsoboSSS.SerializedName] = Extension(
-                name=AsoboSSS.SerializedName, extension=result, required=False
-            )
+            if result:
+                gltf2_material.extensions[AsoboSSS.SerializedName] = Extension(
+                    name=AsoboSSS.SerializedName, extension=result, required=False
+                )
 
 
 class AsoboAnisotropic:
@@ -1306,7 +1317,7 @@ class AsoboAnisotropic:
         if (blender_material.msfs_material_type == "msfs_anisotropic" 
             or blender_material.msfs_material_type == "msfs_hair"):
 
-            if blender_material.msfs_extra_slot1_texture:
+            if blender_material.msfs_extra_slot1_texture is not None:
                 result["anisotropicTexture"] = MSFSMaterial.export_image(
                     blender_material,
                     blender_material.msfs_extra_slot1_texture,
@@ -1670,19 +1681,18 @@ class AsoboTags:
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
         result = {}
-        if (
-            (blender_material.msfs_material_type != "msfs_environment_occluder")
-            and (blender_material.msfs_collision_material or blender_material.msfs_road_collision_material)
-        ):
-            result["tags"] = []
+        if (blender_material.msfs_material_type != "msfs_environment_occluder"):
+            tags = []
             if blender_material.msfs_collision_material:
-                result["tags"].append(AsoboTags.AsoboTag.Collision)
+                tags.append(AsoboTags.AsoboTag.Collision)
             if blender_material.msfs_road_collision_material:
-                result["tags"].append(AsoboTags.AsoboTag.Road)
+                tags.append(AsoboTags.AsoboTag.Road)
 
-            gltf2_material.extensions[AsoboTags.SerializedName] = Extension(
-                name=AsoboTags.SerializedName, extension=result, required=False
-            )
+            if len(tags) > 0:
+                result["tags"] = tags
+                gltf2_material.extensions[AsoboTags.SerializedName] = Extension(
+                    name=AsoboTags.SerializedName, extension=result, required=False
+                )
 
 
 class AsoboMaterialCode:
@@ -1718,22 +1728,18 @@ class AsoboMaterialCode:
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
         result = ""
-        if blender_material.msfs_material_type in [
-            "msfs_windshield",
-            "msfs_porthole",
-            "msfs_geo_decal_frosted",
-            "msfs_clearcoat",
-        ]:
-            if blender_material.msfs_material_type == "msfs_windshield":
-                result = AsoboMaterialCode.MaterialCode.Windshield
-            elif blender_material.msfs_material_type == "msfs_porthole":
-                result = AsoboMaterialCode.MaterialCode.Porthole
-            elif blender_material.msfs_material_type == "msfs_geo_decal_frosted":
-                result = AsoboMaterialCode.MaterialCode.GeoDecalFrosted
-            elif blender_material.msfs_material_type == "msfs_clearcoat":
-                result = AsoboMaterialCode.MaterialCode.ClearCoat
+        
+        if blender_material.msfs_material_type == "msfs_windshield":
+            result = AsoboMaterialCode.MaterialCode.Windshield
+        elif blender_material.msfs_material_type == "msfs_porthole":
+            result = AsoboMaterialCode.MaterialCode.Porthole
+        elif blender_material.msfs_material_type == "msfs_geo_decal_frosted":
+            result = AsoboMaterialCode.MaterialCode.GeoDecalFrosted
+        elif blender_material.msfs_material_type == "msfs_clearcoat":
+            result = AsoboMaterialCode.MaterialCode.ClearCoat
 
-            if gltf2_material.extras is None:
-                gltf2_material.extras = {}
-            
+        if gltf2_material.extras is None:
+            gltf2_material.extras = {}
+        
+        if result != "":
             gltf2_material.extras[AsoboMaterialCode.SerializedName] = result
