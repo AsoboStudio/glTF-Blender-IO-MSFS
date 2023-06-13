@@ -49,10 +49,10 @@ class MSFS_Material:
         self.inputs1 = MSFS_MixNodeInputs.inputs[index1][1]
         self.inputs2 = MSFS_MixNodeInputs.inputs[index1][2]
 
-        print(self.outputs0)
-        print(self.inputs0)
-        print(self.inputs1)
-        print(self.inputs2)
+        #print(self.outputs0)
+        #print(self.inputs0)
+        #print(self.inputs1)
+        #print(self.inputs2)
         
     def revertToPBRShaderTree(self):
         self.cleanNodeTree()

@@ -27,7 +27,7 @@ class MSFSMultiExporterProperties:
             ("OBJECTS", "Objects", ""),
             ("PRESETS", " Presets", ""),
             ("SETTINGS", "Settings", ""),
-        ),
+        )
     )
 
 
@@ -40,7 +40,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
     def export(file_path):
         settings = bpy.context.scene.msfs_multi_exporter_settings
         bpy.context.scene.msfs_exporter_properties.use_unique_id = settings.use_unique_id
-        
+        gltf = None
         if(bpy.app.version < (3, 3, 0)):
             gltf = bpy.ops.export_scene.gltf(
                     export_format="GLTF_SEPARATE",
@@ -87,9 +87,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_draco_texcoord_quantization=settings.export_draco_texcoord_quantization,
                     export_draco_color_quantization=settings.export_draco_color_quantization,
                     export_draco_generic_quantization=settings.export_draco_generic_quantization
-            )
-            if not gltf:
-                print("[ASOBO] Export failed.")
+            )  
         else:
             gltf = bpy.ops.export_scene.gltf(
                     export_format="GLTF_SEPARATE",
@@ -135,7 +133,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_draco_color_quantization=settings.export_draco_color_quantization,
                     export_draco_generic_quantization=settings.export_draco_generic_quantization
             )
-            if not gltf:
+            
+        if gltf is None:
                 print("[ASOBO] Export failed.")
 
     def execute(self, context):
@@ -148,14 +147,9 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
             for lod_group in lod_groups:
                 # Generate XML if needed
                 if lod_group.generate_xml:
-                    xml_path = bpy.path.abspath(
-                        os.path.join(
-                            lod_group.folder_name,
-                            lod_group.group_name + ".xml",
-                        )
-                    )
-
+                    xml_path = bpy.path.abspath(os.path.join(lod_group.folder_name, lod_group.group_name + ".xml"))
                     found_guid = None
+
                     if os.path.exists(xml_path):
                         tree = etree.parse(xml_path)
                         found_guid = tree.getroot().attrib.get("guid")
@@ -167,9 +161,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             version="1.1",
                         )
                     else:
-                        root = etree.Element(
-                            "ModelInfo", guid=found_guid, version="1.1"
-                        )
+                        root = etree.Element("ModelInfo", guid=found_guid, version="1.1")
 
                     lods = etree.SubElement(root, "LODS")
 
@@ -191,19 +183,14 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         if file_name != last_lod[0]:
                             lod_element.set("minSize", str(lod_value))
 
-                        lod_element.set(
-                            "ModelFile", os.path.splitext(file_name)[0] + ".gltf"
-                        )
+                        lod_element.set("ModelFile", os.path.splitext(file_name)[0] + ".gltf")
 
                     if lod_files:
                         # Format XML
                         dom = xml.dom.minidom.parseString(etree.tostring(root))
                         xml_string = dom.toprettyxml(encoding="utf-8")
 
-                        with open(
-                            xml_path,
-                            "wb",
-                        ) as f:
+                        with open(xml_path,"wb") as f:
                             f.write(xml_string)
                             f.close()
 
@@ -228,13 +215,12 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                                 obj.select_set(True)
                         else:
                             select_recursive(lod.object)
-
-                        MSFS_OT_MultiExportGLTF2.export(
-                            os.path.join(
-                                bpy.path.abspath(lod_group.folder_name),
-                                os.path.splitext(lod.file_name)[0],
-                            )
-                        )
+                        
+                        if lod_group.folder_name != "":
+                            exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(lod_group.folder_name), os.path.splitext(lod.file_name)[0]), ".gltf")
+                            MSFS_OT_MultiExportGLTF2.export(exportPath)
+                        else:
+                            self.report({'ERROR'}, "[EXPORT][ERROR] Object : " + lod.file_name + " does not have an export path set.")
 
         elif context.scene.msfs_multi_exporter_current_tab == "PRESETS":
             presets = bpy.context.scene.msfs_multi_exporter_presets
@@ -250,8 +236,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             for obj in layer.collection.all_objects:
                                 if obj in list(bpy.context.window.view_layer.objects):
                                     obj.select_set(True)
-
-                    MSFS_OT_MultiExportGLTF2.export(bpy.path.abspath(preset.file_path))
+                    if preset.file_path != "":
+                        exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(preset.file_path), preset.name), ".gltf")
+                        MSFS_OT_MultiExportGLTF2.export(exportPath)
+                    else:
+                        self.report({'ERROR'}, "[EXPORT][ERROR] Preset : " + preset.name + " does not have an export path set.")
 
         return {"FINISHED"}
 
@@ -286,21 +275,9 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
         current_tab = context.scene.msfs_multi_exporter_current_tab
 
         row = layout.row(align=True)
-        row.operator(
-            MSFS_OT_ChangeTab.bl_idname,
-            text="Objects",
-            depress=(current_tab == "OBJECTS"),
-        ).current_tab = "OBJECTS"
-        row.operator(
-            MSFS_OT_ChangeTab.bl_idname,
-            text="Presets",
-            depress=(current_tab == "PRESETS"),
-        ).current_tab = "PRESETS"
-        row.operator(
-            MSFS_OT_ChangeTab.bl_idname,
-            text="Settings",
-            depress=(current_tab == "SETTINGS"),
-        ).current_tab = "SETTINGS"
+        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Objects", depress=(current_tab == "OBJECTS")).current_tab = "OBJECTS"
+        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Presets", depress=(current_tab == "PRESETS")).current_tab = "PRESETS"
+        row.operator(MSFS_OT_ChangeTab.bl_idname, text="Settings", depress=(current_tab == "SETTINGS")).current_tab = "SETTINGS"
 
 
 def register_panel():

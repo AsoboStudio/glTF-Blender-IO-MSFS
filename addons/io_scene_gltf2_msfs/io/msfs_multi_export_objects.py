@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import re
-import os
+
 import bpy
 
 from .msfs_multi_export import MSFS_OT_MultiExportGLTF2
@@ -25,8 +25,8 @@ class MultiExporterLOD(bpy.types.PropertyGroup):
 
     enabled: bpy.props.BoolProperty(name="", default=False)
     lod_value: bpy.props.IntProperty(name="", default=0, min=0, max=999)
-    flatten_on_export: bpy.props.BoolProperty(name="", default=False)
-    keep_instances: bpy.props.BoolProperty(name="", default=False)
+    # flatten_on_export: bpy.props.BoolProperty(name="", default=False)
+    # keep_instances: bpy.props.BoolProperty(name="", default=False)
     file_name: bpy.props.StringProperty(name="", default="")
 
 
@@ -47,27 +47,19 @@ class MSFS_LODGroupUtility:
         if sort_by_collection:
             # Checking visibility from the collection itself won't work, so we have to find the LayerCollection that contains our collection.
             collection_hidden = False
-            for (
-                layer_collection
-            ) in bpy.context.window.view_layer.layer_collection.children:
+            for layer_collection in bpy.context.window.view_layer.layer_collection.children:
                 if layer_collection.collection == lod.collection:
                     collection_hidden = not layer_collection.visible_get()
 
             if (
-                not context.scene.multi_exporter_show_hidden_objects
-                and collection_hidden
-            ) or (
-                lod.collection is None
-                or lod.collection not in list(bpy.data.collections)
+                (not context.scene.multi_exporter_show_hidden_objects and collection_hidden) or 
+                (lod.collection is None or lod.collection not in list(bpy.data.collections))
             ):
                 return False
         else:
             if (
-                not context.scene.multi_exporter_show_hidden_objects
-                and lod.object.hide_get()
-            ) or (
-                lod.object is None
-                or lod.object not in list(bpy.context.window.view_layer.objects)
+                (not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get()) or 
+                (lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects))
             ):
                 return False
         return True
@@ -84,9 +76,8 @@ class MSFS_OT_ReloadLODGroups(bpy.types.Operator):
 
     @staticmethod
     def get_group_from_name(name):
-        matches = re.findall(
-            "^(?i)x[0-9]_|_lod[0-9]+", name
-        )  # If an object starts with xN_ or ends with _LODN, treat as an LOD
+        matches = re.findall("^(?i)x[0-9]_|_lod[0-9]+", name)
+        # If an object starts with xN_ or ends with _LODN, treat as an LOD
         if matches:
             # Get base object group name from object
             for match in matches:
@@ -112,20 +103,14 @@ class MSFS_OT_ReloadLODGroups(bpy.types.Operator):
                 if sort_by_collection:
                     if (
                         not lod.collection in list(bpy.data.collections)
-                        or not MSFS_OT_ReloadLODGroups.get_group_from_name(
-                            lod.collection.name
-                        )
-                        == lod_group.group_name
+                        or not MSFS_OT_ReloadLODGroups.get_group_from_name(lod.collection.name) == lod_group.group_name
                     ):
                         lod_groups[i].lods.remove(j)
                         continue
                 else:
                     if (
                         not lod.object in list(context.scene.objects)
-                        or not MSFS_OT_ReloadLODGroups.get_group_from_name(
-                            lod.object.name
-                        )
-                        == lod_group.group_name
+                        or not MSFS_OT_ReloadLODGroups.get_group_from_name(lod.object.name) == lod_group.group_name
                     ):
                         lod_groups[i].lods.remove(j)
                         continue
@@ -156,23 +141,17 @@ class MSFS_OT_ReloadLODGroups(bpy.types.Operator):
                 created_lod_group = lod_groups.add()
                 created_lod_group.group_name = lod_group
 
-            lod_group_index = MSFS_OT_ReloadLODGroups.get_lod_group_names(
-                lod_groups
-            ).index(lod_group)
+            lod_group_index = MSFS_OT_ReloadLODGroups.get_lod_group_names(lod_groups).index(lod_group)
 
             if sort_by_collection:
                 for collection in found_lod_groups[lod_group]:
-                    if collection not in [
-                        lod.collection for lod in lod_groups[lod_group_index].lods
-                    ]:
+                    if collection not in [lod.collection for lod in lod_groups[lod_group_index].lods]:
                         lod = lod_groups[lod_group_index].lods.add()
                         lod.collection = collection
                         lod.file_name = collection.name
             else:
                 for obj in found_lod_groups[lod_group]:
-                    if obj not in [
-                        lod.object for lod in lod_groups[lod_group_index].lods
-                    ]:
+                    if obj not in [lod.object for lod in lod_groups[lod_group_index].lods]:
                         lod = lod_groups[lod_group_index].lods.add()
                         lod.object = obj
                         lod.file_name = obj.name
@@ -217,12 +196,9 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
             box.label(text="No LODs found in scene")
         else:
             for lod_group in lod_groups:
-                if (
-                    len(lod_group.lods) == 1
-                ):  # If we only have one LOD in the group, and it is hidden, then don't render the group
-                    if not MSFS_LODGroupUtility.lod_is_visible(
-                        context, lod_group.lods[0]
-                    ):
+                # If we only have one LOD in the group, and it is hidden, then don't render the group
+                if len(lod_group.lods) == 1:
+                    if not MSFS_LODGroupUtility.lod_is_visible(context, lod_group.lods[0]):
                         continue
 
                 if len(lod_group.lods) > 0:
@@ -242,7 +218,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                         if lod_group.generate_xml:
                             box.prop(lod_group, "overwrite_guid", text="Overwrite GUID")
 
-                        box.prop(lod_group, "folder_name", text="Folder")
+                        box.prop(lod_group, "folder_name", text="Export Path")
 
                         col = box.column()
                         for lod in lod_group.lods:
@@ -265,14 +241,10 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
 
 
 def register():
-    bpy.types.Scene.msfs_multi_exporter_lod_groups = bpy.props.CollectionProperty(
-        type=MultiExporterLODGroup
-    )
-    bpy.types.Scene.multi_exporter_show_hidden_objects = bpy.props.BoolProperty(
-        name="Show hidden objects", default=True
-    )
+    bpy.types.Scene.msfs_multi_exporter_lod_groups = bpy.props.CollectionProperty(type=MultiExporterLODGroup)
+    bpy.types.Scene.multi_exporter_show_hidden_objects = bpy.props.BoolProperty(name="Show hidden objects", default=True)
     bpy.types.Scene.multi_exporter_grouped_by_collections = bpy.props.BoolProperty(
         name="Grouped by collections",
         default=False,
-        update=MSFS_OT_ReloadLODGroups.update_grouped_by,
+        update=MSFS_OT_ReloadLODGroups.update_grouped_by
     )

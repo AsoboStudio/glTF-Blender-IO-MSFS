@@ -68,6 +68,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         return False
 
     def execute(self, context):
+        print("Migrate material")
         mat = context.active_object.active_material
         for (
             old_property,

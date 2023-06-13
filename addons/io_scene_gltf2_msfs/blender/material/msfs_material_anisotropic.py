@@ -34,7 +34,7 @@ class MSFS_Anisotropic(MSFS_Material):
         # Out[0] : Separate Anisotrpic -> In[0]
         anisotropicTexNode = self.addNode(
             name = MSFS_AnisotropicNodes.anisotropicTex.value,
-            typeNode = MSFS_ShaderNodesTypes.shaderNodeTexImage.value,
+            typeNode = "ShaderNodeTexImage",
             location = (-500.0, -800.0),
             width = 300.0,
             frame = anisotropicFrame)
