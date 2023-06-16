@@ -154,6 +154,7 @@ class MSFS_Material_Property_Update:
         self.msfs_detail_blend_threshold = 0.1
         self.msfs_detail_color_texture = None
         self.msfs_detail_occlusion_metallic_roughness_texture = None
+        self.msfs_detail_normal_texture = None
         self.msfs_detail_uv_offset_u = 0.0
         self.msfs_detail_uv_offset_v = 0.0
         self.msfs_detail_uv_scale = 1.0
