@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
-
-from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
-from mathutils import Matrix, Quaternion, Euler
 import bpy
+from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
+
+
 class MSFS_unique_id:
     bl_options = {"UNDO"}
 

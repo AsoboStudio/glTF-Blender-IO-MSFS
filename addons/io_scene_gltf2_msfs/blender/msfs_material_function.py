@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import string
-
 import bpy
 
 from .material.utils.msfs_material_enum import (MSFS_AnisotropicNodes,
@@ -28,7 +26,7 @@ class MSFS_Material:
     bl_label = "MSFS Shader Node Tree"
     bl_icon = "SOUND"
 
-    def __init__(self, material, buildTree=False, defaultPBR=False):
+    def __init__(self, material, buildTree=False):
         self.material = material
         self.node_tree = self.material.node_tree
         self.nodes = self.material.node_tree.nodes
@@ -37,7 +35,6 @@ class MSFS_Material:
             self.__buildShaderTree()
             self.force_update_properties()
         
-
     def revertToPBRShaderTree(self):
         self.cleanNodeTree()
         self.__createPBRTree()
@@ -68,15 +65,13 @@ class MSFS_Material:
         MSFS_Material_Property_Update.update_alpha_cutoff(self.material, bpy.context)
         MSFS_Material_Property_Update.update_detail_uv(self.material, bpy.context)
         # Trigger setters
-        self.material.msfs_base_color_factor = self.material.msfs_base_color_factor
-        self.material.msfs_emissive_factor = self.material.msfs_emissive_factor
-        self.material.msfs_metallic_factor = self.material.msfs_metallic_factor
-        self.material.msfs_roughness_factor = self.material.msfs_roughness_factor
-        self.material.msfs_base_color_factor = self.material.msfs_base_color_factor
+        MSFS_Material_Property_Update.update_base_color(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_emissive_color(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_metallic_scale(self.material, bpy.context)
+        MSFS_Material_Property_Update.update_roughness_scale(self.material, bpy.context)
 
     def cleanNodeTree(self):
         nodes = self.material.node_tree.nodes
-
         for idx, node in enumerate(nodes):
             print("Deleting: %s | %s" % (node.name, node.type))
             nodes.remove(node)
@@ -697,10 +692,9 @@ class MSFS_Material:
         nodeBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.baseColorRGB.value)
         nodeBaseColorA = self.getNodeByName(MSFS_ShaderNodes.baseColorA.value)
 
-        colorValue = nodeBaseColorRGB.outputs[0].default_value
-        colorValue[0] = color[0]
-        colorValue[1] = color[1]
-        colorValue[2] = color[2]
+        nodeBaseColorRGB.outputs[0].default_value[0] = color[0]
+        nodeBaseColorRGB.outputs[0].default_value[1] = color[1]
+        nodeBaseColorRGB.outputs[0].default_value[2] = color[2]
         nodeBaseColorA.outputs[0].default_value = color[3]
         self.updateColorLinks()
 
