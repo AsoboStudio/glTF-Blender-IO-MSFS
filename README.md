@@ -16,15 +16,19 @@ This repository contains the current version of the official Microsoft Flight Si
 *******
 
 # Summary
-- [How to Install the ASOBO Blender MSFS Importer/Exporter using Blender](#how-to-install-the-asobo-blender-msfs-importerexporter-using-blender)
-- [How to Install the ASOBO Blender msfs exporter by Copy/Paste to AppData](#how-to-install-the-asobo-blender-msfs-exporter-by-copypaste-to-appdata)
+- [How to Install the Add-on](#how-to-install-the-add-on)
+  - [How to Install the ASOBO Blender MSFS Importer/Exporter using Blender:](#how-to-install-the-asobo-blender-msfs-importerexporter-using-blender)
+  - [How to Install the ASOBO Blender msfs exporter by Copy/Paste to AppData](#how-to-install-the-asobo-blender-msfs-exporter-by-copypaste-to-appdata)
 - [How to remove the Add-on](#how-to-remove-the-add-on)
 - [Migration of Legacy Blend File Material Types/Modes](#migration-of-legacy-blend-file-material-typesmodes)
+  - [Steps For Migration](#steps-for-migration)
+  - [WARNING](#warning)
 - [Documentation](#documentation)
+  - [Notes On Shadertree](#notes-on-shadertree)
 
 *******
 
-# Installation
+# How to Install the Add-on
 
 There are two ways to install the MSFS Blender exporter. Either using the Edit Preferences Menu and Install tab, or copy/paste the addon files to your %APPDATA% folder. Installation steps are explained down bellow :
 
@@ -120,12 +124,12 @@ Note that each Microsoft Flight Simulator material will need to be migrated, but
 
 Finally, you may also notice that some MSFS Material Parameters show data but *cannot* be adjusted. This is in keeping with the ASOBO 3DS Max exporter material parameters.  Please raise an issue if this is not to your requirements.
 
+## WARNING
+After migration SAVE YOUR FILE AS A NEW FILE and keep your legacy blend file for future reference.
+
 # Documentation
 If you want to learn how to use this add-on you can refer to the documentation page here :
 [Documentation](./Documentation/Documentation.md)
-
-## WARNING
-After migration SAVE YOUR FILE AS A NEW FILE and keep your legacy blend file for future reference.
 
 ## Notes On Shadertree
 
