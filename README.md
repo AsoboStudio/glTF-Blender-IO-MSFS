@@ -133,6 +133,8 @@ After migration SAVE YOUR FILE AS A NEW FILE and keep your legacy blend file for
 If you want to learn how to use this add-on you can refer to the documentation page here :
 [Documentation for Microsoft Flight Simulator glTF 2.0 Importer and Exporter for Blender](./Documentation/Documentation.md)
 
+You can also have a look at the SDK documentation of the plugin here : https://docs.flightsimulator.com/html/Asset_Creation/Blender_Plugin/The_Blender_Plugin.htm
+
 # Notes On Shadertree
 
 Shadertree modification directly impacts the result of the exporter. 
