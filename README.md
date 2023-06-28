@@ -7,15 +7,17 @@ This repository contains the current version of the official Microsoft Flight Si
 >Asobo would especially like to thank the following people: <br>
 >Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [ronh991](https://github.com/ronh991), [pepperoni505](https://github.com/pepperoni505) of [FlyByWire](https://flybywiresim.com/)
 
-:warning: **NOTE 1 : ** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the Sim's Package Builder.
+:warning: This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the Sim's Package Builder.
 <br>
-:warning: **NOTE 2 : ** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
+:warning: This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
 <br>
-:warning: **NOTE 3 : ** The version 1.3.x is only compatible with Blender 3.3.x LTS. Other versions are not supported.
+:warning: The version 1.3.x is only compatible with Blender 3.3.x LTS. Other versions are not supported.
 
 *******
 
 # Summary
+- [Microsoft Flight Simulator glTF 2.0 Importer and Exporter for Blender](#microsoft-flight-simulator-gltf-20-importer-and-exporter-for-blender)
+- [Summary](#summary)
 - [How to Install the Add-on](#how-to-install-the-add-on)
   - [How to Install the ASOBO Blender MSFS Importer/Exporter using Blender:](#how-to-install-the-asobo-blender-msfs-importerexporter-using-blender)
   - [How to Install the ASOBO Blender msfs exporter by Copy/Paste to AppData](#how-to-install-the-asobo-blender-msfs-exporter-by-copypaste-to-appdata)
@@ -24,7 +26,7 @@ This repository contains the current version of the official Microsoft Flight Si
   - [Steps For Migration](#steps-for-migration)
   - [WARNING](#warning)
 - [Documentation](#documentation)
-  - [Notes On Shadertree](#notes-on-shadertree)
+- [Notes On Shadertree](#notes-on-shadertree)
 
 *******
 
@@ -129,9 +131,9 @@ After migration SAVE YOUR FILE AS A NEW FILE and keep your legacy blend file for
 
 # Documentation
 If you want to learn how to use this add-on you can refer to the documentation page here :
-[Documentation](./Documentation/Documentation.md)
+[Documentation for Microsoft Flight Simulator glTF 2.0 Importer and Exporter for Blender](./Documentation/Documentation.md)
 
-## Notes On Shadertree
+# Notes On Shadertree
 
 Shadertree modification directly impacts the result of the exporter. 
 The properties of your material must only be modified through the `MSFS Material Panel` section.
