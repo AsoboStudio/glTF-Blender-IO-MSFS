@@ -16,8 +16,6 @@ This repository contains the current version of the official Microsoft Flight Si
 *******
 
 # Summary
-- [Microsoft Flight Simulator glTF 2.0 Importer and Exporter for Blender](#microsoft-flight-simulator-gltf-20-importer-and-exporter-for-blender)
-- [Summary](#summary)
 - [How to Install the Add-on](#how-to-install-the-add-on)
   - [How to Install the ASOBO Blender MSFS Importer/Exporter using Blender:](#how-to-install-the-asobo-blender-msfs-importerexporter-using-blender)
   - [How to Install the ASOBO Blender msfs exporter by Copy/Paste to AppData](#how-to-install-the-asobo-blender-msfs-exporter-by-copypaste-to-appdata)
