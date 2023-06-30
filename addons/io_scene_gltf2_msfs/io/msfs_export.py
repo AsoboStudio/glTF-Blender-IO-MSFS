@@ -13,15 +13,14 @@
 # limitations under the License.
 
 import os
-import bpy
 import urllib
 
 from .. import get_version_string
-
-from .msfs_light import MSFSLight
 from .msfs_gizmo import MSFSGizmo
+from .msfs_light import MSFSLight
 from .msfs_material import MSFSMaterial
 from .msfs_unique_id import MSFS_unique_id
+
 
 class Export:
     
