@@ -22,7 +22,6 @@ This repository contains the current version of the official Microsoft Flight Si
 - [How to remove the Add-on](#how-to-remove-the-add-on)
 - [Migration of Legacy Blend File Material Types/Modes](#migration-of-legacy-blend-file-material-typesmodes)
   - [Steps For Migration](#steps-for-migration)
-  - [WARNING](#warning)
 - [Documentation](#documentation)
 - [Notes On Shadertree](#notes-on-shadertree)
 
