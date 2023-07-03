@@ -24,7 +24,7 @@ bl_info = {
     "author": "Luca Pierabella, Yasmine Khodja, Wing42, pepperoni505, ronh991, and others",
     "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
     "blender": (3, 1, 0),
-    "version": (1, 3, 1),
+    "version": (1,6,0),
     "location": "File > Import-Export",
     "category": "Import-Export",
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
@@ -41,13 +41,11 @@ class MSFS_ImporterProperties(bpy.types.PropertyGroup):
     )
 
 class MSFS_ExporterProperties(bpy.types.PropertyGroup):
-
     enabled: bpy.props.BoolProperty(
         name='Microsoft Flight Simulator Extensions',
         description='Enable MSFS glTF export extensions',
         default=True,
     )
-
     use_unique_id: bpy.props.BoolProperty(
         name='Use ASOBO Unique ID',
         description='use ASOBO Unique ID extension',
@@ -214,8 +212,6 @@ def unregister_panel():
 
 ##################################################################################
 from .io.msfs_import import Import
-
-
 class glTF2ImportUserExtension(Import):
     def __init__(self):
         self.properties = bpy.context.scene.msfs_importer_properties
@@ -223,8 +219,6 @@ class glTF2ImportUserExtension(Import):
 
 ##################################################################################
 from .io.msfs_export import Export
-
-
 class glTF2ExportUserExtension(Export):
     def __init__(self):
         # We need to wait until we create the gltf2UserExtension to import the gltf2 modules

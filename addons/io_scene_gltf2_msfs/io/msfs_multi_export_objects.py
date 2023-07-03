@@ -62,7 +62,6 @@ class MSFS_LODGroupUtility:
                 (lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects))
             ):
                 return False
-
         return True
 
 
@@ -95,6 +94,7 @@ class MSFS_OT_ReloadLODGroups(bpy.types.Operator):
     @staticmethod
     def reload_lod_groups(self, context):
         lod_groups = context.scene.msfs_multi_exporter_lod_groups
+
         sort_by_collection = context.scene.multi_exporter_grouped_by_collections
 
         # Remove deleted LODs
