@@ -70,6 +70,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     def execute(self, context):
         print("Migrate material")
         mat = context.active_object.active_material
+        print("Deleting old property")
         for (
             old_property,
             new_property,
@@ -81,14 +82,17 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                 if mat.get("msfs_material_mode") == "msfs_parallax" and old_property == "msfs_detail_albedo_texture":
                     continue
                 mat[new_property] = mat[old_property]
-
+                print("del ", old_property, mat[old_property])
                 del mat[old_property]
 
         # Base color is a special case - can only have 3 values, we need 4
         base_color = [1,1,1,1]
         alpha = 1
+
+        print("BSDF Alpha found ", alpha)
         if mat.get("msfs_color_alpha_mix"):
             alpha = mat.get("msfs_color_alpha_mix")
+            print("Alpha found ", alpha)
             base_color[3] = alpha
         if mat.get("msfs_color_albedo_mix"):
             base_color = list(mat.get("msfs_color_albedo_mix"))
@@ -111,7 +115,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
             mat.msfs_alpha_mode = old_alpha_order[mat["msfs_blend_mode"]]
 
             del mat["msfs_blend_mode"]
-
+        print("Material to be migrated ", mat.get("msfs_material_mode"))
         if mat.get("msfs_material_mode"):
             old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
                 "NONE",
@@ -130,13 +134,16 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                 "msfs_geo_decal_frosted",  # Changed from old version - matches new name
                 "msfs_hair",
                 "msfs_invisible",
+                "msfs_ghost",  # added because my legacy mod has it????
             ]
             mat.msfs_material_type = old_material_older[mat["msfs_material_mode"]]
 
             del mat["msfs_material_mode"]
 
+        print("Migrate material - Update", mat)
         MSFS_Material_Property_Update.update_msfs_material_type(mat, context)
 
+        print("Migrate material - Done")
         return {"FINISHED"}
 
 
