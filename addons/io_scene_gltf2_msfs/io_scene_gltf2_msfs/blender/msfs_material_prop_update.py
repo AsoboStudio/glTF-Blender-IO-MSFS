@@ -35,6 +35,7 @@ from .msfs_material_function import MSFS_Material
 class MSFS_Material_Property_Update:
     @staticmethod
     def getMaterial(mat):
+        #print("Looking for MSFS Material to update - ", mat.msfs_material_type)
         if mat.msfs_material_type == "msfs_standard":
             return MSFS_Standard(mat)
         elif mat.msfs_material_type == "msfs_geo_decal":
@@ -67,6 +68,8 @@ class MSFS_Material_Property_Update:
             return MSFS_Environment_Occluder(mat)
         elif mat.msfs_material_type == "msfs_ghost":
             return MSFS_Ghost(mat)
+        #print("Found Material to update - ", mat.msfs_material_type)
+        return None
 
     @staticmethod
     def update_msfs_material_type(self, context):
@@ -283,6 +286,7 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_base_color(self, context):
         msfs = MSFS_Material_Property_Update.getMaterial(self)
+        #print("Update base color", msfs)
         if msfs is not None:
             msfs.setBaseColor(self.msfs_base_color_factor)
 
