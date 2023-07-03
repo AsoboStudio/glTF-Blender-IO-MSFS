@@ -33,6 +33,7 @@ from .msfs_material_function import MSFS_Material
 
 
 class MSFS_Material_Property_Update:
+
     @staticmethod
     def getMaterial(mat):
         #print("Looking for MSFS Material to update - ", mat.msfs_material_type)

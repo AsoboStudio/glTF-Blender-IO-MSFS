@@ -21,6 +21,7 @@ from .msfs_light import MSFSLight
 from .msfs_material import MSFSMaterial
 from .msfs_unique_id import MSFS_unique_id
 
+
 class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):

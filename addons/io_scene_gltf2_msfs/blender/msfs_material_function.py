@@ -26,7 +26,6 @@ from .material.utils.msfs_material_enum import (MSFS_AnisotropicNodes,
 class MSFS_Material:
     bl_idname = "MSFS_ShaderNodeTree"
     bl_label = "MSFS Shader Node Tree"
-
     bl_icon = "SOUND"
 
     def __init__(self, material, buildTree=False):
@@ -91,7 +90,6 @@ class MSFS_Material:
 
     def cleanNodeTree(self):
         nodes = self.material.node_tree.nodes
-
         for idx, node in enumerate(nodes):
             print("Deleting: %s | %s" % (node.name, node.type))
             nodes.remove(node)
@@ -126,6 +124,7 @@ class MSFS_Material:
             location = (1250.0, 600.0),
             hidden = False
         )
+
         if bpy.data.node_groups.get(MSFS_ShaderNodes.glTFSettings.value):
             gltfSettingsNodeTree = bpy.data.node_groups[MSFS_ShaderNodes.glTFSettings.value]
         else:
@@ -683,7 +682,6 @@ class MSFS_Material:
             location = (0.0, -400.0),
             frame = normalFrame
         )
-
         
         # Links
         self.link(normalMapSamplerNode.inputs[1], normalTexNode.outputs[0])

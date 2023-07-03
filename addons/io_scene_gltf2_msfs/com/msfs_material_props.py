@@ -55,6 +55,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_msfs_material_type,
         options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
     )
+
     bpy.types.Material.msfs_base_color_factor = bpy.props.FloatVectorProperty(
         name="Base Color",
         description="The RGBA components of the base color of the material. The fourth component (A) is the alpha coverage of the material. The alphaMode property specifies how alpha is interpreted. These values are linear. If a baseColorTexture is specified, this value is multiplied with the texel values",
@@ -66,6 +67,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_base_color,
         options={"ANIMATABLE"}
     )
+
     bpy.types.Material.msfs_emissive_factor = bpy.props.FloatVectorProperty(
         name="Emissive Color",
         description="The RGB components of the emissive color of the material. These values are linear. If an emissiveTexture is specified, this value is multiplied with the texel values",
@@ -77,6 +79,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_emissive_color,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_metallic_factor = bpy.props.FloatProperty(
         name="Metallic Factor",
         description="The metalness of the material. A value of 1.0 means the material is a metal. A value of 0.0 means the material is a dielectric. Values in between are for blending between metals and dielectrics such as dirty metallic surfaces. This value is linear. If a metallicRoughnessTexture is specified, this value is multiplied with the metallic texel values",
@@ -86,6 +89,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_metallic_scale,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_roughness_factor = bpy.props.FloatProperty(
         name="Roughness Factor",
         description="The roughness of the material. A value of 1.0 means the material is completely rough. A value of 0.0 means the material is completely smooth. This value is linear. If a metallicRoughnessTexture is specified, this value is multiplied with the roughness texel values",
@@ -95,6 +99,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_roughness_scale,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_normal_scale = bpy.props.FloatProperty(
         name="Normal Scale",
         description="The scalar multiplier applied to each normal vector of the texture. This value is ignored if normalTexture is not specified",
@@ -104,6 +109,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_normal_scale,
         options=set(),
     )
+
     bpy.types.Material.msfs_emissive_scale = bpy.props.FloatProperty(
         name="Emissive Scale",
         description="Controls the intensity of the emission. A value of 1.0 means that the material is fully emissive. This can be used in addition to an emissive texture and in this case, it will control the emission Strenght of this one.",
@@ -113,6 +119,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_emissive_scale,
         options=set(),
     )
+
     bpy.types.Material.msfs_alpha_mode = bpy.props.EnumProperty(
         name="Alpha Mode",
         items=(
@@ -141,6 +148,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_alpha_mode,
         options=set(),
     )
+
     bpy.types.Material.msfs_alpha_cutoff = bpy.props.FloatProperty(
         name="Alpha Cutoff",
         description="When alphaMode is set to MASK the alphaCutoff property specifies the cutoff threshold. If the alpha value is greater than or equal to the alphaCutoff value then it is rendered as fully opaque, otherwise, it is rendered as fully transparent. alphaCutoff value is ignored for other modes",
@@ -150,6 +158,7 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_alpha_cutoff,
         options=set(),
     )
+
     bpy.types.Material.msfs_double_sided = bpy.props.BoolProperty(
         name="Double Sided",
         description="The doubleSided property specifies whether the material is double sided. When this value is false, back-face culling is enabled. When this value is true, back-face culling is disabled and double sided lighting is enabled. The back-face must have its normals reversed before the lighting equation is evaluated",
@@ -193,14 +202,17 @@ class AsoboMaterialCommon:
         type=bpy.types.Image,
         update=MSFS_Material_Property_Update.update_extra_slot1_texture,
     )
+
     bpy.types.Material.msfs_opacity_texture = bpy.props.PointerProperty(
         name="Opacity Texture", type=bpy.types.Image
     )
+
     bpy.types.Material.msfs_emissive_texture = bpy.props.PointerProperty(
         name="Emissive Texture",
         type=bpy.types.Image,
         update=MSFS_Material_Property_Update.update_emissive_texture,
     )
+
     bpy.types.Material.msfs_detail_color_texture = bpy.props.PointerProperty(
         name="Detail Color Texture",
         type=bpy.types.Image,
@@ -297,6 +309,7 @@ class AsoboMaterialGeometryDecal:
         default=Defaults.baseColorBlendFactor,
         options=set(),
     )
+
     bpy.types.Material.msfs_metallic_blend_factor = bpy.props.FloatProperty(
         name="Metallic Blend Factor",
         min=0.0,
@@ -304,6 +317,7 @@ class AsoboMaterialGeometryDecal:
         default=Defaults.metallicBlendFactor,
         options=set(),
     )
+
     bpy.types.Material.msfs_roughness_blend_factor = bpy.props.FloatProperty(
         name="Roughness Blend Factor",
         min=0.0,
@@ -311,6 +325,7 @@ class AsoboMaterialGeometryDecal:
         default=Defaults.roughnessBlendFactor,
         options=set(),
     )
+
     bpy.types.Material.msfs_normal_blend_factor = bpy.props.FloatProperty(
         name="Normal Blend Factor",
         min=0.0,
@@ -318,6 +333,7 @@ class AsoboMaterialGeometryDecal:
         default=Defaults.normalBlendFactor,
         options=set(),
     )
+
     bpy.types.Material.msfs_emissive_blend_factor = bpy.props.FloatProperty(
         name="Emissive Blend Factor",
         min=0.0,
@@ -325,6 +341,7 @@ class AsoboMaterialGeometryDecal:
         default=Defaults.emissiveBlendFactor,
         options=set(),
     )
+
     bpy.types.Material.msfs_occlusion_blend_factor = bpy.props.FloatProperty(
         name="Occlusion Blend Factor",
         min=0.0,
@@ -584,6 +601,7 @@ class AsoboPearlescent:
         default=False,
         options=set(),
     )
+
     bpy.types.Material.msfs_pearl_shift = bpy.props.FloatProperty(
         name="Pearl Color Shift",
         min=-999.0,
@@ -591,6 +609,7 @@ class AsoboPearlescent:
         default=Defaults.pearlShift,
         options=set(),
     )
+
     bpy.types.Material.msfs_pearl_range = bpy.props.FloatProperty(
         name="Pearl Color Range",
         min=-999.0,
@@ -598,6 +617,7 @@ class AsoboPearlescent:
         default=Defaults.pearlRange,
         options=set(),
     )
+
     bpy.types.Material.msfs_pearl_brightness = bpy.props.FloatProperty(
         name="Pearl Color Brightness",
         min=-1.0,
@@ -754,21 +774,25 @@ class AsoboMaterialUVOptions:
         default=Defaults.AOUseUV2,
         options=set(),
     )
+
     bpy.types.Material.msfs_clamp_uv_x = bpy.props.BoolProperty(
         name="Clamp UV U",
         default=Defaults.clampUVX,
         options=set(),
     )
+
     bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty(
         name="Clamp UV V",
         default=Defaults.clampUVY,
         options=set(),
     )
+
     bpy.types.Material.msfs_clamp_uv_z = bpy.props.BoolProperty(  # Doesn't seem to actually be used, which makes sense. Keeping just in case
         name="Clamp UV Z",
         default=Defaults.clampUVZ,
         options=set(),
     )
+
     bpy.types.Material.msfs_uv_offset_u = bpy.props.FloatProperty(
         name="UV Offset U",
         min=-10.0,
@@ -776,6 +800,7 @@ class AsoboMaterialUVOptions:
         default=Defaults.UVOffsetU,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_uv_offset_v = bpy.props.FloatProperty(
         name="UV Offset V",
         min=-10.0,
@@ -783,6 +808,7 @@ class AsoboMaterialUVOptions:
         default=Defaults.UVOffsetV,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_uv_tiling_u = bpy.props.FloatProperty(
         name="UV Tiling U",
         min=-10.0,
@@ -790,6 +816,7 @@ class AsoboMaterialUVOptions:
         default=Defaults.UVTilingU,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_uv_tiling_v = bpy.props.FloatProperty(
         name="UV Tiling V",
         min=-10.0,
@@ -797,6 +824,7 @@ class AsoboMaterialUVOptions:
         default=Defaults.UVTilingV,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_uv_rotation = bpy.props.FloatProperty(
         name="UV Rotation",
         min=-360.0,
@@ -970,6 +998,7 @@ class AsoboMaterialDetail:
         update=MSFS_Material_Property_Update.update_detail_uv,
         options=set(),
     )
+
     bpy.types.Material.msfs_detail_uv_offset_u = bpy.props.FloatProperty(
         name="Detail UV Offset U",
         min=-10.0,
@@ -978,6 +1007,7 @@ class AsoboMaterialDetail:
         update=MSFS_Material_Property_Update.update_detail_uv,
         options=set(),
     )
+
     bpy.types.Material.msfs_detail_uv_offset_v = bpy.props.FloatProperty(
         name="Detail UV Offset V",
         min=-10.0,
@@ -986,6 +1016,7 @@ class AsoboMaterialDetail:
         update=MSFS_Material_Property_Update.update_detail_uv,
         options=set(),
     )
+
     bpy.types.Material.msfs_detail_blend_threshold = bpy.props.FloatProperty(
         name="Blend Threshold",
         min=0.001,
@@ -993,6 +1024,7 @@ class AsoboMaterialDetail:
         default=Defaults.blendThreshold,
         options=set(),
     )
+
     bpy.types.Material.msfs_detail_normal_scale = bpy.props.FloatProperty(
         name="Detail Normal Scale",
         min=0.0,
@@ -1142,6 +1174,7 @@ class AsoboMaterialFresnelFade:
         default=Defaults.fresnelFactor,
         options=set(),
     )
+
     bpy.types.Material.msfs_fresnel_opacity_offset = bpy.props.FloatProperty(
         name="Fresnel Opacity Bias",
         min=-1.0,
@@ -1315,6 +1348,7 @@ class AsoboWindshield:
         default=Defaults.rainDropScale,
         options=set(),
     )
+
     bpy.types.Material.msfs_wiper_1_state = bpy.props.FloatProperty(
         name="Wiper 1 State",
         min=0.0,
@@ -1322,6 +1356,7 @@ class AsoboWindshield:
         default=Defaults.wiper1State,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_wiper_2_state = bpy.props.FloatProperty(
         name="Wiper 2 State",
         min=0.0,
@@ -1329,6 +1364,7 @@ class AsoboWindshield:
         default=Defaults.wiper2State,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_wiper_3_state = bpy.props.FloatProperty(
         name="Wiper 3 State",
         min=0.0,
@@ -1336,6 +1372,7 @@ class AsoboWindshield:
         default=Defaults.wiper3State,
         options={"ANIMATABLE"},
     )
+
     bpy.types.Material.msfs_wiper_4_state = bpy.props.FloatProperty(
         name="Wiper 4 State",
         min=0.0,
@@ -1461,6 +1498,7 @@ class AsoboParallaxWindow:
         default=Defaults.parallaxScale,
         options=set(),
     )
+
     bpy.types.Material.msfs_parallax_room_size_x = bpy.props.FloatProperty(
         name="Room Size X Scale",
         min=0.01,
@@ -1468,6 +1506,7 @@ class AsoboParallaxWindow:
         default=Defaults.roomSizeXScale,
         options=set(),
     )
+
     bpy.types.Material.msfs_parallax_room_size_y = bpy.props.FloatProperty(
         name="Room Size Y Scale",
         min=0.01,
@@ -1475,6 +1514,7 @@ class AsoboParallaxWindow:
         default=Defaults.roomSizeYScale,
         options=set(),
     )
+
     bpy.types.Material.msfs_parallax_room_number_xy = bpy.props.IntProperty(
         name="Room Number XY",
         min=1,
@@ -1482,6 +1522,7 @@ class AsoboParallaxWindow:
         default=Defaults.roomNumberXY,
         options=set(),
     )
+
     bpy.types.Material.msfs_parallax_corridor = bpy.props.BoolProperty(
         name="Corridor",
         default=Defaults.corridor,
@@ -1560,6 +1601,7 @@ class AsoboGlass:
         default=Defaults.glassReflectionMaskFactor,
         options=set(),
     )
+
     bpy.types.Material.msfs_glass_deformation_factor = bpy.props.FloatProperty(
         name="Glass Deformation Factor",
         min=0.0,
@@ -1613,6 +1655,7 @@ class AsoboTags:
         default=False,
         options=set(),
     )
+
     bpy.types.Material.msfs_road_collision_material = bpy.props.BoolProperty(
         name="Road Collision Material",
         default=False,

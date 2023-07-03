@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+
 import bpy
 
 from .msfs_multi_export import MSFS_OT_MultiExportGLTF2
@@ -22,7 +23,6 @@ class MultiExporterPresetLayer(bpy.types.PropertyGroup):
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
     enabled: bpy.props.BoolProperty(name="", default=False, description="Enable/Disable the collection for the preset")
     expanded: bpy.props.BoolProperty(name="", default=True)
-
 
 class MultiExporterPreset(bpy.types.PropertyGroup):
 
@@ -34,7 +34,6 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(name="", default=False, description="Enable/Disable the preset for the export")
     expanded: bpy.props.BoolProperty(name="", default=True, description="Expand/Collapse preset.")
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
-
 
 class MSFS_OT_AddPreset(bpy.types.Operator):
     bl_idname = "msfs.multi_export_add_preset"
@@ -48,7 +47,6 @@ class MSFS_OT_AddPreset(bpy.types.Operator):
 
         return {"FINISHED"}
 
-
 class MSFS_OT_RemovePreset(bpy.types.Operator):
     bl_idname = "msfs.multi_export_remove_preset"
     bl_label = "Remove preset"
@@ -61,7 +59,6 @@ class MSFS_OT_RemovePreset(bpy.types.Operator):
         presets.remove(self.preset_index)
 
         return {"FINISHED"}
-
 
 class MSFS_OT_EditLayers(bpy.types.Operator):
     bl_idname = "msfs.multi_export_edit_layers"
@@ -132,7 +129,6 @@ class MSFS_OT_EditLayers(bpy.types.Operator):
                         break
 
         drawTree(layout, self.collection_tree[bpy.context.scene.collection])
-
 
 class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
     bl_label = ""
