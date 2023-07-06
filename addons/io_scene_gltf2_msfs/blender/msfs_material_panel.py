@@ -89,7 +89,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         base_color = [1,1,1,1]
         alpha = 1
 
-        print("BSDF Alpha found ", alpha)
+        #print("BSDF Alpha found ", alpha)
         if mat.get("msfs_color_alpha_mix"):
             alpha = mat.get("msfs_color_alpha_mix")
             print("Alpha found ", alpha)

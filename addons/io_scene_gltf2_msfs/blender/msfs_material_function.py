@@ -762,8 +762,8 @@ class MSFS_Material:
     def setBaseColor(self, color):
         nodeBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.baseColorRGB.value)
         nodeBaseColorA = self.getNodeByName(MSFS_ShaderNodes.baseColorA.value)
-        print("set base color", nodeBaseColorRGB, MSFS_ShaderNodes.baseColorRGB.value)
-        print("set base color", nodeBaseColorA, MSFS_ShaderNodes.baseColorA.value)
+        #print("set base color", nodeBaseColorRGB, MSFS_ShaderNodes.baseColorRGB.value)
+        #print("set base color", nodeBaseColorA, MSFS_ShaderNodes.baseColorA.value)
         # if not found try looking for albedo_tint
         nodeBaseColorRGB.outputs[0].default_value[0] = color[0]
         nodeBaseColorRGB.outputs[0].default_value[1] = color[1]

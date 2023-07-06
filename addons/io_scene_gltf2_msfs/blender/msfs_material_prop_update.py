@@ -93,6 +93,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Windshield(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
+            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.1]
         elif self.msfs_material_type == "msfs_porthole":
             msfs_mat = MSFS_Porthole(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
@@ -100,6 +101,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Glass(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
+            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.1]
         elif self.msfs_material_type == "msfs_clearcoat":
             msfs_mat = MSFS_Clearcoat(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
@@ -116,7 +118,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_SSS(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_invisible":
-            msfs_mat = MSFS_Invisible(self, buildTree=True)
+            msfs_mat = MSFS_Invisible(self, buildTree=False)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
             self.msfs_base_color_factor = [0.8, 0.0, 0.0, 0.1]
@@ -128,7 +130,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Fresnel_Fade(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
         elif self.msfs_material_type == "msfs_environment_occluder":
-            msfs_mat = MSFS_Environment_Occluder(self, buildTree=True)
+            msfs_mat = MSFS_Environment_Occluder(self, buildTree=False)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
             self.msfs_base_color_factor = [0.0, 0.8, 0.0, 0.1]

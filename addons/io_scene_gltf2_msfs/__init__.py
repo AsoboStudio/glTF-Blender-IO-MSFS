@@ -23,7 +23,7 @@ bl_info = {
     "name": "Microsoft Flight Simulator glTF Extension",
     "author": "Luca Pierabella, Yasmine Khodja, Wing42, pepperoni505, ronh991, and others",
     "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
-    "blender": (3, 1, 0),
+    "blender": (3, 6, 0),
     "version": (1,6,0),
     "location": "File > Import-Export",
     "category": "Import-Export",
