@@ -912,7 +912,7 @@ class MSFS_Material:
 
         elif nodeCompTex.image and not nodeDetailCompTex.image:
             nodeBlendCompMap.blend_type = "ADD"
-            self.link(nodeRoughnessScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
+            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
         elif not nodeCompTex.image and nodeDetailCompTex.image:
