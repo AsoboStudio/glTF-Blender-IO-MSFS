@@ -68,4 +68,23 @@ class Export:
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if self.properties.enabled:
+            # KHR_materials_emissive_strength issue with msfs materials for bloom
+
+            # KHR_materials_emissive_strength revert the Khronos gltf code to add an extension for emissive scale > 1.0
+            # return the emissive_factor back to the missive color multiplied by the emissive scale
+            for extension in gltf2_material.extensions:
+                if extension:
+                    print("gather_gltf_extensions_hook - KHR Extension", gltf2_material.name, gltf2_material.extensions, extension, gltf2_material.emissive_factor)
+                    if extension == "KHR_materials_emissive_strength":
+
+                        for colorChannel in blender_material.node_tree.nodes['Emissive RGB'].outputs[0].default_value[0:3]:
+                            print ("gather_gltf_extensions_hook - Color value", colorChannel)
+                        maxchannel = max(blender_material.node_tree.nodes['Emissive RGB'].outputs[0].default_value[0:3])
+                        emissive_scale = blender_material.node_tree.nodes['Emissive Scale'].outputs[0].default_value
+                        print("gather_gltf_extensions_hook - maxchannel", maxchannel, emissive_scale)
+
+                        print("gather_gltf_extensions_hook - change remove emissive_factor KHR_materials_emissive_strength")
+                        gltf2_material.emissive_factor = [f * maxchannel * emissive_scale for f in gltf2_material.emissive_factor]
+                        del gltf2_material.extensions['KHR_materials_emissive_strength']
+
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
