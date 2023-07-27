@@ -607,6 +607,7 @@ class MSFS_Material:
             name = MSFS_ShaderNodes.RGBCurves.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeRGBCurve.value,
             location = (-300.0, -400.0)
+            frame = normalFrame
         )
         curveMapping = RGBCurvesNode.mapping.curves[1]
         curveMapping.points[0].location = (0.0, 1.0)
