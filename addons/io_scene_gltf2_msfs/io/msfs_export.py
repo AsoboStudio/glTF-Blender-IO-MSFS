@@ -81,7 +81,7 @@ class Export:
                 if col.data_type == 'BYTE_COLOR':
                     #print("gather_mesh_hook - col data byte", col.data_type, coldata)
                     colname_to_remove = col.name
-                else:
+                #else:
                     #print("gather_mesh_hook - col data float (to be skipped)", col.data_type, coldata)
             colname_to_add = colname_to_remove + "_ASOBO_export_update"
             if colname_to_remove:
