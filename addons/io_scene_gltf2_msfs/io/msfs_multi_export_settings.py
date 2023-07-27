@@ -336,7 +336,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_force_sampling: bpy.props.BoolProperty(
         name="Always Sample Animations",
         description="Apply sampling to all animations",
-        default=True,
+        default=False,
     )
 
     ## Group by NLA Track Check
