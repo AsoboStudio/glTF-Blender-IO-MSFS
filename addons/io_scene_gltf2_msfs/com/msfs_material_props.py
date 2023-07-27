@@ -23,7 +23,7 @@ class AsoboMaterialCommon:
         BaseColorFactor = [0.8, 0.8, 0.8, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
         MetallicFactor = 0.0
-        RoughnessFactor = 0.5
+        RoughnessFactor = 1.0
         NormalScale = 1.0
         EmissiveScale = 1.0
         AlphaMode = "OPAQUE"
