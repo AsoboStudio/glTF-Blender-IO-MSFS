@@ -287,6 +287,10 @@ class AsoboMaterialCommon:
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
         # All the properties here (besides some textures, which we handle elsewhere) are exported from the Khronos exporter
+        gltf2_material.emissive_factor = [f * blender_material.msfs_emissive_scale for f in blender_material.msfs_emissive_factor]
+
+        if "KHR_materials_emissive_strength" in gltf2_material.extensions:
+            gltf2_material.extensions.pop("KHR_materials_emissive_strength")
         pass
 
 
