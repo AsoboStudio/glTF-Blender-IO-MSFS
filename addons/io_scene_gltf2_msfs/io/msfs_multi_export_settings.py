@@ -93,7 +93,10 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Selected Only Check - TODO : See if this works
     use_selected: bpy.props.BoolProperty(
         name="Selected Objects", 
-        description="Export selected objects only", 
+        description= (
+            "Export selected objects only. "
+            "Disabled for the use of the MultiExporter (Needs to be always checked)"
+        ), 
         default=True
     )
 
@@ -141,8 +144,10 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Punctual Lights Check
     export_lights: bpy.props.BoolProperty(
         name="Punctual Lights",
-        description="Export directional, point, and spot lights. "
-        'Uses "KHR_lights_punctual" glTF extension',
+        description= (
+            "Export directional, point, and spot lights. "
+            "Uses 'KHR_lights_punctual' glTF extension"
+        ),
         default=False,
     )
         
@@ -348,7 +353,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_force_sampling: bpy.props.BoolProperty(
         name="Always Sample Animations",
         description="Apply sampling to all animations",
-        default=True,
+        default=False,
     )
 
     ## Group by NLA Track Check
@@ -524,17 +529,19 @@ class MSFS_PT_export_include(bpy.types.Panel):
 
         settings = context.scene.msfs_multi_exporter_settings
 
-        col = layout.column(heading="Limit to", align=True)
-        col.prop(settings, "use_selected")
-        col.prop(settings, "use_visible")
-        col.prop(settings, "use_renderable")
-        col.prop(settings, "use_active_collection")
-        col.prop(settings, "use_active_scene")
+        col1 = layout.column(heading="", align=True)
+        col1.prop(settings, "use_selected") ## To use the MultiExporter panel, it's important to have use selected to True
+        col1.enabled = False
+        col2 = layout.column(heading="Limit to", align=True)
+        col2.prop(settings, "use_visible")
+        col2.prop(settings, "use_renderable")
+        col2.prop(settings, "use_active_collection")
+        col2.prop(settings, "use_active_scene")
 
-        col = layout.column(heading="Data", align=True)
-        col.prop(settings, "export_extras")
-        col.prop(settings, "export_cameras")
-        col.prop(settings, "export_lights")
+        col2 = layout.column(heading="Data", align=True)
+        col2.prop(settings, "export_extras")
+        col2.prop(settings, "export_cameras")
+        col2.prop(settings, "export_lights")
  
  
 class MSFS_PT_export_transform(bpy.types.Panel):
