@@ -508,20 +508,6 @@ class MSFS_Material:
         ## Links
         self.link(splitOccMetalRoughNode.inputs[0], blendCompMapNode.outputs[0])
         
-        ## Occlusion Multiplier
-        # In[1] : Split Occ Metal Rough -> Out[0]
-        occlusionMulNode = self.addNode(
-            name = MSFS_ShaderNodes.occlusionMul.value,
-            typeNode = MSFS_ShaderNodesTypes.shaderNodeMath.value,
-            operation = "MULTIPLY",
-            location = (500.0, 200.0),
-            width = 200.0,
-            frame = omrFrame
-        )
-        occlusionMulNode.inputs[0].default_value = 1.0
-        ## Links
-        self.link(occlusionMulNode.inputs[1], splitOccMetalRoughNode.outputs[0])
-        
         ## Roughness Multiplier
         # In[1] : Split Occ Metal Rough -> Out[1]
         roughnessMulNode = self.addNode(
@@ -890,7 +876,6 @@ class MSFS_Material:
         nodeSeparateComp = self.getNodeByName(MSFS_ShaderNodes.compSeparate.value)
         nodeMulMetallic = self.getNodeByName(MSFS_ShaderNodes.metallicMul.value)
         nodeMulRoughness = self.getNodeByName(MSFS_ShaderNodes.roughnessMul.value)
-        nodeMulOcclusion = self.getNodeByName(MSFS_ShaderNodes.occlusionMul.value)
         nodeGltfSettings = self.getNodeByName(MSFS_ShaderNodes.glTFSettings.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
@@ -903,30 +888,23 @@ class MSFS_Material:
         self.link(nodeBlendCompMap.outputs[0], nodeSeparateComp.inputs[0])
         self.link(nodeMetallicScale.outputs[0], nodeMulMetallic.inputs[0])
         self.link(nodeRoughnessScale.outputs[0], nodeMulRoughness.inputs[0])
-        self.link(nodeSeparateComp.outputs[0], nodeMulOcclusion.inputs[1])
         self.link(nodeSeparateComp.outputs[1], nodeMulRoughness.inputs[1])
         self.link(nodeSeparateComp.outputs[2], nodeMulMetallic.inputs[1])
 
         if not nodeCompTex.image and not nodeDetailCompTex.image:
             self.link(nodeRoughnessScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMetallicScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
-
-        elif nodeCompTex.image and not nodeDetailCompTex.image:
-            nodeBlendCompMap.blend_type = "ADD"
+        else: # nodeCompTex.image or nodeDetailCompTex.image (if we have both images or only one of them)
+            self.link(nodeSeparateComp.outputs[0], nodeGltfSettings.inputs[0])
             self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
-        elif not nodeCompTex.image and nodeDetailCompTex.image:
-            nodeBlendCompMap.blend_type = "ADD"
-            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
-            self.link(nodeMetallicScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
+            if nodeCompTex.image and nodeDetailCompTex.image:
+                nodeBlendCompMap.blend_type = "MULTIPLY"
+            else: # we have only one of the two images
+                nodeBlendCompMap.blend_type = "ADD"
 
-        else:
-            nodeBlendCompMap.blend_type = "MULTIPLY"
-            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
-            self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
-        self.link(nodeMulOcclusion.outputs[0], nodeGltfSettings.inputs[0])
 
     def setBlendMode(self, blendMode):
         if blendMode == "BLEND":
