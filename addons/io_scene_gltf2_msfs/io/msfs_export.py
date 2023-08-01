@@ -27,6 +27,7 @@ class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):
         if self.properties.enabled == True:
+            print("gather_asset_hook", gltf2_asset.extensions)
             if gltf2_asset.extensions is None:
                 gltf2_asset.extensions = {}
             gltf2_asset.extensions["ASOBO_normal_map_convention"] = self.Extension(
@@ -36,6 +37,29 @@ class Export:
             )
 
             gltf2_asset.generator += " and Asobo Studio MSFS Blender I/O v" + get_version_string()
+
+        # for the vetex color rainbow
+        # asset hook is called first before the nodes and objects and mesh, so we make changes to the meshes here
+        # possible caching of blender data may result in changes not takeng at the point of hook function running
+        # does not work in:
+        # def gather_mesh_hook(self, gltf2_mesh, blender_mesh, blender_object, vertex_groups, modifiers, skip_filter, materials, export_settings):
+
+        print("gather_asset_hook - Started with ", gltf2_asset)
+        for o in bpy.context.scene.objects:
+            print("gather_asset_hook - Scene Object",o)
+            # only for meshes
+            if o.type == 'MESH':
+                obj = o
+                print("gather_asset_hook - obj", obj, obj.data)
+                for ca in obj.data.color_attributes:
+                    if ca.data_type != 'FLOAT_COLOR':
+                        print("gather_asset_hook - col before", ca.data_type)
+                        bpy.context.view_layer.objects.active = obj
+                        bpy.ops.geometry.attribute_convert(mode='GENERIC', domain='CORNER', data_type='FLOAT_COLOR')
+                        print("gather_asset_hook - After", obj, obj.data)
+                        for ca in obj.data.color_attributes:
+                            print("gather_asset_hook - col after", ca.data_type)
+        print("gather_asset_hook - Done")
 
     def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
         if self.properties.enabled:
@@ -91,17 +115,3 @@ class Export:
                         del gltf2_material.extensions['KHR_materials_emissive_strength']
 
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
-
-    # mesh hook to change vertex color attributes in vertex colors from Face Corner - Byte Color default to Face Corner Color (byte to float??)
-    # but data looks the same.
-    def gather_mesh_hook(self, gltf2_mesh, blender_mesh, blender_object, vertex_groups, modifiers, skip_filter, materials, export_settings):
-        print("gather_mesh_hookgather_mesh_hook - Started with ", gltf2_mesh, blender_mesh, blender_object)
-        for o in bpy.context.scene.objects:
-            print("Scene Object",o)
-            # only for meshes
-            if o.type == 'MESH' and o.data.name == blender_mesh.name:
-                obj = o
-        print("obj", obj)
-        bpy.context.view_layer.objects.active = obj
-        bpy.ops.geometry.attribute_convert(mode='GENERIC', domain='CORNER', data_type='FLOAT_COLOR')
-        print("gather_mesh_hook - Done")
