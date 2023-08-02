@@ -842,10 +842,8 @@ class MSFS_Material:
 
         if nodeNormalTex.image and not nodeDetailNormalTex.image:
             self.link(nodeNormalMapSampler.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
-
         elif nodeNormalTex.image and nodeDetailNormalTex.image:
             self.link(nodeBlendNormalMap.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
-
         else:
             self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.normal.value)
 
@@ -854,7 +852,6 @@ class MSFS_Material:
         nodeEmissiveScale = self.getNodeByName(MSFS_ShaderNodes.emissiveScale.value)
         nodeEmissiveColor = self.getNodeByName(MSFS_ShaderNodes.emissiveColor.value)
         nodeMulEmissive = self.getNodeByName(MSFS_ShaderNodes.emissiveMul.value)
-        # nodeMulEmissiveScale = self.getNodeByName(MSFS_ShaderNodes.emissiveMulScale.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
         # emissive
@@ -894,6 +891,8 @@ class MSFS_Material:
         if not nodeCompTex.image and not nodeDetailCompTex.image:
             self.link(nodeRoughnessScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMetallicScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
+
+            self.unLinkNodeInput(nodeGltfSettings, 0)
         else: # nodeCompTex.image or nodeDetailCompTex.image (if we have both images or only one of them)
             self.link(nodeSeparateComp.outputs[0], nodeGltfSettings.inputs[0])
             self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
