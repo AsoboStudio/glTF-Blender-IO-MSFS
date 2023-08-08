@@ -473,7 +473,7 @@ class MSFS_PT_Material(bpy.types.Panel):
                         emissive_texture_name = "Secondary Details(A)"
                         extra_slot1_texture = "Wiper Mask (RG)"
                         detail_color_texture_name = (
-                            "Details Scratch(R), Icing Mask(G), Fingerprints(B)"
+                            "Details Scratch(R), Icing Mask(Dirt)(G), Fingerprints(B)"
                         )
                         detail_normal_texture_name = "Icing Normal (use DetailMap UV)"
                     elif mat.msfs_material_type == "msfs_geo_decal_frosted":
