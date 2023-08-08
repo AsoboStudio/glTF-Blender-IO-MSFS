@@ -274,7 +274,7 @@ class MSFS_Material:
             blendColorMapNode = self.addNode(
                 name = MSFS_ShaderNodes.blendColorMap.value,
                 typeNode = MSFS_ShaderNodesTypes.shaderNodeMix.value,
-                data_type = 'RGBA',
+                data_type = "RGBA",
                 blend_type = "MULTIPLY",
                 location = (-200, 450.0),
                 width = 200.0,
@@ -326,7 +326,7 @@ class MSFS_Material:
             mulBaseColorRGBNode = self.addNode(
                 name = MSFS_ShaderNodes.baseColorMulRGB.value,
                 typeNode = MSFS_ShaderNodesTypes.shaderNodeMix.value,
-                data_type = 'RGBA',
+                data_type = "RGBA",
                 blend_type = "MULTIPLY",
                 location = (50.0, 450.0),
                 width = 200.0,
@@ -521,7 +521,7 @@ class MSFS_Material:
             blendCompMapNode = self.addNode(
                 name = MSFS_ShaderNodes.blendCompMap.value,
                 typeNode = MSFS_ShaderNodesTypes.shaderNodeMix.value,
-                data_type = 'RGBA',
+                data_type = "RGBA",
                 blend_type = "MULTIPLY",
                 location = (-150.0, 200.0),
                 width = 300.0,
@@ -613,7 +613,7 @@ class MSFS_Material:
             emissiveMulNode = self.addNode(
                 name = MSFS_ShaderNodes.emissiveMul.value,
                 typeNode = MSFS_ShaderNodesTypes.shaderNodeMix.value,
-                data_type = 'RGBA',
+                data_type = "RGBA",
                 blend_type = "MULTIPLY",
                 location = (200.0, 0.0),
                 frame = emissiveFrame
@@ -712,7 +712,7 @@ class MSFS_Material:
             blendNormalMapNode = self.addNode(
                 name = MSFS_ShaderNodes.blendNormalMap.value,
                 typeNode = MSFS_ShaderNodesTypes.shaderNodeMix.value,
-                data_type = 'RGBA',
+                data_type = "RGBA",
                 blend_type = "ADD",
                 location = (200.0, -400.0),
                 frame = normalFrame
@@ -749,9 +749,7 @@ class MSFS_Material:
     def setBaseColor(self, color):
         nodeBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.baseColorRGB.value)
         nodeBaseColorA = self.getNodeByName(MSFS_ShaderNodes.baseColorA.value)
-        #print("set base color", nodeBaseColorRGB, MSFS_ShaderNodes.baseColorRGB.value)
-        #print("set base color", nodeBaseColorA, MSFS_ShaderNodes.baseColorA.value)
-        # if not found try looking for albedo_tint
+
         nodeBaseColorRGB.outputs[0].default_value[0] = color[0]
         nodeBaseColorRGB.outputs[0].default_value[1] = color[1]
         nodeBaseColorRGB.outputs[0].default_value[2] = color[2]
@@ -807,7 +805,6 @@ class MSFS_Material:
     def setEmissiveColor(self, color):
         nodeEmissiveColor = self.getNodeByName(MSFS_ShaderNodes.emissiveColor.value)
         emissiveValue = nodeEmissiveColor.outputs[0].default_value
-        # try looking for emissive_tint
         emissiveValue[0] = color[0]
         emissiveValue[1] = color[1]
         emissiveValue[2] = color[2]
@@ -1021,7 +1018,7 @@ class MSFS_Material:
         self.material.blend_method = "BLEND"
 
     #########################################################################
-    def addNode(self, name = "", typeNode = "", location = (0.0, 0.0), hidden = True, width = 150.0, frame = None, color = (1.0, 1.0, 1.0), blend_type = "MIX", operation =  "ADD"):
+    def addNode(self, name = "", typeNode = "", location = (0.0, 0.0), hidden = True, width = 150.0, frame = None, color = (1.0, 1.0, 1.0), blend_type = "MIX", operation =  "ADD", data_type = "RGBA"):
         if(self.nodes is not None):
             try:
                 node = self.nodes.new(typeNode)
@@ -1046,8 +1043,6 @@ class MSFS_Material:
         return None
     
     def getNodeByName(self, nodename):
-        #for n in self.node_tree.nodes: 
-        #    print(n.name)
         if self.node_tree.nodes.find(nodename) > -1:
             return self.node_tree.nodes[nodename]
         print("Did not find ", nodename)
