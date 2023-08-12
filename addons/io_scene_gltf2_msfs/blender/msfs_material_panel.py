@@ -52,11 +52,12 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         "msfs_blend_threshold": "msfs_detail_blend_threshold",
         "msfs_albedo_texture": "msfs_base_color_texture",
         "msfs_metallic_texture": "msfs_occlusion_metallic_roughness_texture",
+        "msfs_comp_texture": "msfs_occlusion_metallic_roughness_texture",
         "msfs_detail_albedo_texture": "msfs_detail_color_texture",
         "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
         "msfs_anisotropic_direction_texture": "msfs_extra_slot1_texture",
         "msfs_clearcoat_texture": "msfs_dirt_texture",
-        "msfs_behind_glass_texture": "msfs_detail_color_texture",
+        "msfs_behind_glass_texture": "msfs_detail_color_texture"
     }
 
     @staticmethod
@@ -79,7 +80,12 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                     continue
                 if mat.get("msfs_material_mode") == "msfs_parallax" and old_property == "msfs_detail_albedo_texture":
                     continue
-                mat[new_property] = mat[old_property]
+                try:
+                    #print("execute - make change", new_property, old_property)
+                    mat[new_property] = mat[old_property]
+                    #print("execute - make change new old", mat[new_property], mat[old_property])
+                except:
+                    print("execute - ERROR did not carry over", mat, old_property, new_property)
 
                 del mat[old_property]
 
@@ -499,7 +505,7 @@ class MSFS_PT_Material(bpy.types.Panel):
                         box,
                         mat,
                         "msfs_occlusion_metallic_roughness_texture",
-                        text=occlusion_metallic_roughness_texture_name,
+                        text=occlusion_metallic_roughness_texture_name
                     )
                     self.draw_texture_prop(
                         box, mat, "msfs_normal_texture", text=normal_texture_name
