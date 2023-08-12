@@ -750,11 +750,12 @@ class MSFS_Material:
         nodeBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.baseColorRGB.value)
         nodeBaseColorA = self.getNodeByName(MSFS_ShaderNodes.baseColorA.value)
 
-        nodeBaseColorRGB.outputs[0].default_value[0] = color[0]
-        nodeBaseColorRGB.outputs[0].default_value[1] = color[1]
-        nodeBaseColorRGB.outputs[0].default_value[2] = color[2]
-        nodeBaseColorA.outputs[0].default_value = color[3]
-        self.updateColorLinks()
+        if nodeBaseColorRGB is not None:
+            nodeBaseColorRGB.outputs[0].default_value[0] = color[0]
+            nodeBaseColorRGB.outputs[0].default_value[1] = color[1]
+            nodeBaseColorRGB.outputs[0].default_value[2] = color[2]
+            nodeBaseColorA.outputs[0].default_value = color[3]
+            self.updateColorLinks()
 
     def setBaseColorTex(self, tex):
         nodeBaseColorTex = self.getNodeByName(MSFS_ShaderNodes.baseColorTex.value)

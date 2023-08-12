@@ -27,7 +27,7 @@ class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):
         if self.properties.enabled == True:
-            print("gather_asset_hook", gltf2_asset.extensions)
+            print("gather_asset_hook - Start", gltf2_asset.extensions)
             if gltf2_asset.extensions is None:
                 gltf2_asset.extensions = {}
             gltf2_asset.extensions["ASOBO_normal_map_convention"] = self.Extension(
@@ -44,21 +44,21 @@ class Export:
         # does not work in:
         # def gather_mesh_hook(self, gltf2_mesh, blender_mesh, blender_object, vertex_groups, modifiers, skip_filter, materials, export_settings):
 
-        print("gather_asset_hook - Started with ", gltf2_asset)
+        #print("gather_asset_hook - Started with ", gltf2_asset)
         for o in bpy.context.scene.objects:
-            print("gather_asset_hook - Scene Object",o)
+            #print("gather_asset_hook - Scene Object",o)
             # only for meshes
             if o.type == 'MESH':
                 obj = o
-                print("gather_asset_hook - obj", obj, obj.data)
+                #print("gather_asset_hook - obj", obj, obj.data)
                 for ca in obj.data.color_attributes:
                     if ca.data_type != 'FLOAT_COLOR':
-                        print("gather_asset_hook - col before", ca.data_type)
+                        print("gather_asset_hook - col before", obj, ca.domain, ca.data_type)
                         bpy.context.view_layer.objects.active = obj
                         bpy.ops.geometry.attribute_convert(mode='GENERIC', domain='CORNER', data_type='FLOAT_COLOR')
                         print("gather_asset_hook - After", obj, obj.data)
                         for ca in obj.data.color_attributes:
-                            print("gather_asset_hook - col after", ca.data_type)
+                            print("gather_asset_hook - col after", obj, ca.data_type)
         print("gather_asset_hook - Done")
 
     def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
