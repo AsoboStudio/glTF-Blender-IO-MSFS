@@ -57,8 +57,29 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
         "msfs_anisotropic_direction_texture": "msfs_extra_slot1_texture",
         "msfs_clearcoat_texture": "msfs_dirt_texture",
-        "msfs_behind_glass_texture": "msfs_detail_color_texture"
+        "msfs_behind_glass_texture": "msfs_detail_color_texture",
+        "msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
+        "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
+        "msfs_decal_blend_factor_metal": "msfs_metallic_blend_factor",
+        "msfs_decal_blend_factor_occlusion": "msfs_occlusion_blend_factor",
+        "msfs_decal_blend_factor_normal": "msfs_normal_blend_factor",
+        "msfs_decal_blend_factor_emissive": "msfs_emissive_blend_factor",
+        "windshield": "msfs_windshield",
+        "geo_decal": "msfs_base_color_blend_factor",
     }
+    #"msfs_color_base_mix": " - related to vertex alpha node"
+    #"msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
+    #"msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
+    #"msfs_decal_blend_factor_metal": "msfs_metallic_blend_factor",
+    #"msfs_decal_blend_factor_occlusion": "msfs_occlusion_blend_factor",
+    #"msfs_decal_blend_factor_normal": "msfs_normal_blend_factor",
+    #"msfs_decal_blend_factor_emissive": "msfs_emissive_blend_factor",
+    #"windshield": "msfs_windshield",
+    #"geo_decal": "msfs_base_color_blend_factor",
+    # (yes without the msfs_   - vitus legacy)
+
+    # not implemented
+    # msfs_wiper_mask_texture, msfs_responsive_aa, msfs_ao_use_uv2 
 
     @staticmethod
     def old_properties_present(mat):
