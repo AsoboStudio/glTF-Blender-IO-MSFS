@@ -31,6 +31,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
         default=False,
     )
 
+    # get the preferences set in add-on intall menu
     addonpreferences = get_prefs()
     texture_dir = ''
     copyright = ''
