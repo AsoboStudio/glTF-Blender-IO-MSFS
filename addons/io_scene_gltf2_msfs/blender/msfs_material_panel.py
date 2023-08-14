@@ -15,6 +15,126 @@
 import bpy
 
 from .msfs_material_prop_update import MSFS_Material_Property_Update
+from bpy.types import Material
+
+def equality_check(arr1, arr2, size1, size2):
+   if (size1 != size2):
+      return False
+   for i in range(0, size2):
+      if (arr1[i] != arr2[i]):
+         return False
+   return True
+
+class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
+    """This addon changes the color nodes to the BSDF color if there is no link input"""
+
+    bl_idname = "msfs.migrate_colorfix_data"
+    bl_label = "WARNING - Change Albedo Color B4 Migrate"
+
+
+    @staticmethod
+    def old_albedo_tint_color_diff(mat):
+        nodes = mat.node_tree.nodes
+        bsdfnodes = [n for n in nodes 
+                if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
+        for principled in bsdfnodes:
+            if not principled.inputs[0].links:
+                # now get albedo_tint node and check color same as Base Color on BSDF
+                # get albedo_tint node
+                #print("old_albedo_tint_color_diff - mat", mat)
+                try:
+                    if mat.node_tree.nodes["albedo_tint"] is not None:
+                        # get color
+                        albedo_tint_checkval = mat.node_tree.nodes["albedo_tint"].outputs[0].default_value
+                        #print("old_albedo_tint_color_diff - albedo tint color", albedo_tint_checkval)
+                        # get BSDF base Color value
+                        BSDF_Base_Color = principled.inputs["Base Color"].default_value
+                        #print("old_albedo_tint_color_diff - BSDF color", BSDF_Base_Color[0], albedo_tint_checkval[0], BSDF_Base_Color[1], albedo_tint_checkval[1], BSDF_Base_Color[2], albedo_tint_checkval[2], BSDF_Base_Color[3], albedo_tint_checkval[3])
+                        if not equality_check(BSDF_Base_Color, albedo_tint_checkval, len(BSDF_Base_Color), len(albedo_tint_checkval)):
+                           return True
+                except:
+                    pass
+                finally:
+                    pass
+        return False
+
+
+    def execute(self, context):
+        mat = context.active_object.active_material
+        nodes = mat.node_tree.nodes
+        bsdfnodes = [n for n in nodes 
+                if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
+        for principled in bsdfnodes:
+            if not principled.inputs[0].links:
+                # now get albedo_tint node and check color same as Base Color on BSDF
+                # get albedo_tint node
+                #print("old_albedo_tint_color_diff execute - mat", mat)
+                if mat.node_tree.nodes["albedo_tint"] is not None:
+                    # get color
+                    albedo_tint_checkval = mat.node_tree.nodes["albedo_tint"].outputs[0].default_value
+                    # get BSDF base Color value
+                    BSDF_Base_Color = principled.inputs["Base Color"].default_value
+                    #print("old_albedo_tint_color_diff execute - BSDF color", BSDF_Base_Color)
+                    if not equality_check(BSDF_Base_Color, albedo_tint_checkval, len(BSDF_Base_Color), len(albedo_tint_checkval)):
+                       mat.node_tree.nodes["albedo_tint"].outputs[0].default_value = BSDF_Base_Color
+                       # should add like too to make button go away
+        return {"FINISHED"}
+
+
+class MSFS_OT_MigrateEmissiveFixData(bpy.types.Operator): # TODO: Remove eventually
+    """This addon changes the emissive nodes to the BSDF emissive if there is no link input"""
+
+    bl_idname = "msfs.migrate_emissivefix_data"
+    bl_label = "WARNING - Change Emissive Color B4 Migrate"
+
+
+    @staticmethod
+    def old_emissive_tint_color_diff(mat):
+        nodes = mat.node_tree.nodes
+        bsdfnodes = [n for n in nodes 
+                if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
+        for principled in bsdfnodes:
+            if not principled.inputs[0].links:
+                # now get albedo_tint node and check color same as Base Color on BSDF
+                # get albedo_tint node
+                #print("old_emissive_tint_color_diff - mat", mat)
+                try:
+                    if mat.node_tree.nodes["emissive_tint"] is not None:
+                        # get color
+                        emissive_tint_checkval = mat.node_tree.nodes["emissive_tint"].outputs[0].default_value
+                        #print("old_emissive_tint_color_diff - albedo tint color", emissive_tint_checkval)
+                        # get BSDF base Color value
+                        BSDF_Emission = principled.inputs["Emission"].default_value
+                        #print("old_emissive_tint_color_diff - BSDF emission", BSDF_Emission[0], emissive_tint_checkval[0], BSDF_Emission[1], emissive_tint_checkval[1], BSDF_Emission[2], emissive_tint_checkval[2], BSDF_Emission[3], emissive_tint_checkval[3])
+                        if not equality_check(BSDF_Emission, emissive_tint_checkval, len(BSDF_Emission), len(emissive_tint_checkval)):
+                           return True
+                except:
+                    pass
+                finally:
+                    pass
+        return False
+
+
+    def execute(self, context):
+        mat = context.active_object.active_material
+        nodes = mat.node_tree.nodes
+        bsdfnodes = [n for n in nodes 
+                if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
+        for principled in bsdfnodes:
+            if not principled.inputs[0].links:
+                # now get emissive_tint node and check color same as Base Color on BSDF
+                # get emissive_tint node
+                #print("old_emissive_tint_color_diff execute - mat", mat)
+                if mat.node_tree.nodes["emissive_tint"] is not None:
+                    # get color
+                    emissive_tint_checkval = mat.node_tree.nodes["emissive_tint"].outputs[0].default_value
+                    # get BSDF base Color value
+                    BSDF_Emission = principled.inputs["Emission"].default_value
+                    #print("old_albedo_tint_color_diff execute - BSDF color", BSDF_Emission)
+                    if not equality_check(BSDF_Emission, emissive_tint_checkval, len(BSDF_Emission), len(emissive_tint_checkval)):
+                       mat.node_tree.nodes["emissive_tint"].outputs[0].default_value = BSDF_Emission
+                       # should add like too to make button go away
+        return {"FINISHED"}
 
 
 class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
@@ -89,6 +209,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                     return True
         return False
 
+
     def execute(self, context):
         mat = context.active_object.active_material
         for (
@@ -116,15 +237,34 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         if mat.get("msfs_color_alpha_mix"):
             alpha = mat.get("msfs_color_alpha_mix")
             base_color[3] = alpha
+        else:
+            #print("execute - no msfs_color_alpha_mix", mat)
+            n = mat.node_tree.nodes["albedo_tint"]
+            #print(n, n.outputs[0], n.outputs[0].default_value)
+            base_color[3] = n.outputs[0].default_value[3]
+            #print(base_color)
         if mat.get("msfs_color_albedo_mix"):
             base_color = list(mat.get("msfs_color_albedo_mix"))
             if len(base_color) == 3:
                 base_color.append(alpha)
+        else:
+            #print("execute - no msfs_color_albedo_mix", mat)
+            n = mat.node_tree.nodes["albedo_tint"]
+            #print(n, n.outputs[0], n.outputs[0].default_value)
+            base_color = n.outputs[0].default_value
+            #print(base_color)
         mat.msfs_base_color_factor = base_color
 
         # Emissive factor is also a special case - old material system had 4 floats, we only need 3
         if mat.get("msfs_color_emissive_mix"):
             mat.msfs_emissive_factor = mat.get("msfs_color_emissive_mix")[0:3]
+        else:
+            #print("execute - no msfs_color_albedo_mix", mat)
+            n = mat.node_tree.nodes["emissive_tint"]
+            #print(n, n.outputs[0], n.outputs[0].default_value)
+            emissive_color = n.outputs[0].default_value[0:3]
+            #print(emissive_color)
+            mat.msfs_emissive_factor = emissive_color
 
         # Do our enums manually as only their index of the value are stored - not the string
         if mat.get("msfs_blend_mode"):
@@ -156,13 +296,16 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                 "msfs_geo_decal_frosted",  # Changed from old version - matches new name
                 "msfs_hair",
                 "msfs_invisible",
+                "msfs_ghost",  # added because my legacy mod has it????
             ]
             mat.msfs_material_type = old_material_older[mat["msfs_material_mode"]]
 
             del mat["msfs_material_mode"]
 
+        print("Migrate material - Update", mat)
         MSFS_Material_Property_Update.update_msfs_material_type(mat, context)
 
+        print("Migrate material - Done")
         return {"FINISHED"}
 
 
@@ -205,6 +348,12 @@ class MSFS_PT_Material(bpy.types.Panel):
         mat = context.active_object.active_material
 
         if mat:
+            if MSFS_OT_MigrateColorFixData.old_albedo_tint_color_diff(mat):
+                layout.operator(MSFS_OT_MigrateColorFixData.bl_idname)
+
+            if MSFS_OT_MigrateEmissiveFixData.old_emissive_tint_color_diff(mat):
+                layout.operator(MSFS_OT_MigrateEmissiveFixData.bl_idname)
+
             if MSFS_OT_MigrateMaterialData.old_properties_present(mat):
                 layout.operator(MSFS_OT_MigrateMaterialData.bl_idname)
 

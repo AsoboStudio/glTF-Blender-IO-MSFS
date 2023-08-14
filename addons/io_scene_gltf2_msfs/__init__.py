@@ -18,17 +18,64 @@ import pkgutil
 from pathlib import Path
 
 import bpy
+import os
 
 bl_info = {
     "name": "Microsoft Flight Simulator glTF Extension",
     "author": "Luca Pierabella, Yasmine Khodja, Wing42, pepperoni505, ronh991, and others",
     "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
     "blender": (3, 3, 0),
-    "version": (1, 3, 2.1),
+    "version": (1, 3, 2.2),
     "location": "File > Import-Export",
     "category": "Import-Export",
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
 }
+
+#get the folder path for the .py file containing this function
+def get_path():
+    return os.path.dirname(os.path.realpath(__file__))
+
+
+#get the name of the "base" folder
+def get_name():
+    return os.path.basename(get_path())
+
+
+#now that we have the addons name we can get the preferences
+def get_prefs():
+    return bpy.context.preferences.addons[get_name()].preferences
+
+## class to add the preference settings
+class addSettingsPanel(bpy.types.AddonPreferences):
+    bl_idname = __package__
+ 
+    export_texture_dir: bpy.props.StringProperty (
+        name = "Default Texture Location",
+        description = "Default Texture Location",
+        default = "../texture/"
+    )
+
+    export_copyright: bpy.props.StringProperty (
+        name = "Default Copyright Name",
+        description = "Default Copyright Name",
+        default = "Your Copyright Here"
+    )
+
+    ## draw the panel in the addon preferences
+    def draw(self, context):
+        layout = self.layout
+
+        row = layout.row()
+        row.label(text="Optional - You can set the multi-export default values. This will be used in the multi-export window ONLY", icon='INFO')
+
+        box = layout.box()
+        col = box.column(align = False)
+
+        ## texture default location
+        col.prop(self, 'export_texture_dir', expand=False)
+
+        ## default copyright
+        col.prop(self, 'export_copyright', expand=False)
 
 def get_version_string():
     return str(bl_info['version'][0]) + '.' + str(bl_info['version'][1]) + '.' + str(bl_info['version'][2])
@@ -144,6 +191,7 @@ def update_class_list():
 
 
 def register():
+    bpy.utils.register_class(addSettingsPanel)
     # Refresh the list of classes whenever the addon is reloaded so we can stay up to date with the files on disk.
     update_class_list()
 
@@ -199,6 +247,7 @@ def unregister():
 
     for cls in extension_classes:
         bpy.utils.unregister_class(cls)
+    bpy.utils.unregister_class(addSettingsPanel)
 
 def unregister_panel():
     for panel in extension_panels:

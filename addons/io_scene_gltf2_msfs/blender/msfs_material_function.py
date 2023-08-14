@@ -973,6 +973,7 @@ class MSFS_Material:
     def getNodeByName(self, nodename):
         if self.node_tree.nodes.find(nodename) > -1:
             return self.node_tree.nodes[nodename]
+        print("Did not find ", nodename)
         return None
 
     def getNodesByClassName(self, className):
