@@ -783,13 +783,15 @@ class MSFS_Material:
 
     def setRoughnessScale(self, scale):
         nodeRoughnessScale = self.getNodeByName(MSFS_ShaderNodes.roughnessScale.value)
-        nodeRoughnessScale.outputs[0].default_value = scale
-        self.updateCompLinks()
+        if nodeRoughnessScale is not None:
+            nodeRoughnessScale.outputs[0].default_value = scale
+            self.updateCompLinks()
 
     def setMetallicScale(self, scale):
         nodeMetallicScale = self.getNodeByName(MSFS_ShaderNodes.metallicScale.value)
-        nodeMetallicScale.outputs[0].default_value = scale
-        self.updateCompLinks()
+        if nodeMetallicScale is not None:
+            nodeMetallicScale.outputs[0].default_value = scale
+            self.updateCompLinks()
 
     def setEmissiveTexture(self, tex):
         nodeEmissiveTex = self.getNodeByName(MSFS_ShaderNodes.emissiveTex.value)
@@ -800,17 +802,19 @@ class MSFS_Material:
 
     def setEmissiveScale(self, scale):
         nodeEmissiveScale = self.getNodeByName(MSFS_ShaderNodes.emissiveScale.value)
-        nodeEmissiveScale.outputs[0].default_value = scale
-        self.updateEmissiveLinks()
+        if nodeEmissiveScale is not None:
+            nodeEmissiveScale.outputs[0].default_value = scale
+            self.updateEmissiveLinks()
 
     def setEmissiveColor(self, color):
         nodeEmissiveColor = self.getNodeByName(MSFS_ShaderNodes.emissiveColor.value)
-        emissiveValue = nodeEmissiveColor.outputs[0].default_value
-        emissiveValue[0] = color[0]
-        emissiveValue[1] = color[1]
-        emissiveValue[2] = color[2]
-        nodeEmissiveColor.outputs[0].default_value = emissiveValue
-        self.updateEmissiveLinks()
+        if nodeEmissiveColor is not None:
+            emissiveValue = nodeEmissiveColor.outputs[0].default_value
+            emissiveValue[0] = color[0]
+            emissiveValue[1] = color[1]
+            emissiveValue[2] = color[2]
+            nodeEmissiveColor.outputs[0].default_value = emissiveValue
+            self.updateEmissiveLinks()
 
     def setNormalScale(self, scale):
         nodeNormalMapSampler = self.getNodeByName(MSFS_ShaderNodes.normalMapSampler.value)
