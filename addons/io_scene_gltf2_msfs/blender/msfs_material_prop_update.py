@@ -72,6 +72,10 @@ class MSFS_Material_Property_Update:
         return None
 
     @staticmethod
+    def update_msfs_material_mode(self, context):
+        return
+
+    @staticmethod
     def update_msfs_material_type(self, context):
         from datetime import datetime
         now = datetime.now()
@@ -81,7 +85,8 @@ class MSFS_Material_Property_Update:
         msfs_mat = None
         if self.msfs_material_type == "msfs_standard":
             msfs_mat = MSFS_Standard(self, buildTree=True)
-            self.msfs_alpha_mode = "OPAQUE"
+            if self.msfs_alpha_mode is None:
+                self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_geo_decal":
             msfs_mat = MSFS_Geo_Decal(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"

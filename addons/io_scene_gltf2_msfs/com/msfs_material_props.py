@@ -55,6 +55,50 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_msfs_material_type,
         options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
     )
+    # Main material mode, in accordance with MSFS material shaders:
+    # Material.msfs_material_mode =  bpy.props.EnumProperty(items=(('NONE',"Disabled",""),
+                                                                # ('msfs_standard', "MSFS Standard",""),
+                                                                # ('msfs_anisotropic', "MSFS Anisotropic",""),
+                                                                # ('msfs_sss', "MSFS Subsurface Scattering",""),
+                                                                # ('msfs_glass', "MSFS Glass",""),
+                                                                # ('msfs_decal', "MSFS Decal",""),
+                                                                # ('msfs_clearcoat', "MSFS Clearcoat",""),
+                                                                # ('msfs_env_occluder', "MSFS Environment Occluder",""),
+                                                                # ('msfs_fake_terrain', "MSFS Fake Terrain",""),
+                                                                # ('msfs_fresnel', "MSFS Fresnel Fade",""),
+                                                                # ('msfs_windshield', "MSFS Windshield",""),
+                                                                # ('msfs_porthole', "MSFS Porthole",""),
+                                                                # ('msfs_parallax', "MSFS Parallax",""),
+                                                                # ('msfs_geo_decal', "MSFS Geo Decal Frosted",""),
+                                                                # ('msfs_hair', "MSFS Hair",""),
+                                                                # ('msfs_invisible', "MSFS Invisible",""),
+                                                                # ('msfs_ghost', "MSFS Ghost","")), default='NONE',update=switch_msfs_material,)
+
+    bpy.types.Material.msfs_material_mode = bpy.props.EnumProperty(
+        name="Legacy Mode",
+        items=(
+            ("NONE", "Disabled", ""),
+            ("msfs_standard", "Standard", ""),
+            ('msfs_anisotropic', "MSFS Anisotropic", ""),
+            ('msfs_sss', "MSFS Subsurface Scattering", ""),
+            ('msfs_glass', "MSFS Glass", ""),
+            ('msfs_decal', "MSFS Decal", ""),
+            ('msfs_clearcoat', "MSFS Clearcoat", ""),
+            ('msfs_env_occluder', "MSFS Environment Occluder", ""),
+            ('msfs_fake_terrain', "MSFS Fake Terrain", ""),
+            ('msfs_fresnel', "MSFS Fresnel Fade", ""),
+            ('msfs_windshield', "MSFS Windshield", ""),
+            ('msfs_porthole', "MSFS Porthole", ""),
+            ('msfs_parallax', "MSFS Parallax", ""),
+            ('msfs_geo_decal', "MSFS Geo Decal Frosted", ""),
+            ('msfs_hair', "MSFS Hair", ""),
+            ('msfs_invisible', "MSFS Invisible", ""),
+            ('msfs_ghost', "MSFS Ghost", ""),
+        ),
+        default="NONE",
+        update=MSFS_Material_Property_Update.update_msfs_material_mode,
+        options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
+    )
 
     bpy.types.Material.msfs_base_color_factor = bpy.props.FloatVectorProperty(
         name="Base Color",
