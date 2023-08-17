@@ -73,6 +73,9 @@ class MSFS_Material_Property_Update:
 
     @staticmethod
     def update_msfs_material_mode(self, context):
+        print("updating mode")
+        if self.msfs_material_type == "NONE":
+            msfs_mat = MSFS_Standard(self, buildTree=False)
         return
 
     @staticmethod

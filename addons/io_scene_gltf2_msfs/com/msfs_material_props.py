@@ -96,7 +96,7 @@ class AsoboMaterialCommon:
             ('msfs_ghost', "MSFS Ghost", ""),
         ),
         default="NONE",
-        update=MSFS_Material_Property_Update.update_msfs_material_mode,
+        update=lambda self, context: MSFS_Material_Property_Update.update_msfs_material_mode(self, context),
         options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
     )
 
