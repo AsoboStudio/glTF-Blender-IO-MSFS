@@ -114,7 +114,7 @@ class MSFS_ShaderNodes(Enum):
     combineUVScale = "Combine UV Scale"
     combineUVOffset = "Combine UV Offset"
     mulUVScale = "Multiply UV Scale"
-    addUVOffset = "Multiply UV Offset"
+    addUVOffset = "Add UV Offset"
     detailNormalMapSampler = "Detail Normal Map Sampler"
     blendNormalMap = "Blend Normal Map"
     blendColorMap = "Blend Color Map"
