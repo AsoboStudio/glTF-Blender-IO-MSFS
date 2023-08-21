@@ -163,7 +163,7 @@ class MSFS_Material:
         )
         
         ## Comp Texture
-        # Out[0] : Blend Comp Occlusion Metalic Roughness -> In[1]
+        # Out[0] : Blend Comp Occlusion Metallic Roughness -> In[1]
         compTexNode = self.addNode(
             name = MSFS_ShaderNodes.compTex.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeTexImage.value,
