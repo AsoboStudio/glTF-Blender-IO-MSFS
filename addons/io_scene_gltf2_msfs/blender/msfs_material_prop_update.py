@@ -135,14 +135,12 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def reset_material_prop_object(self):
         self.msfs_alpha_cutoff = 0.5
-        self.msfs_ao_use_uv2 = False
         self.msfs_base_color_blend_factor = 1.0
         self.msfs_base_color_factor = [0.8, 0.8, 0.8, 1.0]
         self.msfs_base_color_texture = None
         self.msfs_blend_mask_texture = None
         self.msfs_clamp_uv_x = False
         self.msfs_clamp_uv_y = False
-        self.msfs_clamp_uv_z = False
         self.msfs_collision_material = False
         self.msfs_day_night_cycle = False
         self.msfs_detail_blend_threshold = 0.1
