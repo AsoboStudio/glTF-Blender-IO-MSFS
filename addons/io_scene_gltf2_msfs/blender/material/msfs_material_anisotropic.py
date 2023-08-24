@@ -14,7 +14,7 @@
 from ..msfs_material_function import MSFS_Material
 from .utils.msfs_material_enum import (MSFS_AnisotropicNodes, MSFS_FrameNodes,
                                        MSFS_ShaderNodesTypes)
-
+import bpy
 
 class MSFS_Anisotropic(MSFS_Material):
     def __init__(self, material, buildTree=False):
@@ -43,7 +43,7 @@ class MSFS_Anisotropic(MSFS_Material):
         # In[0] : Anisotropic Texture -> Out[0]
         separateAnisotropicNode = self.addNode(
             name = MSFS_AnisotropicNodes.separateAnisotropic.value,
-            typeNode = "ShaderNodeSeparateRGB",
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value if(bpy.app.version < (3, 3, 0)) else MSFS_ShaderNodesTypes.shaderNodeSeparateRGB.value,
             location = (-100.0, -800.0),
             width = 300.0,
             frame = anisotropicFrame)

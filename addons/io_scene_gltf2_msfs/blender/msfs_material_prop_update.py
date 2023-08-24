@@ -72,10 +72,15 @@ class MSFS_Material_Property_Update:
         return None
 
     @staticmethod
+    def update_FBW_material(self, context):
+        self.msfs_FBW_material_needs_update = not self.msfs_FBW_material_needs_update
+
+    @staticmethod
     def update_msfs_material_mode(self, context):
         print("updating mode")
-        if self.msfs_material_type == "NONE":
-            msfs_mat = MSFS_Standard(self, buildTree=False)
+        #if self.msfs_material_type == "NONE":
+        #    msfs_mat = MSFS_Standard(self, buildTree=False)
+        #msfs_material_mode = msfs_material_type
         return
 
     @staticmethod
@@ -125,7 +130,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_SSS(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_invisible":
-            msfs_mat = MSFS_Invisible(self, buildTree=False)
+            msfs_mat = MSFS_Invisible(self, buildTree=True)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
             self.msfs_base_color_factor = [0.8, 0.0, 0.0, 0.1]
@@ -137,7 +142,7 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Fresnel_Fade(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
         elif self.msfs_material_type == "msfs_environment_occluder":
-            msfs_mat = MSFS_Environment_Occluder(self, buildTree=False)
+            msfs_mat = MSFS_Environment_Occluder(self, buildTree=True)
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
             self.msfs_base_color_factor = [0.0, 0.8, 0.0, 0.1]
@@ -342,6 +347,10 @@ class MSFS_Material_Property_Update:
     @staticmethod
     def update_alpha_cutoff(self, context):
         self.alpha_threshold = self.msfs_alpha_cutoff
+
+    @staticmethod
+    def update_detail_blend_threshold(self, context):
+        self.detail_blend_threshold = self.msfs_detail_blend_threshold
         
     @staticmethod
     def update_detail_uv(self, context):
