@@ -283,9 +283,10 @@ class MSFS_Material:
         blendColorMapNode.inputs[self.inputs0].default_value = 1.0
         
         # links
+        # switched inputs as 2 is main and 1 is background textures according to blender docs - https://docs.blender.org/manual/en/3.3/render/shader_nodes/color/mix.html
         self.link(blendColorMapNode.inputs[self.inputs0], vertexColorNode.outputs[1])
-        self.link(blendColorMapNode.inputs[self.inputs1], baseColorTexNode.outputs[0])
-        self.link(blendColorMapNode.inputs[self.inputs2], detailColorTexNode.outputs[0])
+        self.link(blendColorMapNode.inputs[self.inputs1], baseColorTexNode.outputs[0]) # !switched stays
+        self.link(blendColorMapNode.inputs[self.inputs2], detailColorTexNode.outputs[0]) # !switched see below
 
         ## Base color RGB
         # Out[0] : Base Color Multiplier -> In[0]
@@ -310,7 +311,7 @@ class MSFS_Material:
         baseColorANode.outputs[0].default_value = 1
         
         ## Base Color Multiplier
-        # In[0] : Vertex Color -> Out[1]
+        # In[0] : Vertex Color -> Out[1]    I disagree with this input assumes all vertex alpha's at 1.0   ********************************************
         # In[1] : Base Color RGB
         # In[2] : Blend Color Map
         if(bpy.app.version < (3, 4, 0)):
@@ -334,9 +335,15 @@ class MSFS_Material:
             )
         
         ## Links
-        self.link(mulBaseColorRGBNode.inputs[self.inputs0], vertexColorNode.outputs[1])
-        self.link(mulBaseColorRGBNode.inputs[self.inputs1], baseColorRGBNode.outputs[0])
-        self.link(mulBaseColorRGBNode.inputs[self.inputs2], blendColorMapNode.outputs[self.outputs0])
+        #self.link(mulBaseColorRGBNode.inputs[self.inputs0], vertexColorNode.outputs[1])
+        mulBaseColorRGBNode.inputs[0].default_value = 1.0 # added by ron
+        print("Vertex color and alpha values", vertexColorNode.outputs[0].default_value[0], vertexColorNode.outputs[0].default_value[1], vertexColorNode.outputs[0].default_value[2], vertexColorNode.outputs[0].default_value[3], vertexColorNode.outputs[1].default_value)
+        # Ron - switched inputs as 2 is main and 1 is background textures according to blender docs - https://docs.blender.org/manual/en/3.3/render/shader_nodes/color/mix.html
+        self.link(mulBaseColorRGBNode.inputs[self.inputs1], baseColorRGBNode.outputs[0]) # !switched
+        #self.link(blendColorMapNode.inputs[self.inputs2], baseColorRGBNode.outputs[0]) # switched
+        #self.link(mulBaseColorRGBNode.inputs[self.inputs2], blendColorMapNode.outputs[0]) # !switched
+        self.link(mulBaseColorRGBNode.inputs[self.inputs1], blendColorMapNode.outputs[0]) # switched
+        #self.link(mulBaseColorRGBNode.inputs[self.inputs2], detailColorTexNode.outputs[0]) # switched
         
         ## Blend Alpha Map (Detail alpha operator)
         # In[0] : Alpha Base Color Texture
@@ -344,6 +351,7 @@ class MSFS_Material:
         blendAlphaMapNode = self.addNode(
             name = MSFS_ShaderNodes.blendAlphaMap.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeMath.value,
+            #blend_type = "MULTIPLY", # ron - was was default ADD
             location = (50.0, 400.0),
             width = 200.0,
             frame = baseColorFrame
@@ -354,7 +362,7 @@ class MSFS_Material:
         self.link(blendAlphaMapNode.inputs[0], baseColorTexNode.outputs[1])
         self.link(blendAlphaMapNode.inputs[1], detailColorTexNode.outputs[1])
         
-        ## Base Color Multiplier
+        ## Base Color Multiplier A
         # In[1]: Base Color Alpha -> GroupInput[2]
         mulBaseColorANode = self.addNode(
             name = MSFS_ShaderNodes.baseColorMulA.value,
@@ -531,8 +539,8 @@ class MSFS_Material:
         
         ## Links
         self.link(blendCompMapNode.inputs[self.inputs0], vertexColorNode.outputs[1])
-        self.link(blendCompMapNode.inputs[self.inputs1], compTexNode.outputs[0])
-        self.link(blendCompMapNode.inputs[self.inputs2], detailCompTexNode.outputs[0])
+        self.link(blendCompMapNode.inputs[self.inputs1], compTexNode.outputs[0]) # !switched
+        self.link(blendCompMapNode.inputs[self.inputs2], detailCompTexNode.outputs[0]) # !switched
 
         ## Split Occlusion Metallic Roughness
         # In[0] : Blend Comp Map -> Out[0]
@@ -684,7 +692,7 @@ class MSFS_Material:
             frame = normalFrame
         )
 
-        ## Emissive Scale
+        ## Detail Normal Scale
         detailNormalScaleNode = self.addNode(
             name = MSFS_ShaderNodes.detailNormalScale.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeValue.value,
@@ -721,8 +729,8 @@ class MSFS_Material:
         
         # Links
         self.link(blendNormalMapNode.inputs[self.inputs0], vertexColorNode.outputs[1])
-        self.link(blendNormalMapNode.inputs[self.inputs1], normalMapSamplerNode.outputs[0])
-        self.link(blendNormalMapNode.inputs[self.inputs2], detailNormalMapSamplerNode.outputs[0])
+        self.link(blendNormalMapNode.inputs[self.inputs1], normalMapSamplerNode.outputs[0]) # !switched
+        self.link(blendNormalMapNode.inputs[self.inputs2], detailNormalMapSamplerNode.outputs[0]) # !switched
         
         ## Update links
         self.toggleVertexBlendMapMask(self.material.msfs_blend_mask_texture is None)
@@ -868,33 +876,42 @@ class MSFS_Material:
         nodeBlendAlphaMap = self.getNodeByName(MSFS_ShaderNodes.blendAlphaMap.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
-        # !!!! input orders matters for the exporter here
-        self.link(nodeBaseColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs1])
-        self.link(nodeDetailColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs2])
-        self.link(nodeBlendColorMap.outputs[self.outputs0], nodeMulBaseColorRGB.inputs[self.inputs2])
-        self.link(nodeBaseColorTex.outputs[1], nodeBlendAlphaMap.inputs[0])
-        self.link(nodeDetailColorTex.outputs[1], nodeBlendAlphaMap.inputs[1])
-        self.link(nodeBaseColorA.outputs[0], nodeMulBaseColorA.inputs[1])
-        self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs1])
+        # !!!! input index orders matters for the exporter here
+        # textures according to blender docs - https://docs.blender.org/manual/en/3.3/render/shader_nodes/color/mix.html
+        self.link(nodeBaseColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs1]) # !switched
+        self.link(nodeDetailColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs2]) # !switched
+        #self.link(nodeDetailColorTex.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs2]) # switched
+        self.link(nodeBlendColorMap.outputs[self.outputs0], nodeMulBaseColorRGB.inputs[self.inputs2]) # !switched
+        #self.link(nodeBlendColorMap.outputs[self.outputs0], nodeMulBaseColorRGB.inputs[self.inputs1]) # switched
+        self.link(nodeBaseColorTex.outputs[1], nodeBlendAlphaMap.inputs[0]) # !switched - stays same - alpha
+        self.link(nodeDetailColorTex.outputs[1], nodeBlendAlphaMap.inputs[1]) # !switched - stays same - alpha
+        self.link(nodeBaseColorA.outputs[0], nodeMulBaseColorA.inputs[1]) # !switched - stays same - alpha
+        self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs1]) # !switched
+        #self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs2]) # switched
 
         if not nodeBaseColorTex.image and not nodeDetailColorTex.image:
+            #nodeBlendColorMap.blend_type = "MULTIPLY"
+            #nodeMulBaseColorRGB.blend_type = "MULTIPLY"
             self.link(nodeBaseColorRGB.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
 
         elif nodeBaseColorTex.image and not nodeDetailColorTex.image:
             nodeBlendColorMap.blend_type = "ADD"
+            #nodeMulBaseColorRGB.blend_type = "ADD"
             self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorTex.outputs[1], nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
 
         elif not nodeBaseColorTex.image and nodeDetailColorTex.image:
             nodeBlendColorMap.blend_type = "ADD"
+            #nodeMulBaseColorRGB.blend_type = "ADD"
             self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeDetailColorTex.outputs[1],nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
 
         else:
             nodeBlendColorMap.blend_type = "MULTIPLY"
+            nodeMulBaseColorRGB.blend_type = "MULTIPLY"
             self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBlendAlphaMap.outputs[0], nodeMulBaseColorA.inputs[0])
 
