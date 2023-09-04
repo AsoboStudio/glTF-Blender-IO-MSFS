@@ -183,31 +183,31 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                             print("old_emissive_tint_color_diff - BSDF emission", BSDF_Emission[0], emissive_tint_checkval[0], BSDF_Emission[1], emissive_tint_checkval[1], BSDF_Emission[2], emissive_tint_checkval[2], BSDF_Emission[3], emissive_tint_checkval[3])
                             if not equality_check(BSDF_Emission, emissive_tint_checkval, len(BSDF_Emission), len(emissive_tint_checkval)):
                                 found_diff = True
-                            print("old_albedo_tint_color_diff - alpha diff", found_diff)
+                            print("old_emissive_tint_color_diff - alpha diff", found_diff)
                             #    found_diff = True
                             if found_diff:
                                 return found_diff
                         else:
                             if mat.msfs_material_type != "NONE":
-                                #print("old_albedo_tint_color_diff - Emission")
+                                #print("old_emissive_tint_color_diff - Emission")
                                 BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
-                                #print("old_albedo_tint_color_diff - BSDF to MSFS base color", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
+                                #print("old_emissive_tint_color_diff - BSDF to MSFS base color", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
                                 if not equality_check(BSDF_Emission, mat.msfs_emissive_factor, len(BSDF_Base_Color), len(mat.msfs_emissive_factor)):
                                     found_diff = True
-                                #print("old_albedo_tint_color_diff - Base Color Alpha Done")
+                                #print("old_emissive_tint_color_diff - Base Color Alpha Done")
                                 if found_diff:
                                     return found_diff
                     except:
                         try:
                             if mat.msfs_material_type != "NONE":
-                                #print("old_albedo_tint_color_diff - BSDF to MSFS emissive", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
+                                #print("old_emissive_tint_color_diff - BSDF to MSFS emissive", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
                                 BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
                                 if not equality_check(BSDF_Emission, mat.msfs_emissive_factor, len(BSDF_Emission), len(mat.msfs_emissive_factor)):
                                     found_diff = True
                                 if found_diff:
                                     return found_diff
                         except:
-                            print("old_albedo_tint_color_diff - old_properties - Error - BSDF properties found skipping")
+                            print("old_emissive_tint_color_diff - old_properties - Error - BSDF properties found skipping")
 
                     finally:
                         pass
@@ -409,7 +409,16 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     bl_idname = "msfs.migrate_material_data"
     bl_label = "Migrate Material Data"
 
+# old order matters as the really old legacy checked first can be overridden by new legacy
     old_property_to_new_mapping = {
+        "msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
+        "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
+        "msfs_decal_blend_factor_metal": "msfs_metallic_blend_factor",
+        "msfs_decal_blend_factor_occlusion": "msfs_occlusion_blend_factor",
+        "msfs_decal_blend_factor_normal": "msfs_normal_blend_factor",
+        "msfs_decal_blend_factor_emissive": "msfs_emissive_blend_factor",
+        "windshield": "msfs_windshield",
+        "geo_decal": "msfs_base_color_blend_factor",
         "msfs_color_sss": "msfs_sss_color",
         "msfs_use_pearl_effect ": "msfs_use_pearl",
         "msfs_decal_color_blend_factor": "msfs_base_color_blend_factor",
@@ -436,23 +445,15 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         "msfs_detail_uv_offset_x": "msfs_detail_uv_offset_u",
         "msfs_detail_uv_offset_y": "msfs_detail_uv_offset_v",
         "msfs_blend_threshold": "msfs_detail_blend_threshold",
+        "msfs_behind_glass_texture": "msfs_detail_color_texture",
         "msfs_albedo_texture": "msfs_base_color_texture",
-        "msfs_metallic_texture": "msfs_occlusion_metallic_roughness_texture",
         "msfs_comp_texture": "msfs_occlusion_metallic_roughness_texture",
+        "msfs_metallic_texture": "msfs_occlusion_metallic_roughness_texture",
         "msfs_detail_albedo_texture": "msfs_detail_color_texture",
-        "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
         "msfs_detail_comp_texture": "msfs_detail_occlusion_metallic_roughness_texture",
+        "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
         "msfs_anisotropic_direction_texture": "msfs_extra_slot1_texture",
         "msfs_clearcoat_texture": "msfs_dirt_texture",
-        "msfs_behind_glass_texture": "msfs_detail_color_texture",
-        "msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
-        "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
-        "msfs_decal_blend_factor_metal": "msfs_metallic_blend_factor",
-        "msfs_decal_blend_factor_occlusion": "msfs_occlusion_blend_factor",
-        "msfs_decal_blend_factor_normal": "msfs_normal_blend_factor",
-        "msfs_decal_blend_factor_emissive": "msfs_emissive_blend_factor",
-        "windshield": "msfs_windshield",
-        "geo_decal": "msfs_base_color_blend_factor",
     }
     #"msfs_color_base_mix": " - related to vertex alpha node"
     #"msfs_color_alpha_mix": " - related to vertex alpha node"
