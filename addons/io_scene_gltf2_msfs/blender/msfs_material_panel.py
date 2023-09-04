@@ -409,7 +409,16 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     bl_idname = "msfs.migrate_material_data"
     bl_label = "Migrate Material Data"
 
+# old order matters as the really old legacy checked first can be overridden by new legacy
     old_property_to_new_mapping = {
+        "msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
+        "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
+        "msfs_decal_blend_factor_metal": "msfs_metallic_blend_factor",
+        "msfs_decal_blend_factor_occlusion": "msfs_occlusion_blend_factor",
+        "msfs_decal_blend_factor_normal": "msfs_normal_blend_factor",
+        "msfs_decal_blend_factor_emissive": "msfs_emissive_blend_factor",
+        "windshield": "msfs_windshield",
+        "geo_decal": "msfs_base_color_blend_factor",
         "msfs_color_sss": "msfs_sss_color",
         "msfs_use_pearl_effect ": "msfs_use_pearl",
         "msfs_decal_color_blend_factor": "msfs_base_color_blend_factor",
@@ -436,23 +445,15 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         "msfs_detail_uv_offset_x": "msfs_detail_uv_offset_u",
         "msfs_detail_uv_offset_y": "msfs_detail_uv_offset_v",
         "msfs_blend_threshold": "msfs_detail_blend_threshold",
+        "msfs_behind_glass_texture": "msfs_detail_color_texture",
         "msfs_albedo_texture": "msfs_base_color_texture",
-        "msfs_metallic_texture": "msfs_occlusion_metallic_roughness_texture",
         "msfs_comp_texture": "msfs_occlusion_metallic_roughness_texture",
+        "msfs_metallic_texture": "msfs_occlusion_metallic_roughness_texture",
         "msfs_detail_albedo_texture": "msfs_detail_color_texture",
-        "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
         "msfs_detail_comp_texture": "msfs_detail_occlusion_metallic_roughness_texture",
+        "msfs_detail_metallic_texture": "msfs_detail_occlusion_metallic_roughness_texture",
         "msfs_anisotropic_direction_texture": "msfs_extra_slot1_texture",
         "msfs_clearcoat_texture": "msfs_dirt_texture",
-        "msfs_behind_glass_texture": "msfs_detail_color_texture",
-        "msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
-        "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
-        "msfs_decal_blend_factor_metal": "msfs_metallic_blend_factor",
-        "msfs_decal_blend_factor_occlusion": "msfs_occlusion_blend_factor",
-        "msfs_decal_blend_factor_normal": "msfs_normal_blend_factor",
-        "msfs_decal_blend_factor_emissive": "msfs_emissive_blend_factor",
-        "windshield": "msfs_windshield",
-        "geo_decal": "msfs_base_color_blend_factor",
     }
     #"msfs_color_base_mix": " - related to vertex alpha node"
     #"msfs_color_alpha_mix": " - related to vertex alpha node"
@@ -501,7 +502,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
             alpha = mat.get("msfs_color_alpha_mix")
             base_color[3] = alpha
         else:
-            #print("execute - no msfs_color_alpha_mix", mat)
+            #print("execute - no msfs_color_alpha_mix Base Color", mat)
             try:
                 n = mat.node_tree.nodes["albedo_tint"]
                 #print(n, n.outputs[0], n.outputs[0].default_value)
@@ -535,21 +536,21 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
             if len(base_color) == 3:
                 base_color.append(alpha)
         else:
-            #print("execute - no msfs_color_albedo_mix", mat)
+            #print("execute - no msfs_color_albedo_mix Base Color Factor", mat)
             try:
                 n = mat.node_tree.nodes["albedo_tint"]
                 #print(n, n.outputs[0], n.outputs[0].default_value)
                 base_color = n.outputs[0].default_value
                 #print(base_color)
             except:
-                #print("execute - Base Color - Exception - albedo_tint not found skipping")
+                #print("execute - Base Color Factor - Exception - albedo_tint not found skipping")
                 try:
                     nodes = mat.node_tree.nodes
                     bsdfnodes = [n for n in nodes 
                             if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
                     for principled in bsdfnodes:
                         BSDF_Base_Color = principled.inputs["Base Color"].default_value
-                        #print("MSFS_OT_MigrateMaterialData execute - BSDF to MSFS base color", BSDF_Base_Color[0], mat.msfs_base_color_factor[0], BSDF_Base_Color[1], mat.msfs_base_color_factor[1], BSDF_Base_Color[2], mat.msfs_base_color_factor[2], BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
+                        #print("execute - BSDF to MSFS base color", BSDF_Base_Color[0], mat.msfs_base_color_factor[0], BSDF_Base_Color[1], mat.msfs_base_color_factor[1], BSDF_Base_Color[2], mat.msfs_base_color_factor[2], BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
                         base_color = BSDF_Base_Color
                 except:
                     #print("execute - Base Color - Exception - BSDF Base Color not found skipping")
