@@ -17,13 +17,93 @@ from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
 from ..blender.msfs_material_prop_update import MSFS_Material_Property_Update
 
+#material_type_return = []  
+
+#@staticmethod
+def get_material_types(self, context):
+    #material_type_return.clear()  
+    mat = context.active_object.active_material
+    #print("get_material_types - START", mat)
+    if mat:
+        # looks like specific to FBW is the custom property is_import
+        try:
+            #print("get_material_types - TRY")
+            # these nodes are in import blend files from FBW
+            n1_IsThere = False
+            n2_IsThere = False
+            for n in mat.node_tree.nodes:
+                #print("get_material_types - Nodes", n, n.name, n.label)
+                if n.label == "METALLIC ROUGHNESS":
+                    n1_IsThere = True
+                if n.label == "OCCLUSION":
+                    n2_IsThere = True
+            if n1_IsThere and n1_IsThere:
+                #print("get_material_types - FBW types")
+                return (("NONE", "Disabled", ""),
+                        ("msfs_standard", "MSFS Standard-FBW", ""),
+                        ("msfs_decal", "MSFS Decal-FBW", ""),
+                        ("msfs_windshield", "MSFS Windshield-FBW", ""),
+                        ("msfs_porthole", "MSFS Porthole-FBW", ""),
+                        ("msfs_glass", "MSFS Glass-FBW", ""),
+                        ("msfs_geo_decal", "MSFS Geo Decal (Frosted)-FBW", ""),
+                        ("msfs_clearcoat", "MSFS Clearcoat-FBW", ""),
+                        ("msfs_parallax", "MSFS Parallax-FBW", ""),
+                        ("msfs_anisotropic", "MSFS Anisotropic-FBW", ""),
+                        ("msfs_hair", "MSFS Hair-FBW", ""),
+                        ("msfs_sss", "MSFS SSS-FBW", ""),
+                        ("msfs_invisible", "MSFS Invisible-FBW", ""),
+                        ("msfs_fake_terrain", "MSFS Fake Terrain-FBW", ""),
+                        ("msfs_fresnel", "MSFS Fresnel-FBW", ""),
+                        ("msfs_env_occluder", "MSFS Environment Occluder-FBW", ""))
+            else:
+                #print("get_material_types - NEW types")
+                return (("NONE", "Disabled", ""),
+                          ("msfs_standard", "Standard", ""),
+                          ("msfs_geo_decal", "Decal", ""),
+                          ("msfs_geo_decal_frosted", "Geo Decal Frosted", ""),
+                          ("msfs_windshield", "Windshield", ""),
+                          ("msfs_porthole", "Porthole", ""),
+                          ("msfs_glass", "Glass", ""),
+                          ("msfs_clearcoat", "Clearcoat", ""),
+                          ("msfs_parallax", "Parallax", ""),
+                          ("msfs_anisotropic", "Anisotropic", ""),
+                          ("msfs_hair", "Hair", ""),
+                          ("msfs_sss", "Sub-surface Scattering", ""),
+                          ("msfs_invisible", "Invisible", ""),
+                          ("msfs_fake_terrain", "Fake Terrain", ""),
+                          ("msfs_fresnel_fade", "Fresnel Fade", ""),
+                          ("msfs_environment_occluder", "Environment Occluder", ""),
+                          ("msfs_ghost", "Ghost", ""))
+        except:
+            print("get_material_types - Error")
+        finally:
+            pass
+
+# whatever return newer node order.
+        return (("NONE", "Disabled", ""),
+                  ("msfs_standard", "Standard", ""),
+                  ("msfs_geo_decal", "Decal", ""),
+                  ("msfs_geo_decal_frosted", "Geo Decal Frosted", ""),
+                  ("msfs_windshield", "Windshield", ""),
+                  ("msfs_porthole", "Porthole", ""),
+                  ("msfs_glass", "Glass", ""),
+                  ("msfs_clearcoat", "Clearcoat", ""),
+                  ("msfs_parallax", "Parallax", ""),
+                  ("msfs_anisotropic", "Anisotropic", ""),
+                  ("msfs_hair", "Hair", ""),
+                  ("msfs_sss", "Sub-surface Scattering", ""),
+                  ("msfs_invisible", "Invisible", ""),
+                  ("msfs_fake_terrain", "Fake Terrain", ""),
+                  ("msfs_fresnel_fade", "Fresnel Fade", ""),
+                  ("msfs_environment_occluder", "Environment Occluder", ""),
+                  ("msfs_ghost", "Ghost", ""))
 
 class AsoboMaterialCommon:
     class Defaults:
         BaseColorFactor = [0.8, 0.8, 0.8, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
-        MetallicFactor = 0.0
-        RoughnessFactor = 0.5
+        MetallicFactor = 1.0  # changed from 0.0
+        RoughnessFactor = 1.0
         NormalScale = 1.0
         EmissiveScale = 1.0
         AlphaMode = "OPAQUE"
@@ -55,6 +135,82 @@ class AsoboMaterialCommon:
         update=MSFS_Material_Property_Update.update_msfs_material_type,
         options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
     )
+
+    bpy.types.Material.msfs_FBW_material_needs_update = bpy.props.BoolProperty(
+        name="FBW material type set and needs to be changed",
+        description="The doubleSided property specifies whether the material is double sided. When this value is false, back-face culling is enabled. When this value is true, back-face culling is disabled and double sided lighting is enabled. The back-face must have its normals reversed before the lighting equation is evaluated",
+        default=False,
+        update=MSFS_Material_Property_Update.update_FBW_material,
+        options=set(),
+    )
+
+    #back up
+    # bpy.types.Material.msfs_material_type = bpy.props.EnumProperty(
+        # name="Type",
+        # items=get_material_types,
+        # #default='NONE',
+        # update=MSFS_Material_Property_Update.update_msfs_material_type,
+        # options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
+    # )
+
+    bpy.types.Material.msfs_material_mode = bpy.props.EnumProperty(
+        name="Legacy Mode",
+        items=(
+            ("NONE", "Disabled", ""),
+            ("msfs_standard", "Standard", ""),
+            ('msfs_anisotropic', "MSFS Anisotropic", ""),
+            ('msfs_sss', "MSFS Subsurface Scattering", ""),
+            ('msfs_glass', "MSFS Glass", ""),
+            ('msfs_decal', "MSFS Decal", ""),
+            ('msfs_clearcoat', "MSFS Clearcoat", ""),
+            ('msfs_env_occluder', "MSFS Environment Occluder", ""),
+            ('msfs_fake_terrain', "MSFS Fake Terrain", ""),
+            ('msfs_fresnel', "MSFS Fresnel Fade", ""),
+            ('msfs_windshield', "MSFS Windshield", ""),
+            ('msfs_porthole', "MSFS Porthole", ""),
+            ('msfs_parallax', "MSFS Parallax", ""),
+            ('msfs_geo_decal', "MSFS Geo Decal Frosted", ""),
+            ('msfs_hair', "MSFS Hair", ""),
+            ('msfs_invisible', "MSFS Invisible", ""),
+            ('msfs_ghost', "MSFS Ghost", ""),
+        ),
+        default="NONE",
+        update=MSFS_Material_Property_Update.update_msfs_material_mode,
+        options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
+    )
+
+    bpy.types.Material.msfs_material_fbw = bpy.props.EnumProperty(
+        name="FBW Legacy Mode",
+        items=(
+            ("NONE", "Disabled", ""),
+            ("msfs_standard", "MSFS Standard-FBW", ""),
+            ("msfs_decal", "MSFS Decal-FBW", ""),
+            ("msfs_windshield", "MSFS Windshield-FBW", ""),
+            ("msfs_porthole", "MSFS Porthole-FBW", ""),
+            ("msfs_glass", "MSFS Glass-FBW", ""),
+            ("msfs_geo_decal", "MSFS Geo Decal (Frosted)-FBW", ""),
+            ("msfs_clearcoat", "MSFS Clearcoat-FBW", ""),
+            ("msfs_parallax", "MSFS Parallax-FBW", ""),
+            ("msfs_anisotropic", "MSFS Anisotropic-FBW", ""),
+            ("msfs_hair", "MSFS Hair-FBW", ""),
+            ("msfs_sss", "MSFS SSS-FBW", ""),
+            ("msfs_invisible", "MSFS Invisible-FBW", ""),
+            ("msfs_fake_terrain", "MSFS Fake Terrain-FBW", ""),
+            ("msfs_fresnel", "MSFS Fresnel-FBW", ""),
+            ("msfs_env_occluder", "MSFS Environment Occluder-FBW", ""),
+        ),
+        default="NONE",
+        update=None,
+        options=set(),  # ANIMATABLE is a default item in options, so for properties that shouldn't be animatable, we have to overwrite this.
+    )
+
+    # bpy.types.Material.is_import = bpy.props.BoolProperty(
+        # name="Is Import",
+        # description="The import bool from FBW",
+        # default=False,
+        # update=None,
+        # options=set(),
+    # )
 
     bpy.types.Material.msfs_base_color_factor = bpy.props.FloatVectorProperty(
         name="Base Color",
@@ -287,6 +443,10 @@ class AsoboMaterialCommon:
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
         # All the properties here (besides some textures, which we handle elsewhere) are exported from the Khronos exporter
+        gltf2_material.emissive_factor = [f * blender_material.msfs_emissive_scale for f in blender_material.msfs_emissive_factor]
+
+        if "KHR_materials_emissive_strength" in gltf2_material.extensions:
+            gltf2_material.extensions.pop("KHR_materials_emissive_strength")
         pass
 
 
@@ -1022,6 +1182,7 @@ class AsoboMaterialDetail:
         min=0.001,
         max=1.0,
         default=Defaults.blendThreshold,
+        update=MSFS_Material_Property_Update.update_detail_blend_threshold,
         options=set(),
     )
 
