@@ -213,7 +213,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             for obj in lod.collection.all_objects:
                                 obj.select_set(True)
                         else:
-                            select_recursive(lod.object)
+                            select_recursive(lod.objectLOD)
                         
                         if lod_group.folder_name != "":
                             exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(lod_group.folder_name), os.path.splitext(lod.file_name)[0]), ".gltf")

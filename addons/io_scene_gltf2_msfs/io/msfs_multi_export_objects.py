@@ -20,7 +20,7 @@ from .msfs_multi_export import MSFS_OT_MultiExportGLTF2
 
 
 class MultiExporterLOD(bpy.types.PropertyGroup):
-    object: bpy.props.PointerProperty(name="", type=bpy.types.Object)
+    objectLOD: bpy.props.PointerProperty(name="", type=bpy.types.Object)
     collection: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
 
     enabled: bpy.props.BoolProperty(name="", default=False)
@@ -58,8 +58,8 @@ class MSFS_LODGroupUtility:
                 return False
         else:
             if (
-                (not context.scene.multi_exporter_show_hidden_objects and lod.object.hide_get()) or 
-                (lod.object is None or lod.object not in list(bpy.context.window.view_layer.objects))
+                (not context.scene.multi_exporter_show_hidden_objects and lod.objectLOD.hide_get()) or 
+                (lod.objectLOD is None or lod.objectLOD not in list(bpy.context.window.view_layer.objects))
             ):
                 return False
 
@@ -109,8 +109,8 @@ class MSFS_OT_ReloadLODGroups(bpy.types.Operator):
                         continue
                 else:
                     if (
-                        not lod.object in list(context.scene.objects)
-                        or not MSFS_OT_ReloadLODGroups.get_group_from_name(lod.object.name) == lod_group.group_name
+                        not lod.objectLOD in list(context.scene.objects)
+                        or not MSFS_OT_ReloadLODGroups.get_group_from_name(lod.objectLOD.name) == lod_group.group_name
                     ):
                         lod_groups[i].lods.remove(j)
                         continue
@@ -151,9 +151,9 @@ class MSFS_OT_ReloadLODGroups(bpy.types.Operator):
                         lod.file_name = collection.name
             else:
                 for obj in found_lod_groups[lod_group]:
-                    if obj not in [lod.object for lod in lod_groups[lod_group_index].lods]:
+                    if obj not in [lod.objectLOD for lod in lod_groups[lod_group_index].lods]:
                         lod = lod_groups[lod_group_index].lods.add()
-                        lod.object = obj
+                        lod.objectLOD = obj
                         lod.file_name = obj.name
 
     def execute(self, context):
@@ -229,7 +229,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                             if sort_by_collection:
                                 row.prop(lod, "enabled", text=lod.collection.name)
                             else:
-                                row.prop(lod, "enabled", text=lod.object.name)
+                                row.prop(lod, "enabled", text=lod.objectLOD.name)
                             subrow = row.column()
                             subrow.prop(lod, "lod_value", text="LOD Value")
                             # subrow.prop(lod, "flatten_on_export", text="Flatten on Export") # Disable these two options for now as there's not a great way to implement them
