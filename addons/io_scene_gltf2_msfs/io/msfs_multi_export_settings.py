@@ -81,7 +81,10 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Selected Only Check - TODO : See if this works
     use_selected: bpy.props.BoolProperty(
         name="Selected Objects", 
-        description="Export selected objects only", 
+        description= (
+            "Export selected objects only. "
+            "Disabled for the use of the MultiExporter (Needs to be always checked)"
+        ), 
         default=True
     )
 
@@ -95,7 +98,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Renderable Objects Check
     use_renderable: bpy.props.BoolProperty(
         name="Renderable Objects",
-        description="Export renderable objects only",
+        description="Export renderable objects only",        
         default=False,
     )
 
@@ -129,8 +132,10 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Punctual Lights Check
     export_lights: bpy.props.BoolProperty(
         name="Punctual Lights",
-        description="Export directional, point, and spot lights. "
-        'Uses "KHR_lights_punctual" glTF extension',
+        description= (
+            "Export directional, point, and spot lights. "
+            "Uses 'KHR_lights_punctual' glTF extension"
+        ),
         default=False,
     )
         
@@ -336,7 +341,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_force_sampling: bpy.props.BoolProperty(
         name="Always Sample Animations",
         description="Apply sampling to all animations",
-        default=True,
+        default=False,
     )
 
     ## Group by NLA Track Check
@@ -512,17 +517,19 @@ class MSFS_PT_export_include(bpy.types.Panel):
 
         settings = context.scene.msfs_multi_exporter_settings
 
-        col = layout.column(heading="Limit to", align=True)
-        col.prop(settings, "use_selected")
-        col.prop(settings, "use_visible")
-        col.prop(settings, "use_renderable")
-        col.prop(settings, "use_active_collection")
-        col.prop(settings, "use_active_scene")
+        col1 = layout.column(heading="", align=True)
+        col1.prop(settings, "use_selected") ## To use the MultiExporter panel, it's important to have use selected to True
+        col1.enabled = False
+        col2 = layout.column(heading="Limit to", align=True)
+        col2.prop(settings, "use_visible")
+        col2.prop(settings, "use_renderable")
+        col2.prop(settings, "use_active_collection")
+        col2.prop(settings, "use_active_scene")
 
-        col = layout.column(heading="Data", align=True)
-        col.prop(settings, "export_extras")
-        col.prop(settings, "export_cameras")
-        col.prop(settings, "export_lights")
+        col2 = layout.column(heading="Data", align=True)
+        col2.prop(settings, "export_extras")
+        col2.prop(settings, "export_cameras")
+        col2.prop(settings, "export_lights")
  
  
 class MSFS_PT_export_transform(bpy.types.Panel):
@@ -669,7 +676,10 @@ class MSFS_PT_export_animation_export(bpy.types.Panel):
         if settings.export_nla_strips is False:
             layout.prop(settings, 'export_nla_strips_merged_animation_name')
         layout.prop(settings, "optimize_animation_size")
-        layout.prop(settings, "export_all_armature_actions")
+        if (bpy.app.version > (3, 3, 0)):
+            layout.prop(settings, "export_all_armature_actions")
+        else:
+            layout.prop(settings, 'export_def_bones')
 
 
 class MSFS_PT_export_animation_shapekeys(bpy.types.Panel):
@@ -727,11 +737,13 @@ class MSFS_PT_export_animation_skinning(bpy.types.Panel):
         layout.active = settings.export_skins
         layout.prop(settings, "export_all_influences")
 
-        row = layout.row()
-        row.active = settings.export_force_sampling
-        row.prop(settings, 'export_def_bones')
-        if settings.export_force_sampling is False and settings.export_def_bones is True:
-            layout.label(text="Export only deformation bones is not possible when not sampling animation")
+        if bpy.app.version > (3, 3, 0):
+            row = layout.row()
+            row.prop(settings, 'export_def_bones')
+            row.active = settings.export_force_sampling
+            if settings.export_force_sampling is False and settings.export_def_bones is True:
+                layout.label(text="Export only deformation bones is not possible when not sampling animation")
+        
 
 
 def register():

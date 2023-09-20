@@ -69,7 +69,6 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_frame_step=settings.export_frame_step,
                     export_force_sampling=settings.export_force_sampling,
                     export_nla_strips=settings.export_nla_strips,
-                    export_nla_strips_merged_animation_name=settings.export_nla_strips_merged_animation_name,
                     export_def_bones=settings.export_def_bones,
                     export_current_frame=settings.export_current_frame,
                     export_skins=settings.export_skins,
@@ -214,7 +213,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             for obj in lod.collection.all_objects:
                                 obj.select_set(True)
                         else:
-                            select_recursive(lod.object)
+                            select_recursive(lod.objectLOD)
                         
                         if lod_group.folder_name != "":
                             exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(lod_group.folder_name), os.path.splitext(lod.file_name)[0]), ".gltf")

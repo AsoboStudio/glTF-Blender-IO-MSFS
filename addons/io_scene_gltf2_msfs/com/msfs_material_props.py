@@ -22,8 +22,8 @@ class AsoboMaterialCommon:
     class Defaults:
         BaseColorFactor = [0.8, 0.8, 0.8, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
-        MetallicFactor = 0.0
-        RoughnessFactor = 0.5
+        MetallicFactor = 1.0
+        RoughnessFactor = 1.0
         NormalScale = 1.0
         EmissiveScale = 1.0
         AlphaMode = "OPAQUE"
@@ -287,6 +287,10 @@ class AsoboMaterialCommon:
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
         # All the properties here (besides some textures, which we handle elsewhere) are exported from the Khronos exporter
+        gltf2_material.emissive_factor = [f * blender_material.msfs_emissive_scale for f in blender_material.msfs_emissive_factor]
+
+        if "KHR_materials_emissive_strength" in gltf2_material.extensions:
+            gltf2_material.extensions.pop("KHR_materials_emissive_strength")
         pass
 
 
@@ -759,21 +763,14 @@ class AsoboMaterialUVOptions:
     SerializedName = "ASOBO_material_UV_options"
 
     class Defaults:
-        AOUseUV2 = False
         clampUVX = False
         clampUVY = False
-        clampUVZ = False
         UVOffsetU = 0.0
         UVOffsetV = 0.0
         UVTilingU = 1.0
         UVTilingV = 1.0
         UVRotation = 0.0
 
-    bpy.types.Material.msfs_ao_use_uv2 = bpy.props.BoolProperty(
-        name="AO Use UV2",
-        default=Defaults.AOUseUV2,
-        options=set(),
-    )
 
     bpy.types.Material.msfs_clamp_uv_x = bpy.props.BoolProperty(
         name="Clamp UV U",
@@ -784,12 +781,6 @@ class AsoboMaterialUVOptions:
     bpy.types.Material.msfs_clamp_uv_y = bpy.props.BoolProperty(
         name="Clamp UV V",
         default=Defaults.clampUVY,
-        options=set(),
-    )
-
-    bpy.types.Material.msfs_clamp_uv_z = bpy.props.BoolProperty(  # Doesn't seem to actually be used, which makes sense. Keeping just in case
-        name="Clamp UV Z",
-        default=Defaults.clampUVZ,
         options=set(),
     )
 
@@ -844,13 +835,11 @@ class AsoboMaterialUVOptions:
         if extension is None:
             return
 
-        if extension.get("AOUseUV2"):
-            blender_material.msfs_ao_use_uv2 = extension.get("AOUseUV2")
         if extension.get("clampUVX"):
             blender_material.msfs_clamp_uv_x = extension.get("clampUVX")
         if extension.get("clampUVY"):
             blender_material.msfs_clamp_uv_y = extension.get("clampUVY")
-        if extension.get("clampUVZ"):
+        if extension.get("clampUVZ"): # Deprecated
             blender_material.msfs_clamp_uv_z = extension.get("clampUVZ")
         if extension.get("UVOffsetU"):
             blender_material.msfs_uv_offset_u = extension.get("UVOffsetU")
@@ -867,10 +856,8 @@ class AsoboMaterialUVOptions:
     def to_extension(blender_material, gltf2_material, export_settings):
         result = {}
         if (
-            (blender_material.msfs_ao_use_uv2
-            or blender_material.msfs_clamp_uv_x
+            (blender_material.msfs_clamp_uv_x
             or blender_material.msfs_clamp_uv_y
-            or blender_material.msfs_clamp_uv_z
             or (
                 blender_material.msfs_uv_offset_u != AsoboMaterialUVOptions.Defaults.UVOffsetU
                 or blender_material.msfs_uv_offset_v != AsoboMaterialUVOptions.Defaults.UVOffsetV
@@ -883,10 +870,8 @@ class AsoboMaterialUVOptions:
             and blender_material.msfs_material_type != "msfs_invisible" 
             and blender_material.msfs_material_type != "msfs_environment_occluder"
         ):
-            result["AOUseUV2"] = blender_material.msfs_ao_use_uv2
             result["clampUVX"] = blender_material.msfs_clamp_uv_x
             result["clampUVY"] = blender_material.msfs_clamp_uv_y
-            result["clampUVZ"] = blender_material.msfs_clamp_uv_z
             result["UVOffsetU"] = blender_material.msfs_uv_offset_u
             result["UVOffsetV"] = blender_material.msfs_uv_offset_v
             result["UVTilingU"] = blender_material.msfs_uv_tiling_u

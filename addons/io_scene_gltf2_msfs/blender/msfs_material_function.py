@@ -163,7 +163,7 @@ class MSFS_Material:
         )
         
         ## Comp Texture
-        # Out[0] : Blend Comp Occlusion Metalic Roughness -> In[1]
+        # Out[0] : Blend Comp Occlusion Metallic Roughness -> In[1]
         compTexNode = self.addNode(
             name = MSFS_ShaderNodes.compTex.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeTexImage.value,
@@ -508,20 +508,6 @@ class MSFS_Material:
         ## Links
         self.link(splitOccMetalRoughNode.inputs[0], blendCompMapNode.outputs[0])
         
-        ## Occlusion Multiplier
-        # In[1] : Split Occ Metal Rough -> Out[0]
-        occlusionMulNode = self.addNode(
-            name = MSFS_ShaderNodes.occlusionMul.value,
-            typeNode = MSFS_ShaderNodesTypes.shaderNodeMath.value,
-            operation = "MULTIPLY",
-            location = (500.0, 200.0),
-            width = 200.0,
-            frame = omrFrame
-        )
-        occlusionMulNode.inputs[0].default_value = 1.0
-        ## Links
-        self.link(occlusionMulNode.inputs[1], splitOccMetalRoughNode.outputs[0])
-        
         ## Roughness Multiplier
         # In[1] : Split Occ Metal Rough -> Out[1]
         roughnessMulNode = self.addNode(
@@ -601,12 +587,24 @@ class MSFS_Material:
             color = (0.5, 0.25, 0.25)
         )
         
+        ## Normal scale
+        # Out[0] : Normap Map Sampler -> In[0]
+        normalScaleNode = self.addNode(
+            name = MSFS_ShaderNodes.normalScale.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeValue.value,
+            location = (-300.0, -350.0),
+            frame = normalFrame
+        )
+
+        normalScaleNode.outputs[0].default_value = 1.0
+
         # Fix the normal view by reversing the green channel
         # since blender can only render openGL normal textures
         RGBCurvesNode = self.addNode(
             name = MSFS_ShaderNodes.RGBCurves.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeRGBCurve.value,
-            location = (-300.0, -400.0)
+            location = (-300.0, -400.0),
+            frame = normalFrame
         )
         curveMapping = RGBCurvesNode.mapping.curves[1]
         curveMapping.points[0].location = (0.0, 1.0)
@@ -623,6 +621,7 @@ class MSFS_Material:
         )
         
         # Links
+        self.link(normalMapSamplerNode.inputs[0], normalScaleNode.outputs[0])
         self.link(normalMapSamplerNode.inputs[1], normalTexNode.outputs[0])
         
         ## Detail Normal Map Sampler
@@ -754,8 +753,8 @@ class MSFS_Material:
         self.updateEmissiveLinks()
 
     def setNormalScale(self, scale):
-        nodeNormalMapSampler = self.getNodeByName(MSFS_ShaderNodes.normalMapSampler.value)
-        nodeNormalMapSampler.inputs[0].default_value = scale
+        nodeNormalScale = self.getNodeByName(MSFS_ShaderNodes.normalScale.value)
+        nodeNormalScale.outputs[0].default_value = scale
         self.updateNormalLinks()
 
     def setDetailNormalTex(self, tex):
@@ -845,7 +844,7 @@ class MSFS_Material:
         nodeDetailNormalScale = self.getNodeByName(MSFS_ShaderNodes.detailNormalScale.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
-        # normal
+        # Normal
         self.link(nodeNormalTex.outputs[0], nodeRGBCurves.inputs[1])
         self.link(nodeRGBCurves.outputs[0], nodeNormalMapSampler.inputs[1])
         self.link(nodeNormalMapSampler.outputs[0], nodeBlendNormalMap.inputs[1])
@@ -855,10 +854,8 @@ class MSFS_Material:
 
         if nodeNormalTex.image and not nodeDetailNormalTex.image:
             self.link(nodeNormalMapSampler.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
-
         elif nodeNormalTex.image and nodeDetailNormalTex.image:
             self.link(nodeBlendNormalMap.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
-
         else:
             self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.normal.value)
 
@@ -867,7 +864,6 @@ class MSFS_Material:
         nodeEmissiveScale = self.getNodeByName(MSFS_ShaderNodes.emissiveScale.value)
         nodeEmissiveColor = self.getNodeByName(MSFS_ShaderNodes.emissiveColor.value)
         nodeMulEmissive = self.getNodeByName(MSFS_ShaderNodes.emissiveMul.value)
-        # nodeMulEmissiveScale = self.getNodeByName(MSFS_ShaderNodes.emissiveMulScale.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
         # emissive
@@ -889,7 +885,6 @@ class MSFS_Material:
         nodeSeparateComp = self.getNodeByName(MSFS_ShaderNodes.compSeparate.value)
         nodeMulMetallic = self.getNodeByName(MSFS_ShaderNodes.metallicMul.value)
         nodeMulRoughness = self.getNodeByName(MSFS_ShaderNodes.roughnessMul.value)
-        nodeMulOcclusion = self.getNodeByName(MSFS_ShaderNodes.occlusionMul.value)
         nodeGltfSettings = self.getNodeByName(MSFS_ShaderNodes.glTFSettings.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
@@ -902,7 +897,6 @@ class MSFS_Material:
         self.link(nodeBlendCompMap.outputs[0], nodeSeparateComp.inputs[0])
         self.link(nodeMetallicScale.outputs[0], nodeMulMetallic.inputs[0])
         self.link(nodeRoughnessScale.outputs[0], nodeMulRoughness.inputs[0])
-        self.link(nodeSeparateComp.outputs[0], nodeMulOcclusion.inputs[1])
         self.link(nodeSeparateComp.outputs[1], nodeMulRoughness.inputs[1])
         self.link(nodeSeparateComp.outputs[2], nodeMulMetallic.inputs[1])
 
@@ -910,22 +904,18 @@ class MSFS_Material:
             self.link(nodeRoughnessScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMetallicScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
-        elif nodeCompTex.image and not nodeDetailCompTex.image:
-            nodeBlendCompMap.blend_type = "ADD"
-            self.link(nodeRoughnessScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
-            self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
-
-        elif not nodeCompTex.image and nodeDetailCompTex.image:
-            nodeBlendCompMap.blend_type = "ADD"
-            self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
-            self.link(nodeMetallicScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
-
-        else:
-            nodeBlendCompMap.blend_type = "MULTIPLY"
+            self.unLinkNodeInput(nodeGltfSettings, 0)
+        else: # nodeCompTex.image or nodeDetailCompTex.image (if we have both images or only one of them)
+            self.link(nodeSeparateComp.outputs[0], nodeGltfSettings.inputs[0])
             self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
-        self.link(nodeMulOcclusion.outputs[0], nodeGltfSettings.inputs[0])
+            if nodeCompTex.image and nodeDetailCompTex.image:
+                nodeBlendCompMap.blend_type = "MULTIPLY"
+            else: # we have only one of the two images
+                nodeBlendCompMap.blend_type = "ADD"
+
+
 
     def setBlendMode(self, blendMode):
         if blendMode == "BLEND":
