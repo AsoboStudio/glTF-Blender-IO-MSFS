@@ -409,7 +409,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     bl_idname = "msfs.migrate_material_data"
     bl_label = "Migrate Material Data"
 
-# old order matters as the really old legacy checked first can be overridden by new legacy
+    # old order matters as the really old legacy checked first can be overridden by new legacy
     old_property_to_new_mapping = {
         "msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
         "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
@@ -469,7 +469,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                     return True
         return False
 
-
     def execute(self, context):
         mat = context.active_object.active_material
         # ToDo: FBW msfs_material_type mapping
@@ -496,7 +495,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         print("execute - make change to property - old new DONE")
         # Base Color is a special case - can only have 3 values, we need 4
         base_color = [1,1,1,1]
-        # find alpha
         alpha = 1
         if mat.get("msfs_color_alpha_mix"):
             alpha = mat.get("msfs_color_alpha_mix")
@@ -591,7 +589,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
         # Do our enums manually as only their index of the value are stored - not the string
         if mat.get("msfs_blend_mode"):
-            print("execute - msfs_blend_mode migrate check", mat.get("msfs_blend_mode"))
             old_alpha_order = [
                 "OPAQUE",
                 "MASK",  # Changed from old version - matches new name
@@ -604,9 +601,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
         # ToDo: could be FBW order - need to determine
         # FBW importer has a custom Property of is_import
-        print("mode, fbw, type", mat.get("msfs_material_mode"), mat.get("msfs_material_fbw"), mat.get("msfs_material_type"), Is_thereFBW_material)
         if mat.get("msfs_material_mode"):
-            print("execute - Using Legacy material", mat["msfs_material_mode"])
             old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
                 "NONE",
                 "msfs_standard",
@@ -634,92 +629,9 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                     del mat["msfs_material_fbw"]
             except:
                 pass
-        # elif Is_thereFBW_material:
-            # print("execute - Using FBW material", mat["msfs_material_fbw"])
-            # old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
-                # "NONE",
-                # "msfs_standard",
-                # "msfs_decal",
-                # "msfs_geo_decal",
-                # "msfs_windshield",
-                # "msfs_porthole",  
-                # "msfs_glass",
-                # "msfs_clearcoat",  
-                # "msfs_parallax",
-                # "msfs_anisotropic",  
-                # "msfs_hair",
-                # "msfs_sss",
-                # "msfs_invisible",
-                # "msfs_fake_terrain",  
-                # "msfs_fresnel",
-                # "msfs_env_occluder",
-            # ]
-            # mat.msfs_material_type = old_material_older[mat["msfs_material_fbw"]]
-            # del mat["msfs_material_mode"]
 
-            # ASOBO
-            # ("NONE", "Disabled", ""),
-            # ("msfs_standard", "Standard", ""),
-            # ("msfs_geo_decal", "Decal", ""),
-            # ("msfs_geo_decal_frosted", "Geo Decal Frosted", ""),
-            # ("msfs_windshield", "Windshield", ""),
-            # ("msfs_porthole", "Porthole", ""),
-            # ("msfs_glass", "Glass", ""),
-            # ("msfs_clearcoat", "Clearcoat", ""),
-            # ("msfs_parallax", "Parallax", ""),
-            # ("msfs_anisotropic", "Anisotropic", ""),
-            # ("msfs_hair", "Hair", ""),
-            # ("msfs_sss", "Sub-surface Scattering", ""),
-            # ("msfs_invisible", "Invisible", ""),
-            # ("msfs_fake_terrain", "Fake Terrain", ""),
-            # ("msfs_fresnel_fade", "Fresnel Fade", ""),
-            # ("msfs_environment_occluder", "Environment Occluder", ""),
-            # ("msfs_ghost", "Ghost", ""),
-
-            # FBW
-            # ("NONE", "Disabled", ""),
-            # ("msfs_standard", "MSFS Standard-FBW", ""),
-            # ("msfs_decal", "MSFS Decal-FBW", ""),
-            # ("msfs_windshield", "MSFS Windshield-FBW", ""),
-            # ("msfs_porthole", "MSFS Porthole-FBW", ""),
-            # ("msfs_glass", "MSFS Glass-FBW", ""),
-            # ("msfs_geo_decal", "MSFS Geo Decal (Frosted)-FBW", ""),
-            # ("msfs_clearcoat", "MSFS Clearcoat-FBW", ""),
-            # ("msfs_parallax", "MSFS Parallax-FBW", ""),
-            # ("msfs_anisotropic", "MSFS Anisotropic-FBW", ""),
-            # ("msfs_hair", "MSFS Hair-FBW", ""),
-            # ("msfs_sss", "MSFS SSS-FBW", ""),
-            # ("msfs_invisible", "MSFS Invisible-FBW", ""),
-            # ("msfs_fake_terrain", "MSFS Fake Terrain-FBW", ""),
-            # ("msfs_fresnel", "MSFS Fresnel-FBW", ""),
-            # ("msfs_env_occluder", "MSFS Environment Occluder-FBW", ""),
-
-            # Legacy
-            # ("NONE", "Disabled", ""),
-            # ("msfs_standard", "Standard", ""),
-            # ('msfs_anisotropic', "MSFS Anisotropic", ""),
-            # ('msfs_sss', "MSFS Subsurface Scattering", ""),
-            # ('msfs_glass', "MSFS Glass", ""),
-            # ('msfs_decal', "MSFS Decal", ""),
-            # ('msfs_clearcoat', "MSFS Clearcoat", ""),
-            # ('msfs_env_occluder', "MSFS Environment Occluder", ""),
-            # ('msfs_fake_terrain', "MSFS Fake Terrain", ""),
-            # ('msfs_fresnel', "MSFS Fresnel Fade", ""),
-            # ('msfs_windshield', "MSFS Windshield", ""),
-            # ('msfs_porthole', "MSFS Porthole", ""),
-            # ('msfs_parallax', "MSFS Parallax", ""),
-            # ('msfs_geo_decal', "MSFS Geo Decal Frosted", ""),
-            # ('msfs_hair', "MSFS Hair", ""),
-            # ('msfs_invisible', "MSFS Invisible", ""),
-            # ('msfs_ghost', "MSFS Ghost", ""),
-
-
-        print("Migrate material - Update Other properties", mat)
         MSFS_Material_Property_Update.update_msfs_material_type(mat, context)
 
-        # after generation of nodes may need to check base color and emissive
-
-        print("Migrate material - Done")
         return {"FINISHED"}
 
 
@@ -767,7 +679,6 @@ class MSFS_PT_Material(bpy.types.Panel):
 
             if MSFS_OT_MigrateMaterialData.old_properties_present(mat):
                 layout.operator(MSFS_OT_MigrateMaterialData.bl_idname)
-            #print(mat.msfs_material_fbw)
             self.draw_prop(layout, mat, "msfs_material_type", enabled=mat.msfs_material_fbw == "NONE")
 
             if mat.msfs_material_mode != "NONE":

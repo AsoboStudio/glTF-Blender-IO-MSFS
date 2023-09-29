@@ -50,8 +50,9 @@ class MSFS_Clearcoat(MSFS_Material):
             name = MSFS_ShaderNodes.clearcoatSeparate.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value if bpy.app.version < (3, 3, 0) else MSFS_ShaderNodesTypes.shaderNodeSeparateRGB.value,
             location = (-800.0, -500.0),
-            frame = clearcoatFrame)
-        # Links
+            frame = clearcoatFrame
+        )
+
         self.link(clearcoatTexNode.outputs[0], clearcoatSeparateNode.inputs[0])
 
     def setClearcoatDirtTexture(self, tex):
