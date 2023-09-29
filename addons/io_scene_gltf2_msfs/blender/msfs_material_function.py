@@ -181,7 +181,7 @@ class MSFS_Material:
         )
         
         ## Comp Texture
-        # Out[0] : Blend Comp Occlusion Metalic Roughness -> In[1]
+        # Out[0] : Blend Comp Occlusion Metallic Roughness -> In[1]
         compTexNode = self.addNode(
             name = MSFS_ShaderNodes.compTex.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeTexImage.value,
@@ -283,10 +283,9 @@ class MSFS_Material:
         blendColorMapNode.inputs[self.inputs0].default_value = 1.0
         
         # links
-        # switched inputs as 2 is main and 1 is background textures according to blender docs - https://docs.blender.org/manual/en/3.3/render/shader_nodes/color/mix.html
         self.link(blendColorMapNode.inputs[self.inputs0], vertexColorNode.outputs[1])
-        self.link(blendColorMapNode.inputs[self.inputs1], baseColorTexNode.outputs[0]) # !switched stays
-        self.link(blendColorMapNode.inputs[self.inputs2], detailColorTexNode.outputs[0]) # !switched see below
+        self.link(blendColorMapNode.inputs[self.inputs1], baseColorTexNode.outputs[0])
+        self.link(blendColorMapNode.inputs[self.inputs2], detailColorTexNode.outputs[0])
 
         ## Base color RGB
         # Out[0] : Base Color Multiplier -> In[0]
@@ -311,7 +310,7 @@ class MSFS_Material:
         baseColorANode.outputs[0].default_value = 1
         
         ## Base Color Multiplier
-        # In[0] : Vertex Color -> Out[1]    I disagree with this input assumes all vertex alpha's at 1.0   ********************************************
+        # In[0] : Vertex Color -> Out[1]
         # In[1] : Base Color RGB
         # In[2] : Blend Color Map
         if(bpy.app.version < (3, 4, 0)):
@@ -335,15 +334,10 @@ class MSFS_Material:
             )
         
         ## Links
-        #self.link(mulBaseColorRGBNode.inputs[self.inputs0], vertexColorNode.outputs[1])
         mulBaseColorRGBNode.inputs[0].default_value = 1.0 # added by ron
         print("Vertex color and alpha values", vertexColorNode.outputs[0].default_value[0], vertexColorNode.outputs[0].default_value[1], vertexColorNode.outputs[0].default_value[2], vertexColorNode.outputs[0].default_value[3], vertexColorNode.outputs[1].default_value)
-        # Ron - switched inputs as 2 is main and 1 is background textures according to blender docs - https://docs.blender.org/manual/en/3.3/render/shader_nodes/color/mix.html
-        self.link(mulBaseColorRGBNode.inputs[self.inputs1], baseColorRGBNode.outputs[0]) # !switched
-        #self.link(blendColorMapNode.inputs[self.inputs2], baseColorRGBNode.outputs[0]) # switched
-        #self.link(mulBaseColorRGBNode.inputs[self.inputs2], blendColorMapNode.outputs[0]) # !switched
-        self.link(mulBaseColorRGBNode.inputs[self.inputs1], blendColorMapNode.outputs[0]) # switched
-        #self.link(mulBaseColorRGBNode.inputs[self.inputs2], detailColorTexNode.outputs[0]) # switched
+        self.link(mulBaseColorRGBNode.inputs[self.inputs1], baseColorRGBNode.outputs[0])
+        self.link(mulBaseColorRGBNode.inputs[self.inputs1], blendColorMapNode.outputs[0])
         
         ## Blend Alpha Map (Detail alpha operator)
         # In[0] : Alpha Base Color Texture
@@ -351,7 +345,6 @@ class MSFS_Material:
         blendAlphaMapNode = self.addNode(
             name = MSFS_ShaderNodes.blendAlphaMap.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeMath.value,
-            #blend_type = "MULTIPLY", # ron - was was default ADD
             location = (50.0, 400.0),
             width = 200.0,
             frame = baseColorFrame
@@ -539,8 +532,8 @@ class MSFS_Material:
         
         ## Links
         self.link(blendCompMapNode.inputs[self.inputs0], vertexColorNode.outputs[1])
-        self.link(blendCompMapNode.inputs[self.inputs1], compTexNode.outputs[0]) # !switched
-        self.link(blendCompMapNode.inputs[self.inputs2], detailCompTexNode.outputs[0]) # !switched
+        self.link(blendCompMapNode.inputs[self.inputs1], compTexNode.outputs[0])
+        self.link(blendCompMapNode.inputs[self.inputs2], detailCompTexNode.outputs[0])
 
         ## Split Occlusion Metallic Roughness
         # In[0] : Blend Comp Map -> Out[0]
@@ -656,6 +649,17 @@ class MSFS_Material:
             color = (0.5, 0.25, 0.25)
         )
         
+        ## Normal scale
+        # Out[0] : Normap Map Sampler -> In[0]
+        normalScaleNode = self.addNode(
+            name = MSFS_ShaderNodes.normalScale.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeValue.value,
+            location = (-300.0, -350.0),
+            frame = normalFrame
+        )
+
+        normalScaleNode.outputs[0].default_value = 1.0
+
         # Fix the normal view by reversing the green channel
         # since blender can only render openGL normal textures
         RGBCurvesNode = self.addNode(
@@ -679,6 +683,7 @@ class MSFS_Material:
         )
         
         # Links
+        self.link(normalMapSamplerNode.inputs[0], normalScaleNode.outputs[0])
         self.link(normalMapSamplerNode.inputs[1], normalTexNode.outputs[0])
         
         ## Detail Normal Map Sampler
@@ -729,8 +734,8 @@ class MSFS_Material:
         
         # Links
         self.link(blendNormalMapNode.inputs[self.inputs0], vertexColorNode.outputs[1])
-        self.link(blendNormalMapNode.inputs[self.inputs1], normalMapSamplerNode.outputs[0]) # !switched
-        self.link(blendNormalMapNode.inputs[self.inputs2], detailNormalMapSamplerNode.outputs[0]) # !switched
+        self.link(blendNormalMapNode.inputs[self.inputs1], normalMapSamplerNode.outputs[0])
+        self.link(blendNormalMapNode.inputs[self.inputs2], detailNormalMapSamplerNode.outputs[0])
         
         ## Update links
         self.toggleVertexBlendMapMask(self.material.msfs_blend_mask_texture is None)
@@ -825,8 +830,8 @@ class MSFS_Material:
             self.updateEmissiveLinks()
 
     def setNormalScale(self, scale):
-        nodeNormalMapSampler = self.getNodeByName(MSFS_ShaderNodes.normalMapSampler.value)
-        nodeNormalMapSampler.inputs[0].default_value = scale
+        nodeNormalScale = self.getNodeByName(MSFS_ShaderNodes.normalScale.value)
+        nodeNormalScale.outputs[0].default_value = scale
         self.updateNormalLinks()
 
     def setDetailNormalTex(self, tex):
@@ -878,33 +883,26 @@ class MSFS_Material:
 
         # !!!! input index orders matters for the exporter here
         # textures according to blender docs - https://docs.blender.org/manual/en/3.3/render/shader_nodes/color/mix.html
-        self.link(nodeBaseColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs1]) # !switched
-        self.link(nodeDetailColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs2]) # !switched
-        #self.link(nodeDetailColorTex.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs2]) # switched
-        self.link(nodeBlendColorMap.outputs[self.outputs0], nodeMulBaseColorRGB.inputs[self.inputs2]) # !switched
-        #self.link(nodeBlendColorMap.outputs[self.outputs0], nodeMulBaseColorRGB.inputs[self.inputs1]) # switched
-        self.link(nodeBaseColorTex.outputs[1], nodeBlendAlphaMap.inputs[0]) # !switched - stays same - alpha
-        self.link(nodeDetailColorTex.outputs[1], nodeBlendAlphaMap.inputs[1]) # !switched - stays same - alpha
-        self.link(nodeBaseColorA.outputs[0], nodeMulBaseColorA.inputs[1]) # !switched - stays same - alpha
-        self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs1]) # !switched
-        #self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs2]) # switched
+        self.link(nodeBaseColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs1])
+        self.link(nodeDetailColorTex.outputs[0], nodeBlendColorMap.inputs[self.inputs2])
+        self.link(nodeBlendColorMap.outputs[self.outputs0], nodeMulBaseColorRGB.inputs[self.inputs2]
+        self.link(nodeBaseColorTex.outputs[1], nodeBlendAlphaMap.inputs[0])
+        self.link(nodeDetailColorTex.outputs[1], nodeBlendAlphaMap.inputs[1])
+        self.link(nodeBaseColorA.outputs[0], nodeMulBaseColorA.inputs[1])
+        self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs1])
 
         if not nodeBaseColorTex.image and not nodeDetailColorTex.image:
-            #nodeBlendColorMap.blend_type = "MULTIPLY"
-            #nodeMulBaseColorRGB.blend_type = "MULTIPLY"
             self.link(nodeBaseColorRGB.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
 
         elif nodeBaseColorTex.image and not nodeDetailColorTex.image:
             nodeBlendColorMap.blend_type = "ADD"
-            #nodeMulBaseColorRGB.blend_type = "ADD"
             self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorTex.outputs[1], nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
 
         elif not nodeBaseColorTex.image and nodeDetailColorTex.image:
             nodeBlendColorMap.blend_type = "ADD"
-            #nodeMulBaseColorRGB.blend_type = "ADD"
             self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeDetailColorTex.outputs[1],nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
@@ -925,7 +923,7 @@ class MSFS_Material:
         nodeDetailNormalScale = self.getNodeByName(MSFS_ShaderNodes.detailNormalScale.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
-        # normal
+        # Normal
         self.link(nodeNormalTex.outputs[0], nodeRGBCurves.inputs[1])
         self.link(nodeRGBCurves.outputs[0], nodeNormalMapSampler.inputs[1])
         self.link(nodeNormalMapSampler.outputs[0], nodeBlendNormalMap.inputs[1])
@@ -935,10 +933,8 @@ class MSFS_Material:
 
         if nodeNormalTex.image and not nodeDetailNormalTex.image:
             self.link(nodeNormalMapSampler.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
-
         elif nodeNormalTex.image and nodeDetailNormalTex.image:
             self.link(nodeBlendNormalMap.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
-
         else:
             self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.normal.value)
 
@@ -947,7 +943,6 @@ class MSFS_Material:
         nodeEmissiveScale = self.getNodeByName(MSFS_ShaderNodes.emissiveScale.value)
         nodeEmissiveColor = self.getNodeByName(MSFS_ShaderNodes.emissiveColor.value)
         nodeMulEmissive = self.getNodeByName(MSFS_ShaderNodes.emissiveMul.value)
-        # nodeMulEmissiveScale = self.getNodeByName(MSFS_ShaderNodes.emissiveMulScale.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
         # emissive
@@ -987,6 +982,8 @@ class MSFS_Material:
         if not nodeCompTex.image and not nodeDetailCompTex.image:
             self.link(nodeRoughnessScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMetallicScale.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
+
+            self.unLinkNodeInput(nodeGltfSettings, 0)
         else: # nodeCompTex.image or nodeDetailCompTex.image (if we have both images or only one of them)
             self.link(nodeSeparateComp.outputs[0], nodeGltfSettings.inputs[0])
             self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
@@ -1067,7 +1064,6 @@ class MSFS_Material:
     def getNodeByName(self, nodename):
         if self.node_tree.nodes.find(nodename) > -1:
             return self.node_tree.nodes[nodename]
-        print("Did not find ", nodename)
         return None
 
     def getNodesByClassName(self, className):

@@ -27,7 +27,6 @@ class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):
         if self.properties.enabled == True:
-            print("gather_asset_hook - Start", gltf2_asset.extensions)
             if gltf2_asset.extensions is None:
                 gltf2_asset.extensions = {}
             gltf2_asset.extensions["ASOBO_normal_map_convention"] = self.Extension(
@@ -63,9 +62,7 @@ class Export:
 
     def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
         if self.properties.enabled:
-            print("gather_gltf_extensions_hook", gltf2_plan.images)
             for i, image in enumerate(gltf2_plan.images):
-                print("gather_gltf_extensions_hook", i, image)
                 image.uri = os.path.basename(urllib.parse.unquote(image.uri))
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
