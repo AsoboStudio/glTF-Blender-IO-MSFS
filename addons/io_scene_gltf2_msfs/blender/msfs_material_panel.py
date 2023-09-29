@@ -16,6 +16,9 @@ import bpy
 
 from .msfs_material_prop_update import MSFS_Material_Property_Update
 from bpy.types import Material
+from .material.utils.msfs_material_enum import (MSFS_MixNodeInputs,
+                                                MSFS_MixNodeOutputs,
+                                                MSFS_BSDFNodeInputs)
 
 def equality_check(arr1, arr2, size1, size2):
    if (size1 != size2):
@@ -54,6 +57,21 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
     @staticmethod
     def old_material_values_diff(mat):
         #print("Called")
+        index1 = 1
+        index_B4 = 1 # index for Blender v4
+        if(bpy.app.version < (3, 4, 0)):
+            index1 = 0
+        if(bpy.app.version < (4, 0, 0)):
+            index_B4 = 0
+
+        outputs0 = MSFS_MixNodeOutputs.outputs[index1][0]
+        inputs0 = MSFS_MixNodeInputs.inputs[index1][0]
+        inputs1 = MSFS_MixNodeInputs.inputs[index1][1]
+        inputs2 = MSFS_MixNodeInputs.inputs[index1][2]
+        bsdfinputs6 = MSFS_BSDFNodeInputs.inputs[index_B4][0]
+        bsdfinputs9 = MSFS_BSDFNodeInputs.inputs[index_B4][1]
+        bsdfinputs20 = MSFS_BSDFNodeInputs.inputs[index_B4][2]
+        bsdfinputs21 = MSFS_BSDFNodeInputs.inputs[index_B4][3]
 
         # To Do: check if new material type and Base Color and Base Color A nodes present then just assume good
         try:
@@ -129,9 +147,9 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                             #print("old_albedo_tint_color_diff - diff BSDF to albedo tint color", found_diff, BSDF_Base_Color[0], albedo_tint_checkval[0], BSDF_Base_Color[1], albedo_tint_checkval[1], BSDF_Base_Color[2], albedo_tint_checkval[2], BSDF_Base_Color[3], albedo_tint_checkval[3])
                             if not equality_check(BSDF_Base_Color, albedo_tint_checkval, len(BSDF_Base_Color), len(albedo_tint_checkval)):
                                 found_diff = True
-                            #print("old_albedo_tint_color_diff - diff now alphas", found_diff, principled.inputs[21].default_value, temp_alpha, mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3])
+                            #print("old_albedo_tint_color_diff - diff now alphas", found_diff, principled.inputs[bsdfinputs21].default_value, temp_alpha, mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3])
                             # check the alphas - if an input to alpha then use node alpha - if no inputs use BSDF alpha - won't get here if no albedo_tint
-                            if not principled.inputs[0].links and not principled.inputs[21].links and principled.inputs[21].default_value != temp_alpha:
+                            if not principled.inputs[0].links and not principled.inputs[bsdfinputs21].links and principled.inputs[bsdfinputs21].default_value != temp_alpha:
                                 found_diff = True
                             #print("old_albedo_tint_color_diff - alpha diff", found_diff)
                             if found_diff:
@@ -146,7 +164,7 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                                 if not equality_check(BSDF_Base_Color, mat.msfs_base_color_factor, len(BSDF_Base_Color), len(mat.msfs_base_color_factor)):
                                     found_diff = True
                                 # make Base Color alpha value BSDF - there is no albedo_tint here
-                                if not principled.inputs[0].links and not principled.inputs[21].links and principled.inputs[21].default_value != temp_alpha:
+                                if not principled.inputs[0].links and not principled.inputs[bsdfinputs21].links and principled.inputs[bsdfinputs21].default_value != temp_alpha:
                                     found_diff = True
                                 #print("old_albedo_tint_color_diff - Base Color Alpha Done")
                                 if found_diff:
@@ -160,7 +178,7 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                                 BSDF_Base_Color = principled.inputs["Base Color"].default_value
                                 if not equality_check(BSDF_Base_Color, mat.msfs_base_color_factor, len(BSDF_Base_Color), len(mat.msfs_base_color_factor)):
                                     found_diff = True
-                                if not principled.inputs[0].links and not principled.inputs[21].links and principled.inputs[21].default_value != temp_alpha:
+                                if not principled.inputs[0].links and not principled.inputs[bsdfinputs21].links and principled.inputs[bsdfinputs21].default_value != temp_alpha:
                                     found_diff = True
                                 #print("old_albedo_tint_color_diff - alpha diff", found_diff)
                                 if found_diff:
@@ -180,34 +198,34 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                             # get color
                             BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
                             emissive_tint_checkval = mat.node_tree.nodes["emissive_tint"].outputs[0].default_value
-                            #print("old_emissive_tint_color_diff - BSDF emission", BSDF_Emission[0], emissive_tint_checkval[0], BSDF_Emission[1], emissive_tint_checkval[1], BSDF_Emission[2], emissive_tint_checkval[2], BSDF_Emission[3], emissive_tint_checkval[3])
+                            print("old_emissive_tint_color_diff - BSDF emission", BSDF_Emission[0], emissive_tint_checkval[0], BSDF_Emission[1], emissive_tint_checkval[1], BSDF_Emission[2], emissive_tint_checkval[2], BSDF_Emission[3], emissive_tint_checkval[3])
                             if not equality_check(BSDF_Emission, emissive_tint_checkval, len(BSDF_Emission), len(emissive_tint_checkval)):
                                 found_diff = True
-                            #print("old_albedo_tint_color_diff - alpha diff", found_diff)
+                            print("old_emissive_tint_color_diff - alpha diff", found_diff)
                             #    found_diff = True
                             if found_diff:
                                 return found_diff
                         else:
                             if mat.msfs_material_type != "NONE":
-                                #print("old_albedo_tint_color_diff - Emission")
+                                #print("old_emissive_tint_color_diff - Emission")
                                 BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
-                                #print("old_albedo_tint_color_diff - BSDF to MSFS base color", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
+                                #print("old_emissive_tint_color_diff - BSDF to MSFS base color", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
                                 if not equality_check(BSDF_Emission, mat.msfs_emissive_factor, len(BSDF_Base_Color), len(mat.msfs_emissive_factor)):
                                     found_diff = True
-                                #print("old_albedo_tint_color_diff - Base Color Alpha Done")
+                                #print("old_emissive_tint_color_diff - Base Color Alpha Done")
                                 if found_diff:
                                     return found_diff
                     except:
                         try:
                             if mat.msfs_material_type != "NONE":
-                                #print("old_albedo_tint_color_diff - BSDF to MSFS emissive", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
+                                #print("old_emissive_tint_color_diff - BSDF to MSFS emissive", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
                                 BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
                                 if not equality_check(BSDF_Emission, mat.msfs_emissive_factor, len(BSDF_Emission), len(mat.msfs_emissive_factor)):
                                     found_diff = True
                                 if found_diff:
                                     return found_diff
                         except:
-                            print("old_albedo_tint_color_diff - old_properties - Error - BSDF properties found skipping")
+                            print("old_emissive_tint_color_diff - old_properties - Error - BSDF properties found skipping")
 
                     finally:
                         pass
@@ -216,15 +234,15 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                 if mat.msfs_material_type == "NONE" or bad_material_setup or (mat.msfs_material_mode != "NONE" and not bad_material_setup):
                     #print("old_albedo_tint_color_diff - values", principled.inputs[6].default_value, principled.inputs[9].default_value, principled.inputs[20].default_value, principled.inputs[21].default_value)
                     # input 6 Metallic
-                    if not principled.inputs[6].links and principled.inputs[6].default_value != mat.msfs_metallic_factor:
+                    if not principled.inputs[bsdfinputs6].links and principled.inputs[bsdfinputs6].default_value != mat.msfs_metallic_factor:
                         found_diff = True
                     #print("after met", found_diff, mat.msfs_metallic_factor, principled.inputs[6].default_value)
                     # input 9 Roughness
-                    if not principled.inputs[9].links and principled.inputs[9].default_value != mat.msfs_roughness_factor:
+                    if not principled.inputs[bsdfinputs9].links and principled.inputs[bsdfinputs9].default_value != mat.msfs_roughness_factor:
                         found_diff = True
                     #print("after rough", found_diff)
                     # input 20 Emissive Scale
-                    if not principled.inputs[20].links and principled.inputs[20].default_value != mat.msfs_emissive_scale:
+                    if not principled.inputs[bsdfinputs20].links and principled.inputs[bsdfinputs20].default_value != mat.msfs_emissive_scale:
                         found_diff = True
                     #print("after emissive - diff", found_diff, principled.inputs[6].default_value, principled.inputs[9].default_value, principled.inputs[20].default_value, principled.inputs[21].default_value)
         #print("on return - diff", found_diff)
@@ -232,10 +250,26 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
 
 
     def execute(self, context):
+        index1 = 1
+        index_B4 = 1 # index for Blender v4
+        if(bpy.app.version < (3, 4, 0)):
+            index1 = 0
+        if(bpy.app.version < (4, 0, 0)):
+            index_B4 = 0
+
+        outputs0 = MSFS_MixNodeOutputs.outputs[index1][0]
+        inputs0 = MSFS_MixNodeInputs.inputs[index1][0]
+        inputs1 = MSFS_MixNodeInputs.inputs[index1][1]
+        inputs2 = MSFS_MixNodeInputs.inputs[index1][2]
+        bsdfinputs6 = MSFS_BSDFNodeInputs.inputs[index_B4][0]
+        bsdfinputs9 = MSFS_BSDFNodeInputs.inputs[index_B4][1]
+        bsdfinputs20 = MSFS_BSDFNodeInputs.inputs[index_B4][2]
+        bsdfinputs21 = MSFS_BSDFNodeInputs.inputs[index_B4][3]
+
         mat = context.active_object.active_material
         if Is_it_FBW_Material(mat):
             #mat.msfs_material_mode = mat.msfs_material_type
-            #print("msfs_material_mode - type", mat.get("msfs_material_mode"), mat.get("msfs_material_type"))
+            print("msfs_material_mode - type", mat.get("msfs_material_mode"), mat.get("msfs_material_type"))
             old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
                 "NONE",
                 "msfs_standard",
@@ -263,78 +297,78 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                 if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
         temp_alpha = 1.0
         for principled in bsdfnodes:
-            #print("old_albedo_tint_color_diff - execute - principled", principled)
+            print("old_albedo_tint_color_diff - execute - principled", principled)
             #if not principled.inputs[0].links:
             # now get albedo_tint node and check color same as Base Color on BSDF
             # get albedo_tint node
             try:
-                #print("old_albedo_tint_color_diff - execute - TRY")
+                print("old_albedo_tint_color_diff - execute - TRY")
                 if mat.node_tree.nodes["albedo_tint"] is not None:
-                    #print("old_albedo_tint_color_diff - execute - albedo_tint")
+                    print("old_albedo_tint_color_diff - execute - albedo_tint")
                     # get alpha for later input 21 alpha check
                     temp_alpha = mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3]
                     # get color
                     albedo_tint_checkval = mat.node_tree.nodes["albedo_tint"].outputs[0].default_value
                     # get BSDF base Color value
                     BSDF_Base_Color = principled.inputs["Base Color"].default_value
-                    #print("old_albedo_tint_color_diff - execute - BSDF color", BSDF_Base_Color)
+                    print("old_albedo_tint_color_diff - execute - BSDF color", BSDF_Base_Color)
                     if not equality_check(BSDF_Base_Color, albedo_tint_checkval, len(BSDF_Base_Color), len(albedo_tint_checkval)):
                         mat.node_tree.nodes["albedo_tint"].outputs[0].default_value = BSDF_Base_Color
                         mat.msfs_base_color_factor = BSDF_Base_Color
                     # input 21 Alpha
                     # check the alphas - if an input to alpha then use node alpha - if no inputs use BSDF alpha - won't get here if no albedo_tint
-                    if not principled.inputs[0].links and not principled.inputs[21].links and principled.inputs[21].default_value != temp_alpha:
-                        #print("old_albedo_tint_color_diff - execute - Alpha", mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3], principled.inputs[21].default_value)
-                        # make alpha value from BSDF input(21)
-                        mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3] = principled.inputs[21].default_value
-                        principled.inputs["Base Color"].default_value[3] = principled.inputs[21].default_value
-                        #print("old_albedo_tint_color_diff - execute - Alpha out", mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3], principled.inputs[21].default_value)
-                        mat.msfs_color_alpha_mix = principled.inputs[21].default_value
-                    elif principled.inputs[21].links:
+                    if not principled.inputs[0].links and not principled.inputs[bsdfinputs21].links and principled.inputs[bsdfinputs21].default_value != temp_alpha:
+                        print("old_albedo_tint_color_diff - execute - Alpha", mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3], principled.inputs[bsdfinputs21].default_value)
+                        # make alpha value from BSDF input(bsdfinputs21)
+                        mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3] = principled.inputs[bsdfinputs21].default_value
+                        principled.inputs["Base Color"].default_value[3] = principled.inputs[bsdfinputs21].default_value
+                        print("old_albedo_tint_color_diff - execute - Alpha out", mat.node_tree.nodes["albedo_tint"].outputs[0].default_value[3], principled.inputs[bsdfinputs21].default_value)
+                        mat.msfs_color_alpha_mix = principled.inputs[bsdfinputs21].default_value
+                    elif principled.inputs[bsdfinputs21].links:
                         # another alpha from somewhere - Alpha Factor
-                        #print("old_albedo_tint_color_diff - execute - Alpha other", mat.node_tree.nodes["Alpha Factor"].outputs[0].default_value)
+                        print("old_albedo_tint_color_diff - execute - Alpha other", mat.node_tree.nodes["Alpha Factor"].outputs[0].default_value)
                         mat.msfs_color_alpha_mix = mat.node_tree.nodes["Alpha Factor"].outputs[0].default_value
             except:
                 print("old_albedo_tint_color_diff - execute - Error - TRY - albedo_tint skipping")
                 try:
                     if mat.msfs_material_type != "NONE":
-                        #print("old_albedo_tint_color_diff - execute - Base Color")
+                        print("old_albedo_tint_color_diff - execute - Base Color")
                         BSDF_Base_Color = principled.inputs["Base Color"].default_value
                         ###print("old_albedo_tint_color_diff - execute - BSDF to MSFS base color", BSDF_Base_Color[0], mat.msfs_base_color_factor[0], BSDF_Base_Color[1], mat.msfs_base_color_factor[1], BSDF_Base_Color[2], mat.msfs_base_color_factor[2], BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
                         # set default in case not there.
                         #try:
-                        #print("old_albedo_tint_color_diff - execute - msfs_base_color_factor")
+                        print("old_albedo_tint_color_diff - execute - msfs_base_color_factor")
                         if not mat.msfs_base_color_factor:
                             mat.msfs_base_color_factor = mat.msfs_base_color_factor.default
                         # determine alpha
                         temp_alpha = BSDF_Base_Color[3]
                         if not equality_check(BSDF_Base_Color, mat.msfs_base_color_factor, len(BSDF_Base_Color), len(mat.msfs_base_color_factor)):
-                            #print("1")
+                            print("1")
                             mat.msfs_base_color_factor = BSDF_Base_Color
-                            #print("2")
+                            print("2")
                         # make Base Color alpha value BSDF - there is no albedo_tint here
-                        if not principled.inputs[0].links and not principled.inputs[21].links and principled.inputs[21].default_value != temp_alpha:
-                            #print("3")
-                            principled.inputs["Base Color"].default_value[3] = principled.inputs[21].default_value
-                            mat.msfs_base_color_factor[3] = principled.inputs[21].default_value
-                            #mat.msfs_color_alpha_mix = principled.inputs[21].default_value
-                            #print("4")
+                        if not principled.inputs[0].links and not principled.inputs[bsdfinputs21].links and principled.inputs[bsdfinputs21].default_value != temp_alpha:
+                            print("3")
+                            principled.inputs["Base Color"].default_value[3] = principled.inputs[bsdfinputs21].default_value
+                            mat.msfs_base_color_factor[3] = principled.inputs[bsdfinputs21].default_value
+                            #mat.msfs_color_alpha_mix = principled.inputs[bsdfinputs21].default_value
+                            print("4")
                         else:
-                            #print("old_albedo_tint_color_diff - execute - Found Alpha Factor")
-                            link = principled.inputs[21].links[0]
-                            #print("4.5")
+                            print("old_albedo_tint_color_diff - execute - Found Alpha Factor")
+                            link = principled.inputs[bsdfinputs21].links[0]
+                            print("4.5")
                             mat.msfs_base_color_factor[3] = link.from_node.inputs[1].default_value
                             
-                        #print("old_albedo_tint_color_diff - execute - Base Color Alpha Done")
+                        print("old_albedo_tint_color_diff - execute - Base Color Alpha Done")
                     elif mat.msfs_material_type == "NONE" and mat.msfs_material_mode == "NONE":
                         # SPECIAL now if you have had msfs properties values - assume msfs_standard - make a wild guess because there was data here from before.
                         try:
-                            #print("old_albedo_tint_color_diff - execute - simple values BSDF to msfs_*")
-                            #print("5")
+                            print("old_albedo_tint_color_diff - execute - simple values BSDF to msfs_*")
+                            print("5")
                             mat.msfs_base_color_factor = principled.inputs["Base Color"].default_value
-                            mat.mat.msfs_metallic_factor = principled.inputs[6].default_value
-                            mat.mat.msfs_roughness_factor = principled.inputs[9].default_value
-                            #print("6")
+                            mat.mat.msfs_metallic_factor = principled.inputs[bsdfinputs6].default_value
+                            mat.mat.msfs_roughness_factor = principled.inputs[bsdfinputs9].default_value
+                            print("6")
                         except:
                             print("old_albedo_tint_color_diff - execute - old_properties - Error - BSDF properties found skipping")
 
@@ -348,7 +382,7 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
             # put Emissive color stuff here
 
 
-            #print("old_emissive_tint_color_diff - execute - mat", mat)
+            print("old_emissive_tint_color_diff - execute - mat", mat)
             try:
                 if mat.node_tree.nodes["emissive_tint"] is not None:
                     # get color
@@ -361,26 +395,26 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                         mat.msfs_emissive_factor = BSDF_Emission
                        # should add like too to make button go away
             except:
-                #print("old_emissive_tint_color_diff - execute - Error - TRY - emissive_tint skipping")
+                print("old_emissive_tint_color_diff - execute - Error - TRY - emissive_tint skipping")
                 try:
                     if mat.msfs_material_type != "NONE":
-                        #print("old_emissive_tint_color_diff - execute - Emissive")
+                        print("old_emissive_tint_color_diff - execute - Emissive")
                         BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
                         ###print("old_emissive_tint_color_diff - execute - BSDF to MSFS emissive", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
                         # set default in case not there.
                         #try:
-                        #print("old_emissive_tint_color_diff - execute - msfs_emissive_factor")
+                        print("old_emissive_tint_color_diff - execute - msfs_emissive_factor")
                         if not mat.msfs_emissive_factor:
                             mat.msfs_emissive_factor = mat.msfs_emissive_factor.default
                         if not equality_check(BSDF_Emission, mat.msfs_emissive_factor, len(BSDF_Emission), len(mat.msfs_emissive_factor)):
                             print("1")
                             mat.msfs_emissive_factor = BSDF_Emission
                             print("2")
-                        #print("old_emissive_tint_color_diff - execute - Emissive Done")
+                        print("old_emissive_tint_color_diff - execute - Emissive Done")
                     elif mat.msfs_material_type == "NONE" and mat.msfs_material_mode == "NONE":
                         # SPECIAL now if you have had msfs properties values - assume msfs_standard - make a wild guess because there was data here from before.
                         try:
-                            #print("old_emissive_tint_color_diff - execute - simple values BSDF to msfs_*")
+                            print("old_emissive_tint_color_diff - execute - simple values BSDF to msfs_*")
                             mat.msfs_emissive_factor = principled.inputs["Emission"].default_value
                         except:
                             print("old_emissive_tint_color_diff - execute - old_properties - Error - BSDF to msfs_ skipping")
@@ -390,16 +424,16 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                 pass
 
             # input 6 Metallic
-            #print("7")
-            if not principled.inputs[6].links and principled.inputs[6].default_value != mat.msfs_metallic_factor:
-                mat.msfs_metallic_factor = principled.inputs[6].default_value
+            print("7")
+            if not principled.inputs[bsdfinputs6].links and principled.inputs[bsdfinputs6].default_value != mat.msfs_metallic_factor:
+                mat.msfs_metallic_factor = principled.inputs[bsdfinputs6].default_value
             # input 9 Roughness
-            if not principled.inputs[9].links and principled.inputs[9].default_value != mat.msfs_roughness_factor:
-                mat.msfs_roughness_factor = principled.inputs[9].default_value
+            if not principled.inputs[bsdfinputs9].links and principled.inputs[bsdfinputs9].default_value != mat.msfs_roughness_factor:
+                mat.msfs_roughness_factor = principled.inputs[bsdfinputs9].default_value
             # input 20 Emissive Scale
-            if not principled.inputs[20].links and principled.inputs[20] != mat.msfs_emissive_scale:
-                mat.msfs_emissive_scale = principled.inputs[20].default_value
-            #print("8")
+            if not principled.inputs[bsdfinputs20].links and principled.inputs[bsdfinputs20] != mat.msfs_emissive_scale:
+                mat.msfs_emissive_scale = principled.inputs[bsdfinputs20].default_value
+            print("8")
         return {"FINISHED"}
 
 
@@ -409,7 +443,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
     bl_idname = "msfs.migrate_material_data"
     bl_label = "Migrate Material Data"
 
-# old order matters as the really old legacy checked first can be overridden by new legacy
+    # old order matters as the really old legacy checked first can be overridden by new legacy
     old_property_to_new_mapping = {
         "msfs_decal_blend_factor_color": "msfs_decal_color_blend_factor",
         "msfs_decal_blend_factor_roughness": "msfs_roughness_blend_factor",
@@ -469,12 +503,11 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                     return True
         return False
 
-
     def execute(self, context):
         mat = context.active_object.active_material
         # ToDo: FBW msfs_material_type mapping
         Is_thereFBW_material = Is_it_FBW_Material(mat)
-        #print("MSFS_OT_MigrateMaterialData - execute - msfs_material_mode and Is_thereFBW_material", mat.get("msfs_material_mode"), Is_thereFBW_material)
+        print("MSFS_OT_MigrateMaterialData - execute - msfs_material_mode and Is_thereFBW_material", mat.get("msfs_material_mode"), Is_thereFBW_material)
         for (
             old_property,
             new_property,
@@ -486,44 +519,43 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                 if mat.get("msfs_material_mode") == "msfs_parallax" and old_property == "msfs_detail_albedo_texture":
                     continue
                 try:
-                    #print("execute - make change to property - old new", old_property, mat.get(old_property), new_property, mat.get(new_property))
+                    print("execute - make change to property - old new", old_property, mat.get(old_property), new_property, mat.get(new_property))
                     mat[new_property] = mat[old_property]
-                    #print("execute - make change new old", mat[new_property], mat[old_property])
+                    print("execute - make change old new", mat[old_property], mat[new_property])
                 except:
                     print("execute - ERROR did not carry over", mat, old_property, mat.get(old_property), new_property, mat.get(new_property))
 
                 del mat[old_property]
-        #print("execute - make change to property - old new DONE")
+        print("execute - make change to property - old new DONE")
         # Base Color is a special case - can only have 3 values, we need 4
         base_color = [1,1,1,1]
-        # find alpha
         alpha = 1
         if mat.get("msfs_color_alpha_mix"):
             alpha = mat.get("msfs_color_alpha_mix")
             base_color[3] = alpha
         else:
-            #print("execute - no msfs_color_alpha_mix Base Color", mat)
+            print("execute - no msfs_color_alpha_mix Base Color", mat)
             try:
                 n = mat.node_tree.nodes["albedo_tint"]
-                #print(n, n.outputs[0], n.outputs[0].default_value)
+                print(n, n.outputs[0], n.outputs[0].default_value)
                 base_color[3] = n.outputs[0].default_value[3]
-                #print(base_color)
+                print(base_color)
             except:
-                #print("execute - Base Color Alpha - Exception - albedo_tint not found skipping")
+                print("execute - Base Color Alpha - Exception - albedo_tint not found skipping")
                 try:
                     nodes = mat.node_tree.nodes
                     bsdfnodes = [n for n in nodes 
                             if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
                     for principled in bsdfnodes:
                         BSDF_Base_Color = principled.inputs["Base Color"].default_value
-                        #print("execute - BSDF to MSFS base color alpha", BSDF_Base_Color[0], mat.msfs_base_color_factor[0], BSDF_Base_Color[1], mat.msfs_base_color_factor[1], BSDF_Base_Color[2], mat.msfs_base_color_factor[2], BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
+                        print("execute - BSDF to MSFS base color alpha", BSDF_Base_Color[0], mat.msfs_base_color_factor[0], BSDF_Base_Color[1], mat.msfs_base_color_factor[1], BSDF_Base_Color[2], mat.msfs_base_color_factor[2], BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
                         if BSDF_Base_Color[3] != mat.msfs_base_color_factor[3]:
-                            #print("alpha diff", BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
+                            print("alpha diff", BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
                             if BSDF_Base_Color[3] == 1.0:
-                                #print("alpha diff", BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
+                                print("alpha diff", BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
                                 alpha = mat.msfs_base_color_factor[3]
                             else:
-                                #print("alpha diff - base", BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
+                                print("alpha diff - base", BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
                                 alpha = principled.inputs["Base Color"].default_value[3]
                 except:
                     print("execute - Base Color Alpha - Exception - BSDF Base Color not found skipping")
@@ -536,24 +568,24 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
             if len(base_color) == 3:
                 base_color.append(alpha)
         else:
-            #print("execute - no msfs_color_albedo_mix Base Color Factor", mat)
+            print("execute - no msfs_color_albedo_mix Base Color Factor", mat)
             try:
                 n = mat.node_tree.nodes["albedo_tint"]
-                #print(n, n.outputs[0], n.outputs[0].default_value)
+                print(n, n.outputs[0], n.outputs[0].default_value)
                 base_color = n.outputs[0].default_value
-                #print(base_color)
+                print(base_color)
             except:
-                #print("execute - Base Color Factor - Exception - albedo_tint not found skipping")
+                print("execute - Base Color Factor - Exception - albedo_tint not found skipping")
                 try:
                     nodes = mat.node_tree.nodes
                     bsdfnodes = [n for n in nodes 
                             if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
                     for principled in bsdfnodes:
                         BSDF_Base_Color = principled.inputs["Base Color"].default_value
-                        #print("execute - BSDF to MSFS base color", BSDF_Base_Color[0], mat.msfs_base_color_factor[0], BSDF_Base_Color[1], mat.msfs_base_color_factor[1], BSDF_Base_Color[2], mat.msfs_base_color_factor[2], BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
+                        print("execute - BSDF to MSFS base color", BSDF_Base_Color[0], mat.msfs_base_color_factor[0], BSDF_Base_Color[1], mat.msfs_base_color_factor[1], BSDF_Base_Color[2], mat.msfs_base_color_factor[2], BSDF_Base_Color[3], mat.msfs_base_color_factor[3])
                         base_color = BSDF_Base_Color
                 except:
-                    #print("execute - Base Color - Exception - BSDF Base Color not found skipping")
+                    print("execute - Base Color - Exception - BSDF Base Color not found skipping")
                     pass
             finally:
                 pass
@@ -562,26 +594,26 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         mat.msfs_base_color_factor = base_color
 
         # Emissive factor is also a special case - old material system had 4 floats, we only need 3
-        #print("execute - Emissive START", mat)
+        print("execute - Emissive START", mat)
         emissive_color = [0, 0, 0]
         if mat.get("msfs_color_emissive_mix"):
             mat.msfs_emissive_factor = mat.get("msfs_color_emissive_mix")[0:3]
         else:
             try:
-                #print("execute - no msfs_color_albedo_mix", mat)
+                print("execute - no msfs_color_emissive_mix", mat)
                 n = mat.node_tree.nodes["emissive_tint"]
-                #print(n, n.outputs[0], n.outputs[0].default_value)
+                print(n, n.outputs[0], n.outputs[0].default_value)
                 emissive_color = n.outputs[0].default_value[0:3]
-                #print(emissive_color)
+                print(emissive_color)
             except:
-                #print("execute - Emissive Color - Error - emissive_tint not found skipping")
+                print("execute - Emissive Color - Error - emissive_tint not found skipping")
                 try:
                     nodes = mat.node_tree.nodes
                     bsdfnodes = [n for n in nodes 
                             if isinstance(n, bpy.types.ShaderNodeBsdfPrincipled)]
                     for principled in bsdfnodes:
                         BSDF_Emissive = principled.inputs["Emission"].default_value[0:3]
-                        #print("execute - BSDF to MSFS base color alpha", BSDF_Emissive[0], mat.msfs_emissive_factor[0], BSDF_Emissive[1], mat.msfs_emissive_factor[1], BSDF_Emissive[2], mat.msfs_emissive_factor[2])
+                        print("execute - BSDF to MSFS base color alpha", BSDF_Emissive[0], mat.msfs_emissive_factor[0], BSDF_Emissive[1], mat.msfs_emissive_factor[1], BSDF_Emissive[2], mat.msfs_emissive_factor[2])
                         emissive_color = BSDF_Emissive
                 except:
                     pass
@@ -591,7 +623,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
         # Do our enums manually as only their index of the value are stored - not the string
         if mat.get("msfs_blend_mode"):
-            #print("execute - msfs_blend_mode migrate check", mat.get("msfs_blend_mode"))
             old_alpha_order = [
                 "OPAQUE",
                 "MASK",  # Changed from old version - matches new name
@@ -604,9 +635,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
         # ToDo: could be FBW order - need to determine
         # FBW importer has a custom Property of is_import
-        #print("mode, fbw, type", mat.get("msfs_material_mode"), mat.get("msfs_material_fbw"), mat.get("msfs_material_type"), Is_thereFBW_material)
         if mat.get("msfs_material_mode"):
-            #print("execute - Using Legacy material", mat["msfs_material_mode"])
             old_material_older = [  # Assuming the user uninstalled the old plugin, the index of the value will be stored instead of the name of the current material. Replicate the order here
                 "NONE",
                 "msfs_standard",
@@ -767,7 +796,6 @@ class MSFS_PT_Material(bpy.types.Panel):
 
             if MSFS_OT_MigrateMaterialData.old_properties_present(mat):
                 layout.operator(MSFS_OT_MigrateMaterialData.bl_idname)
-            #print(mat.msfs_material_fbw)
             self.draw_prop(layout, mat, "msfs_material_type", enabled=mat.msfs_material_fbw == "NONE")
 
             if mat.msfs_material_mode != "NONE":

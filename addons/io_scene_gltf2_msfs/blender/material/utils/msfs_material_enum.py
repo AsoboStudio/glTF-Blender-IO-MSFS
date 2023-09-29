@@ -102,6 +102,7 @@ class MSFS_ShaderNodes(Enum):
     emissiveMulScale = "Emissive Multiplier Scale"
     RGBCurves = "RGB Curves"
     emissiveMul = "Emissive Multiplier"
+    normalScale = "Normal Scale"
     normalMapSampler = "Normal Map Sampler"
     detailColorTex = "Detail Color(RGBA)"
     detailCompTex = "Detail Occlusion(R) Roughness(G) Metallic(B)"
@@ -115,7 +116,7 @@ class MSFS_ShaderNodes(Enum):
     combineUVScale = "Combine UV Scale"
     combineUVOffset = "Combine UV Offset"
     mulUVScale = "Multiply UV Scale"
-    addUVOffset = "Multiply UV Offset"
+    addUVOffset = "Add UV Offset"
     detailNormalMapSampler = "Detail Normal Map Sampler"
     blendNormalMap = "Blend Normal Map"
     blendColorMap = "Blend Color Map"
@@ -133,6 +134,8 @@ class MSFS_AnisotropicNodes(Enum):
     anisotropicTex = "Anisotropic Texture"
     separateAnisotropic = "Separate Anisotropic"
 
+# Blender 4.0 has changed these names
+# fix with enum tuples https://jwodder.github.io/kbits/posts/multi-value-enum/
 class MSFS_PrincipledBSDFInputs(Enum):
     baseColor = "Base Color"
     subsurfaceColor = "Subsurface Color"
@@ -142,7 +145,7 @@ class MSFS_PrincipledBSDFInputs(Enum):
     anisotropicRotation = "Anisotropic Rotation"
     clearcoat = "Clearcoat"
     clearcoatRoughness = "Clearcoat Roughness"
-    emission = "Emission"
+    emission = "Emission Color"
     emissionStrength = "Emission Strength"
     alpha = "Alpha"
     normal = "Normal"
@@ -152,3 +155,7 @@ class MSFS_MixNodeInputs:
 
 class MSFS_MixNodeOutputs:
     outputs = [[0], [2]]
+
+# metallic factor, roughness factor, emissive strength, Alpha - Blender v 4.0+
+class MSFS_BSDFNodeInputs:
+    inputs = [[6, 9, 20, 21], [1, 2, 27, 4]]
