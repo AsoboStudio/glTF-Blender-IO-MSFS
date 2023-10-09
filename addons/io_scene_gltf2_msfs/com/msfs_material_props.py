@@ -1306,8 +1306,9 @@ class AsoboMaterialFresnelFade:
     SerializedName = "ASOBO_material_fresnel_fade"
 
     class Defaults:
-        fresnelFactor = 1.0
-        fresnelOpacityOffset = 1.0
+        # LHC request
+        fresnelFactor = 0.8
+        fresnelOpacityOffset = 0.5
 
     bpy.types.Material.msfs_fresnel_factor = bpy.props.FloatProperty(
         name="Fresnel Factor",

@@ -632,6 +632,7 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
 
         MSFS_Material_Property_Update.update_msfs_material_type(mat, context)
 
+        print("Migrate material - Done")
         return {"FINISHED"}
 
 
