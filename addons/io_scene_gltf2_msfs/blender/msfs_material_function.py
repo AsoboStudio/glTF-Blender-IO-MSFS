@@ -350,7 +350,7 @@ class MSFS_Material:
         mulBaseColorRGBNode.inputs[0].default_value = 1.0 # added by ron
         print("Vertex color and alpha values", vertexColorNode.outputs[0].default_value[0], vertexColorNode.outputs[0].default_value[1], vertexColorNode.outputs[0].default_value[2], vertexColorNode.outputs[0].default_value[3], vertexColorNode.outputs[1].default_value)
         self.link(mulBaseColorRGBNode.inputs[self.inputs1], baseColorRGBNode.outputs[0])
-        self.link(mulBaseColorRGBNode.inputs[self.inputs1], blendColorMapNode.outputs[0])
+        self.link(mulBaseColorRGBNode.inputs[self.inputs2], blendColorMapNode.outputs[0])
         
         ## Blend Alpha Map (Detail alpha operator)
         # In[0] : Alpha Base Color Texture
