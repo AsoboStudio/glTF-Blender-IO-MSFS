@@ -939,15 +939,15 @@ class MSFS_Material:
         # Normal
         self.link(nodeNormalTex.outputs[0], nodeRGBCurves.inputs[1])
         self.link(nodeRGBCurves.outputs[0], nodeNormalMapSampler.inputs[1])
-        self.link(nodeNormalMapSampler.outputs[0], nodeBlendNormalMap.inputs[1])
-        self.link(nodeDetailNormalMapSampler.outputs[0], nodeBlendNormalMap.inputs[2])
+        self.link(nodeNormalMapSampler.outputs[0], nodeBlendNormalMap.inputs[self.inputs1])
+        self.link(nodeDetailNormalMapSampler.outputs[0], nodeBlendNormalMap.inputs[self.inputs2])
         self.link(nodeDetailNormalScale.outputs[0], nodeDetailNormalMapSampler.inputs[0])
         self.link(nodeDetailNormalTex.outputs[0], nodeDetailNormalMapSampler.inputs[1])
 
         if nodeNormalTex.image and not nodeDetailNormalTex.image:
             self.link(nodeNormalMapSampler.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
         elif nodeNormalTex.image and nodeDetailNormalTex.image:
-            self.link(nodeBlendNormalMap.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
+            self.link(nodeBlendNormalMap.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
         else:
             self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.normal.value)
 
@@ -962,7 +962,7 @@ class MSFS_Material:
         if nodeEmissiveTex.image:
             self.link(nodeEmissiveColor.outputs[0], nodeMulEmissive.inputs[0])
             self.link(nodeEmissiveTex.outputs[0], nodeMulEmissive.inputs[1])
-            self.link(nodeMulEmissive.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.emission.value])
+            self.link(nodeMulEmissive.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.emission.value])
         else:
             self.link(nodeEmissiveColor.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.emission.value])
 

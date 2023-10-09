@@ -388,7 +388,7 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                     # get color
                     emissive_tint_checkval = mat.node_tree.nodes["emissive_tint"].outputs[0].default_value
                     # get BSDF base Color value
-                    BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
+                    BSDF_Emission = principled.inputs["Emission Color"].default_value[0:3]
                     #print("old_emissive_tint_color_diff execute - BSDF Emission", BSDF_Emission)
                     if not equality_check(BSDF_Emission, emissive_tint_checkval, len(BSDF_Emission), len(emissive_tint_checkval)):
                         mat.node_tree.nodes["emissive_tint"].outputs[0].default_value = BSDF_Emission
@@ -399,7 +399,7 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                 try:
                     if mat.msfs_material_type != "NONE":
                         print("old_emissive_tint_color_diff - execute - Emissive")
-                        BSDF_Emission = principled.inputs["Emission"].default_value[0:3]
+                        BSDF_Emission = principled.inputs["Emission Color"].default_value[0:3]
                         ###print("old_emissive_tint_color_diff - execute - BSDF to MSFS emissive", BSDF_Emission[0], mat.msfs_emissive_factor[0], BSDF_Emission[1], mat.msfs_emissive_factor[1], BSDF_Emission[2], mat.msfs_emissive_factor[2], BSDF_Emission[3], mat.msfs_emissive_factor[3])
                         # set default in case not there.
                         #try:
@@ -415,7 +415,7 @@ class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
                         # SPECIAL now if you have had msfs properties values - assume msfs_standard - make a wild guess because there was data here from before.
                         try:
                             print("old_emissive_tint_color_diff - execute - simple values BSDF to msfs_*")
-                            mat.msfs_emissive_factor = principled.inputs["Emission"].default_value
+                            mat.msfs_emissive_factor = principled.inputs["Emission Color"].default_value
                         except:
                             print("old_emissive_tint_color_diff - execute - old_properties - Error - BSDF to msfs_ skipping")
                 except:
