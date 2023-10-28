@@ -100,7 +100,7 @@ def get_material_types(self, context):
 
 class AsoboMaterialCommon:
     class Defaults:
-        BaseColorFactor = [0.8, 0.8, 0.8, 1.0]
+        BaseColorFactor = [1.0, 1.0, 1.0, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
         MetallicFactor = 1.0
         RoughnessFactor = 1.0
@@ -447,6 +447,9 @@ class AsoboMaterialCommon:
 
         if "KHR_materials_emissive_strength" in gltf2_material.extensions:
             gltf2_material.extensions.pop("KHR_materials_emissive_strength")
+        print("AsoboMaterialCommon - Started with ", gltf2_material)
+        #print("exportsettings", export_settings)
+        print("AsoboMaterialCommon - Done blender_material", blender_material, blender_material.msfs_base_color_texture, blender_material.msfs_detail_color_texture)
         pass
 
 

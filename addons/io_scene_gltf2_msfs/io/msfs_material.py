@@ -85,15 +85,21 @@ class MSFSMaterial:
         # Create shader to plug texture into
         shader_node = nodes.new("ShaderNodeBsdfPrincipled")
 
+# Blender 4 messes with Detail Color textures - example windshield material Detail color for scratches is also added as a regular Basecolor texture
+# this messes up windshield material in the sim
+
         # Gather texture info
         if type == "DEFAULT":
             link = links.new(shader_node.inputs["Base Color"], texture_node.outputs[0])
 
+# had to add in a default texture argument for compatability with 4.0+  added (),
             texture_info = gather_texture_info(
                 shader_node.inputs["Base Color"],
                 (shader_node.inputs["Base Color"],),
+                (),
                 export_settings,
             )
+            print("MSFSMaterial - texture_info", texture_info)
         elif type == "NORMAL":
             normal_node = nodes.new("ShaderNodeNormalMap")
             if normal_scale:

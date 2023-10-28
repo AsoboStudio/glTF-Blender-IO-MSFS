@@ -93,3 +93,44 @@ class Export:
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if self.properties.enabled:
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+
+# blender 4.0 issue with detail textures added twice once correct and once as a regular basecolor texture
+    # def gather_texture_info_hook(self, gltf2_io, blender_shader_sockets, export_settings):
+        # print("gather_texture_info_hook - Started with ", blender_shader_sockets)
+        # #print("exportsettings", export_settings)
+        # print("io", gltf2_io.extensions, gltf2_io.extras, gltf2_io.index, gltf2_io.tex_coord)
+        # #if self.properties.enabled:
+            # #MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+        # print("gather_texture_info_hook - Done")
+
+    # def gather_material_pbr_metallic_roughness_hook(self, gltf2_material, blender_material, orm_texture, export_settings):
+        # print("gather_material_pbr_metallic_roughness_hook - Started with ", gltf2_material.base_color_texture)
+        # #print("exportsettings", export_settings)
+        # print("blender_material", blender_material, blender_material.msfs_base_color_texture, blender_material.msfs_detail_color_texture)
+        # #if self.properties.enabled:
+            # #MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+        # print("gather_material_pbr_metallic_roughness_hook - Done")
+
+    # def gather_import_texture_before_hook(gltf, pytexture, mh, tex_info, location, label, color_socket, alpha_socket, is_data):
+        # print("gather_import_texture_before_hook - Started with ", gltf)
+        # #print("exportsettings", export_settings)
+        # print("arg material", pytexture, mh, tex_info, location, label, color_socket, alpha_socket, is_data)
+        # #if self.properties.enabled:
+            # #MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+        # print("gather_import_texture_before_hook - Done")
+
+    # def gather_import_texture_after_hook(gltf, pytexture, mh, tex_info, location, label, color_socket, alpha_socket, is_data):
+        # print("gather_import_texture_after_hook - Started with ", gltf)
+        # #print("exportsettings", export_settings)
+        # print("arg material", pytexture, mh, tex_info, location, label, color_socket, alpha_socket, is_data)
+        # #if self.properties.enabled:
+            # #MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+        # print("gather_import_texture_after_hook - Done")
+
+    # def gather_texture_hook(self, texture, blender_shader_sockets, export_settings):
+        # print("gather_texture_hook - Started with ", blender_shader_sockets)
+        # #print("exportsettings", export_settings)
+        # print("texture", texture.name, texture.sampler, texture.extras, texture.source.name)
+        # #if self.properties.enabled:
+            # #MSFSMaterial.export(gltf2_material, blender_material, export_settings)
+        # print("gather_texture_hook - Done")
