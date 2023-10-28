@@ -105,7 +105,8 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Windshield(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
-            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.1]
+            self.msfs_roughness_factor = 0.0
+            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.01]
         elif self.msfs_material_type == "msfs_porthole":
             msfs_mat = MSFS_Porthole(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
@@ -152,11 +153,13 @@ class MSFS_Material_Property_Update:
             self.msfs_no_cast_shadow = True
             self.msfs_alpha_mode = "BLEND"
         else:
+            print(current_time, " - Reset Material")
             MSFS_Material_Property_Update.reset_material_prop_object(self)
             msfs_mat = MSFS_Material(self)
             msfs_mat.revertToPBRShaderTree()
             self.msfs_alpha_mode = "OPAQUE"
             return
+        print(current_time, " - Update DONE")
     
     @staticmethod
     def reset_material_prop_object(self):

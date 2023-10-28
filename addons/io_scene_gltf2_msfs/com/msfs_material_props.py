@@ -100,7 +100,7 @@ def get_material_types(self, context):
 
 class AsoboMaterialCommon:
     class Defaults:
-        BaseColorFactor = [0.8, 0.8, 0.8, 1.0]
+        BaseColorFactor = [1.0, 1.0, 1.0, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
         MetallicFactor = 1.0
         RoughnessFactor = 1.0
