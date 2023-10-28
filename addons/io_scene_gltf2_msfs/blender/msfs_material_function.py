@@ -334,8 +334,9 @@ class MSFS_Material:
             )
         
         ## Links
-        mulBaseColorRGBNode.inputs[0].default_value = 1.0 # added by ron
-        print("Vertex color and alpha values", vertexColorNode.outputs[0].default_value[0], vertexColorNode.outputs[0].default_value[1], vertexColorNode.outputs[0].default_value[2], vertexColorNode.outputs[0].default_value[3], vertexColorNode.outputs[1].default_value)
+        self.link(mulBaseColorRGBNode.inputs[self.inputs0], vertexColorNode.outputs[1])
+        #mulBaseColorRGBNode.inputs[self.inputs0].default_value = 1.0 # added by ron
+        #print("Vertex color and alpha values", vertexColorNode.outputs[0].default_value[0], vertexColorNode.outputs[0].default_value[1], vertexColorNode.outputs[0].default_value[2], vertexColorNode.outputs[0].default_value[3], vertexColorNode.outputs[1].default_value)
         self.link(mulBaseColorRGBNode.inputs[self.inputs1], baseColorRGBNode.outputs[0])
         self.link(mulBaseColorRGBNode.inputs[self.inputs2], blendColorMapNode.outputs[0])
         
@@ -767,6 +768,7 @@ class MSFS_Material:
             nodeBaseColorRGB.outputs[0].default_value[0] = color[0]
             nodeBaseColorRGB.outputs[0].default_value[1] = color[1]
             nodeBaseColorRGB.outputs[0].default_value[2] = color[2]
+            nodeBaseColorRGB.outputs[0].default_value[3] = color[3] # added for Blender 4.0+
             nodeBaseColorA.outputs[0].default_value = color[3]
             self.updateColorLinks()
 
@@ -891,22 +893,29 @@ class MSFS_Material:
         self.link(nodeBaseColorA.outputs[0], nodeMulBaseColorA.inputs[1])
         self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs1])
 
+        # no tex
         if not nodeBaseColorTex.image and not nodeDetailColorTex.image:
             self.link(nodeBaseColorRGB.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
-
+        # has basecolor - no detailColor
         elif nodeBaseColorTex.image and not nodeDetailColorTex.image:
             nodeBlendColorMap.blend_type = "ADD"
             self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorTex.outputs[1], nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
-
+        # no basecolor - has detailColor
+        # Blender 4.0+ issue with finding a texture here on alpha channel - puts DetailColor in BaseColor slot also along with ASOBO extension
         elif not nodeBaseColorTex.image and nodeDetailColorTex.image:
+            # blender 4.0+ messes with the basecolor and puts the DetailColor - for scratches into the BaseColor slot in the PBRMetallicRoughness, but already in the ASOBO
+            # extensions for DetailColor - seems the alpha is triggering this - there is no Alpha in the Detail Color Scratches so rewire the links
             nodeBlendColorMap.blend_type = "ADD"
             self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            # Alpha links
             self.link(nodeDetailColorTex.outputs[1],nodeMulBaseColorA.inputs[0])
-            self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
-
+            #self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
+            #added by ron
+            self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
+        # has both tex
         else:
             nodeBlendColorMap.blend_type = "MULTIPLY"
             nodeMulBaseColorRGB.blend_type = "MULTIPLY"
@@ -934,6 +943,9 @@ class MSFS_Material:
         if nodeNormalTex.image and not nodeDetailNormalTex.image:
             self.link(nodeNormalMapSampler.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
         elif nodeNormalTex.image and nodeDetailNormalTex.image:
+            self.link(nodeBlendNormalMap.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
+        elif not nodeNormalTex.image and nodeDetailNormalTex.image:
+            # added by ron - discussion with ASOBO says that a Normal texture is needed with the icing normal - but default aircraft not the case.
             self.link(nodeBlendNormalMap.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.normal.value])
         else:
             self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.normal.value)
