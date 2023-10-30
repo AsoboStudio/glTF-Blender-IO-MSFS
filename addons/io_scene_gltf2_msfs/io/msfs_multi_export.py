@@ -117,6 +117,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                     export_nla_strips=settings.export_nla_strips,
                     export_nla_strips_merged_animation_name=settings.export_nla_strips_merged_animation_name,
                     export_def_bones=settings.export_def_bones,
+                    export_optimize_animation_size=settings.export_optimize_animation_size,
                     export_current_frame=settings.export_current_frame,
                     export_skins=settings.export_skins,
                     export_all_influences=settings.export_all_influences,

@@ -365,7 +365,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     )
 
     ## Optimize Animation Size Check
-    optimize_animation_size: bpy.props.BoolProperty(
+    export_optimize_animation_size: bpy.props.BoolProperty(
         name="Optimize Animation Size",
         description=(
             "Reduces exported filesize by removing duplicate keyframes"
