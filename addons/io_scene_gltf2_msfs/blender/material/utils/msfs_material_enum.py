@@ -51,6 +51,7 @@ class MSFS_ShaderNodesTypes(Enum):
     shaderNodeTree = "ShaderNodeTree"
     shaderNodeOutputMaterial = "ShaderNodeOutputMaterial"
     nodeFrame = "NodeFrame"
+    shaderNodeMix = "ShaderNodeMix" 
     shaderNodeMixRGB = "ShaderNodeMixRGB" 
     nodeGroupOutput = "NodeGroupOutput"
     nodeGroupInput = "NodeGroupInput"
@@ -146,3 +147,9 @@ class MSFS_PrincipledBSDFInputs(Enum):
     emissionStrength = "Emission Strength"
     alpha = "Alpha"
     normal = "Normal"
+
+class MSFS_MixNodeInputs:
+    inputs = [[0, 1, 2], [0, 6, 7]]
+
+class MSFS_MixNodeOutputs:
+    outputs = [[0], [2]]

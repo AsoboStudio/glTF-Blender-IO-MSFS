@@ -114,7 +114,8 @@ class MSFS_Material_Property_Update:
             msfs_mat = MSFS_Glass(self, buildTree=True)
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
-            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.1]
+            self.msfs_roughness_factor = 0.0
+            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.01]
         elif self.msfs_material_type == "msfs_clearcoat":
             msfs_mat = MSFS_Clearcoat(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
