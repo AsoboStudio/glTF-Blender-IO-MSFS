@@ -22,4 +22,4 @@ class MSFS_Environment_Occluder(MSFS_Material):
     def customShaderTree(self):
         super(MSFS_Environment_Occluder, self).defaultShadersTree()
         self.principledBSDF = self.getNodesByClassName("ShaderNodeBsdfPrincipled")[0]
-        self.principledBSDF.inputs[21].default_value = 0
+        self.principledBSDF.inputs[4].default_value = 0   # from 21 to 4 for blender 4.0

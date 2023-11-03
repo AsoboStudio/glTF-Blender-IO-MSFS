@@ -46,20 +46,12 @@ class MSFS_Clearcoat(MSFS_Material):
 
         ## Clearcoat separate
         # In[0] : ClearcoatTexture -> Out[0]
-        if(bpy.app.version < (3, 3, 0)):
-            clearcoatSeparateNode = self.addNode(
-                name = MSFS_ShaderNodes.clearcoatSeparate.value,
-                typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateRGB.value,
-                location = (-800.0, -500.0),
-                frame = clearcoatFrame
-            )
-        else:
-            clearcoatSeparateNode = self.addNode(
-                name = MSFS_ShaderNodes.clearcoatSeparate.value,
-                typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value,
-                location = (-800.0, -500.0),
-                frame = clearcoatFrame
-            )
+        clearcoatSeparateNode = self.addNode(
+            name = MSFS_ShaderNodes.clearcoatSeparate.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value if bpy.app.version < (3, 3, 0) else MSFS_ShaderNodesTypes.shaderNodeSeparateRGB.value,
+            location = (-800.0, -500.0),
+            frame = clearcoatFrame
+        )
 
         self.link(clearcoatTexNode.outputs[0], clearcoatSeparateNode.inputs[0])
 
@@ -72,8 +64,8 @@ class MSFS_Clearcoat(MSFS_Material):
             nodeClearcoat.image = tex
             nodeClearcoat.image.colorspace_settings.name = "Non-Color"
 
-            self.link(nodeClearcoatSeparate.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.clearcoat.value])
-            self.link(nodeClearcoatSeparate.outputs[1], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.clearcoatRoughness.value])
+            self.link(nodeClearcoatSeparate.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.clearcoat.value]) # input named Weight?
+            self.link(nodeClearcoatSeparate.outputs[1], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.clearcoatRoughness.value])  # input 19 just roughness??
         else:
-            self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.clearcoat.value)
+            self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.clearcoat.value)   # probably need new nodelinks
             self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.clearcoatRoughness.value)

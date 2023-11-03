@@ -24,5 +24,5 @@ class MSFS_SSS(MSFS_Material):
         super(MSFS_SSS, self).defaultShadersTree()
 
     def setSSSColor(self, color):
-        nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
+        nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)  # does not seem to be implemented in Khronos core code - there is no sss or subsurface or sub-surface
         nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.subsurfaceColor.value].default_value = color

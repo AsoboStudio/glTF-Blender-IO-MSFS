@@ -143,8 +143,9 @@ class MSFS_PrincipledBSDFInputs(Enum):
     roughness = "Roughness"
     anisotropic = "Anisotropic"
     anisotropicRotation = "Anisotropic Rotation"
-    clearcoat = "Clearcoat"
-    clearcoatRoughness = "Clearcoat Roughness"
+    clearcoat = "Coat Weight" # need new name for blender 4.0
+    clearcoatRoughness = "Coat Roughness" # need new name for blender 4.0
+    clearcoatNormal = "Coat Normal" # need new name for blender 4.0
     emission = "Emission Color"
     emissionStrength = "Emission Strength"
     alpha = "Alpha"
