@@ -689,7 +689,7 @@ class MSFS_PT_export_animation_export(bpy.types.Panel):
         if settings.export_nla_strips is False:
             layout.prop(settings, 'export_nla_strips_merged_animation_name')
         layout.prop(settings, "optimize_animation_size")
-        if (bpy.app.version > (3, 3, 0)):
+        if (bpy.app.version >= (3, 3, 0)):
             layout.prop(settings, "export_all_armature_actions")
         else:
             layout.prop(settings, 'export_def_bones')
@@ -750,7 +750,7 @@ class MSFS_PT_export_animation_skinning(bpy.types.Panel):
         layout.active = settings.export_skins
         layout.prop(settings, "export_all_influences")
 
-        if bpy.app.version > (3, 3, 0):
+        if bpy.app.version >= (3, 3, 0):
             row = layout.row()
             row.prop(settings, 'export_def_bones')
             row.active = settings.export_force_sampling

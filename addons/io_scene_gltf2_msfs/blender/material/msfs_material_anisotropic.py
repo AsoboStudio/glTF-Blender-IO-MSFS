@@ -41,20 +41,12 @@ class MSFS_Anisotropic(MSFS_Material):
         
         ## Separate Anisotropic
         # In[0] : Anisotropic Texture -> Out[0]
-        if(bpy.app.version < (3, 3, 0)):
-            separateAnisotropicNode = self.addNode(
-                name = MSFS_AnisotropicNodes.separateAnisotropic.value,
-                typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateRGB.value,
-                location = (-100.0, -800.0),
-                width = 300.0,
-                frame = anisotropicFrame)
-        else:
-            separateAnisotropicNode = self.addNode(
-                name = MSFS_AnisotropicNodes.separateAnisotropic.value,
-                typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value,
-                location = (-100.0, -800.0),
-                width = 300.0,
-                frame = anisotropicFrame)
+        separateAnisotropicNode = self.addNode(
+            name = MSFS_AnisotropicNodes.separateAnisotropic.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value if(bpy.app.version < (3, 3, 0)) else MSFS_ShaderNodesTypes.shaderNodeSeparateRGB.value,
+            location = (-100.0, -800.0),
+            width = 300.0,
+            frame = anisotropicFrame)
         # Links
         self.link(anisotropicTexNode.outputs[0], separateAnisotropicNode.inputs[0])
 
