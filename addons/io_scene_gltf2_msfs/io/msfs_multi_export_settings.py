@@ -45,7 +45,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     )
 
     ## Remember export settings check
-    remember_export_settings: bpy.props.BoolProperty(
+    will_save_settings: bpy.props.BoolProperty(
         name="Remember Export Settings",
         description="Store glTF export settings in the Blender project.",
         default=False
@@ -469,7 +469,7 @@ class MSFS_PT_export_main(bpy.types.Panel):
             layout.prop(settings, "export_texture_dir", icon="FILE_FOLDER")
 
         layout.prop(settings, "export_copyright")
-        layout.prop(settings, "remember_export_settings")
+        layout.prop(settings, "will_save_settings")
         
 
 class MSFS_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
@@ -524,7 +524,8 @@ class MSFS_PT_export_include(bpy.types.Panel):
         col2.prop(settings, "use_visible")
         col2.prop(settings, "use_renderable")
         col2.prop(settings, "use_active_collection")
-        col2.prop(settings, "use_active_scene")
+        if (bpy.app.version > (3, 3, 0)):
+            col2.prop(settings, "use_active_scene")
 
         col2 = layout.column(heading="Data", align=True)
         col2.prop(settings, "export_extras")
@@ -673,9 +674,9 @@ class MSFS_PT_export_animation_export(bpy.types.Panel):
         layout.prop(settings, "export_frame_step")
         layout.prop(settings, "export_force_sampling")
         layout.prop(settings, "export_nla_strips")
-        if settings.export_nla_strips is False:
+        if settings.export_nla_strips is False and bpy.app.version > (3, 3, 0):
             layout.prop(settings, 'export_nla_strips_merged_animation_name')
-        layout.prop(settings, "optimize_animation_size")
+        layout.prop(settings, "export_optimize_animation_size")
         if (bpy.app.version > (3, 3, 0)):
             layout.prop(settings, "export_all_armature_actions")
         else:
