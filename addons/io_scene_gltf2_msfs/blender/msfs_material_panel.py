@@ -47,6 +47,38 @@ def Is_it_FBW_Material(mat):
     # need other ways to check if FBW for glass
     return Is_FBW_material
 
+
+class MSFS_OT_glTfSettingsMaterialData(bpy.types.Operator): # TODO: Remove eventually
+    """This addon changes some of the internal property names. glTf Settings will be updated for ALL materials."""
+
+    bl_idname = "msfs.gltfsetttings_material_data"
+    bl_label = "Reset glTf Settings Material Data"
+
+
+    @staticmethod
+    def gltf_settings_with_dot_present():
+        # Ensure the material has a shader node tree
+        for material in bpy.data.materials:
+            if material.use_nodes:
+                for node in material.node_tree.nodes:
+                    # Check if the node is a group node with a name "glTF Settings new"
+                    if node.type == 'GROUP' and node.node_tree and ( 'glTF Settings.' in node.node_tree.name)  :
+                        return True
+        return False
+
+    def execute(self, context):
+        # Ensure the material has a shader node tree
+        for material in bpy.data.materials:
+            if material.use_nodes:
+                for node in material.node_tree.nodes:
+                    # Check if the node is a group node with a name "glTF Settings new"
+                    if node.type == 'GROUP' and node.node_tree and ( 'glTF Settings.' in node.node_tree.name)  :
+                        # Reassign the proper node group
+                        proper_occlusion_node_tree = bpy.data.node_groups.get("glTF Settings")
+                        node.node_tree = proper_occlusion_node_tree
+                        print(f"Reassigned 'glTF Settings.xxx' to 'glTF Settings' in material  '{material.name}'",  node.node_tree.name)
+        return {"FINISHED"}
+
 class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
     """This addon changes the color nodes, metallic, roughness values to the BSDF color if there is no link input"""
 
@@ -710,6 +742,9 @@ class MSFS_PT_Material(bpy.types.Panel):
         mat = context.active_object.active_material
 
         if mat:
+            if MSFS_OT_glTfSettingsMaterialData.gltf_settings_with_dot_present():
+                layout.operator(MSFS_OT_glTfSettingsMaterialData.bl_idname)
+
             if MSFS_OT_MigrateColorFixData.old_material_values_diff(mat):
                 layout.operator(MSFS_OT_MigrateColorFixData.bl_idname)
 

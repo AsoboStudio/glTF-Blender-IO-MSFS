@@ -91,11 +91,14 @@ class Export:
             MSFSGizmo.export(gltf2_scene.nodes, blender_scene, export_settings)
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
-        # print("gather_material_hook - Started with gltf2_material", gltf2_material, gltf2_material.pbr_metallic_roughness, gltf2_material.pbr_metallic_roughness.base_color_texture)
-        # print("gather_material_hook - gltf2_material.index", gltf2_material.pbr_metallic_roughness.base_color_texture.index.name, gltf2_material.pbr_metallic_roughness.base_color_texture.index.source, gltf2_material.pbr_metallic_roughness.base_color_texture.index.sampler)
-        # print("gather_material_hook - gltf2_material.index", gltf2_material.pbr_metallic_roughness.base_color_texture.index.extras, gltf2_material.pbr_metallic_roughness.base_color_texture.index.extensions)
+        print("gather_material_hook - Started with gltf2_material", gltf2_material, gltf2_material.pbr_metallic_roughness, gltf2_material.pbr_metallic_roughness.base_color_texture)
         # #print("exportsettings", export_settings)
-        # print("gather_material_hook - blender material", blender_material, blender_material.msfs_detail_color_texture)
+        print("gather_material_hook - blender material", blender_material, blender_material.msfs_detail_color_texture, blender_material.msfs_base_color_texture)
+        # if it has a detail color texture then set basecolor to none
+        print("gather_material_hook - blender material - delete base color before", blender_material, blender_material.msfs_detail_color_texture, blender_material.msfs_base_color_texture)
+        if blender_material.msfs_detail_color_texture is not None:
+            gltf2_material.pbr_metallic_roughness.base_color_texture = None
+            print("gather_material_hook - blender material - delete base color after", blender_material, blender_material.msfs_detail_color_texture, blender_material.msfs_base_color_texture)
         if self.properties.enabled:
             print("gather_material_hook - export")
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)

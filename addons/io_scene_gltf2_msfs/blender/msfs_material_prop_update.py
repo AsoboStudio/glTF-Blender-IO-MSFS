@@ -121,7 +121,7 @@ class MSFS_Material_Property_Update:
             self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_parallax":
             msfs_mat = MSFS_Parallax(self, buildTree=True)
-            self.msfs_alpha_mode = "MASK"
+            self.msfs_alpha_mode = "MASK"  # rumbaflappy says should be opaque
         elif self.msfs_material_type == "msfs_anisotropic":
             msfs_mat = MSFS_Anisotropic(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
@@ -209,7 +209,7 @@ class MSFS_Material_Property_Update:
         self.msfs_parallax_room_number_xy = 1
         self.msfs_parallax_room_size_x = 1.0
         self.msfs_parallax_room_size_y = 1.0
-        self.msfs_parallax_scale = 0.0
+        self.msfs_parallax_scale = 0.5
         self.msfs_pearl_brightness = 0.0
         self.msfs_pearl_range = 0.0
         self.msfs_pearl_shift = 0.0
