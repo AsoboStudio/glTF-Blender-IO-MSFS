@@ -349,6 +349,25 @@ class MSFS_Material:
         
         ## Links
         self.link(mulBaseColorANode.inputs[0], baseColorANode.outputs[0])
+        
+        ## Vertex Color Base Color Multiplier
+        # In[0] : Free
+        # In[1] : Vertex Color -> Out[1]
+        # In[2] : Blend Color Map
+        VertexColorBaseColorMulNode = self.addNode(
+            name = MSFS_ShaderNodes.vertexColorBaseMul.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeMixRGB.value if bpy.app.version < (3, 4, 0) else MSFS_ShaderNodesTypes.shaderNodeMix.value,
+            data_type = "RGBA",
+            blend_type = "MULTIPLY",
+            location = (350.0, 450.0),
+            width = 220.0,
+            frame = baseColorFrame
+        )
+        
+        ## Links
+        VertexColorBaseColorMulNode.inputs[self.inputs0].default_value = 1.0
+        self.link(VertexColorBaseColorMulNode.inputs[self.inputs1], vertexColorNode.outputs[0])
+        self.link(VertexColorBaseColorMulNode.inputs[self.inputs2], mulBaseColorRGBNode.outputs[self.outputs0])
 
         #### UV MAPS
         ## UV Frame
@@ -833,6 +852,8 @@ class MSFS_Material:
         nodeMulBaseColorA = self.getNodeByName(MSFS_ShaderNodes.baseColorMulA.value)
         nodeBlendColorMap = self.getNodeByName(MSFS_ShaderNodes.blendColorMap.value)
         nodeBlendAlphaMap = self.getNodeByName(MSFS_ShaderNodes.blendAlphaMap.value)
+        nodeVertexColorBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.vertexColorBaseMul.value)
+        nodeVertexColor = self.getNodeByName(MSFS_ShaderNodes.vertexColor.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
         # !!!! input index orders matters for the exporter here
@@ -852,7 +873,9 @@ class MSFS_Material:
         # has basecolor - no detailColor
         elif nodeBaseColorTex.image and not nodeDetailColorTex.image:
             nodeBlendColorMap.blend_type = "ADD"
-            self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            self.link(nodeVertexColor.outputs[0], nodeVertexColorBaseColorRGB.inputs[self.inputs1])
+            self.link(nodeVertexColorBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorTex.outputs[1], nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
         # no basecolor - has detailColor
@@ -861,17 +884,23 @@ class MSFS_Material:
             # blender 4.0+ messes with the basecolor and puts the DetailColor - for scratches into the BaseColor slot in the PBRMetallicRoughness, but already in the ASOBO
             # extensions for DetailColor - seems the alpha is triggering this - there is no Alpha in the Detail Color Scratches so rewire the links
             nodeBlendColorMap.blend_type = "ADD"
-            self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            self.link(nodeVertexColor.outputs[0], nodeVertexColorBaseColorRGB.inputs[self.inputs1])
+            #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodeVertexColorBaseColorRGB.inputs[self.inputs2])
+            self.link(nodeVertexColorBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             # Alpha links
             self.link(nodeDetailColorTex.outputs[1],nodeMulBaseColorA.inputs[0])
-            #self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
-            #added by ron
-            self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
+            self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
+            # commnet out above line for workaround
+            # added by ron for Blender 4.0 base color issue
+            #self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
         # has both tex
         else:
             nodeBlendColorMap.blend_type = "MULTIPLY"
             nodeMulBaseColorRGB.blend_type = "MULTIPLY"
-            self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodeVertexColorBaseColorRGB.inputs[self.inputs1])
+            self.link(nodeVertexColorBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBlendAlphaMap.outputs[0], nodeMulBaseColorA.inputs[0])
 
     def updateNormalLinks(self):

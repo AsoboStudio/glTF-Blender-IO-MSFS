@@ -128,6 +128,7 @@ class MSFS_ShaderNodes(Enum):
     clearcoatTex = "Clearcoat"
     clearcoatSeparate = "Clearcoat Separate"
     ShaderOutputMaterial = "Shader Output Material"
+    vertexColorBaseMul = "Vertex Color Base Mul"
     principledBSDF = "Principled BSDF"
 
 class MSFS_AnisotropicNodes(Enum):
