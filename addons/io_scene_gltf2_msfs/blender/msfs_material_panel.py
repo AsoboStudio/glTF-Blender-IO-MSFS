@@ -15,6 +15,9 @@
 import bpy
 
 from .msfs_material_prop_update import MSFS_Material_Property_Update
+from .msfs_material_function import MSFS_Material
+from .material.utils.msfs_material_enum import (MSFS_ShaderNodes)
+
 from bpy.types import Material
 
 def equality_check(arr1, arr2, size1, size2):
@@ -39,13 +42,131 @@ def Is_it_FBW_Material(mat):
             n2_IsThere = True
     if n1_IsThere and n1_IsThere:
         Is_FBW_material = True
-
-
     # need other ways to check if FBW for glass
     return Is_FBW_material
 
+def set_vertex_color_white(mat, obj):
+    # now adding a base color triggers vertex color links - they make object black in blender - show texture by making mesh color attribute white
+    # add color attribute to all meshes in material
+    if mat.msfs_base_color_texture or mat.msfs_detail_color_texture:
+        if obj.type == 'MESH':
+            for mat_slot in obj.material_slots:
+                if mat_slot.material.name == mat.name:
+                    #print("update_base_color_texture - found mesh object with material base color texture", obj, mat.name, mat.msfs_base_color_texture, mat.msfs_detail_color_texture)
+                    for ca in obj.data.color_attributes:
+                        if len(obj.data.color_attributes) > 0:
+                            return
+                    # None found - make new Vertex_Color_white and assing to mesh
+                    # Create a new color attribute - seems to be white already ????
+                    color_attribute = obj.data.color_attributes.new(
+                                          name='Col',
+                                          type='BYTE_COLOR',
+                                          domain='CORNER',
+                                      )
 
-class MSFS_OT_glTfSettingsMaterialData(bpy.types.Operator): # TODO: Remove eventually
+
+# def reset_base_color_links(mat, obj):
+        # # Ensure the mesh has a vertex_color_white attribute if it has a base color texture - detail color texture
+        # if (mat and obj.type == "MESH"):
+            # for n in mat.node_tree.nodes:
+                # # possible check is base color is not (1,1,1) don't check alpha
+                # if n.label == MSFS_ShaderNodes.baseColorRGB.value:
+                    # #print("mat, obj", mat, obj)
+                    # color = n.outputs[0].default_value
+                    # #print("color", color, color[0], color[1], color[2])
+                    # if (color[0] != 1 or color[1] != 1 or color[2] != 1):
+                        # if MSFS_OT_vertex_color_white_Data.vertex_color_attribute_isfound(obj):
+                            # nodes = mat.node_tree.nodes
+                            # links = mat.node_tree.links
+                            # for n in nodes:
+                                # #print("node",n, n.label)
+                                # if (n.label == MSFS_ShaderNodes.vertexBaseColorMul.value):
+                                    # basecolorsocket = n.outputs[0]
+                                    # print("socket",basecolorsocket,n, n.label)
+                                    # if not(basecolorsocket.is_linked):
+                                        # print("BasecolorMul link is to be reset")
+                                        # mat.updateColorLinks()
+
+
+class MSFS_OT_vertex_color_white_Data(bpy.types.Operator):
+    """This addon changes some of the internal property names. vertex_color_white will be applied to mesh."""
+
+    bl_idname = "msfs.vertex_color_white_attribute"
+    bl_label = "Apply Vertex_Color_White attribute"
+
+
+    @staticmethod
+    def vertex_color_white_attribute_is_required(mat, obj):
+        # Ensure the mesh has a vertex_color_white attribute if it has a base color texture - detail color texture
+        if (mat and obj.type == "MESH"):
+            for n in mat.node_tree.nodes:
+                if n.label == MSFS_ShaderNodes.baseColorTex.value and n.image:
+                    if not MSFS_OT_vertex_color_white_Data.vertex_color_attribute_isfound(obj):
+                        #print("vertex_color_white_attribute_is_required - required")
+                        return True
+                if n.label == MSFS_ShaderNodes.detailColorTex.value and n.image:
+                    if not MSFS_OT_vertex_color_white_Data.vertex_color_attribute_isfound(obj):
+                        #print("vertex_color_white_attribute_is_required - required")
+                        return True
+        return False
+
+
+    # @staticmethod
+    # def basecolor_link_is_required(mat, obj):
+        # # Ensure the mesh has a vertex_color_white attribute if it has a base color texture - detail color texture
+        # if (mat and obj.type == "MESH"):
+            # for n in mat.node_tree.nodes:
+                # # possible check is base color is not (1,1,1) don't check alpha
+                # if n.label == MSFS_ShaderNodes.baseColorRGB.value:
+                    # #print("mat, obj", mat, obj)
+                    # color = n.outputs[0].default_value
+                    # #print("color", color, color[0], color[1], color[2])
+                    # if (color[0] != 1 or color[1] != 1 or color[2] != 1):
+                        # if MSFS_OT_vertex_color_white_Data.vertex_color_attribute_isfound(obj):
+                            # nodes = mat.node_tree.nodes
+                            # links = mat.node_tree.links
+                            # for n in nodes:
+                                # #print("node",n, n.label)
+                                # if (n.label == MSFS_ShaderNodes.vertexBaseColorMul.value):
+                                    # basecolorsocket = n.outputs[0]
+                                    # if not(basecolorsocket.is_linked):
+                                        # #print("No BasecolorMul link!")
+                                        # return True
+        # return False
+
+
+    @staticmethod
+    def vertex_color_attribute_isfound(obj):
+        for ca in obj.data.color_attributes:
+            if len(obj.data.color_attributes) > 0:
+                return True
+        return False
+
+
+    def execute(self, context):
+        # Ensure the mesh has vertex_color_white attribute
+        mat = context.active_object.active_material
+        obj = context.active_object
+        for n in mat.node_tree.nodes:
+            if n.label == MSFS_ShaderNodes.baseColorTex.value and n.image:
+                if not self.vertex_color_attribute_isfound(obj):
+                    set_vertex_color_white(mat, obj)
+            if n.label == MSFS_ShaderNodes.detailColorTex.value and n.image:
+                if not self.vertex_color_attribute_isfound(obj):
+                    set_vertex_color_white(mat, obj)
+            # if n.label == MSFS_ShaderNodes.baseColorRGB.value:
+                # #print("mat, obj", mat, obj)
+                # color = n.outputs[0].default_value
+                # #print("color", color, color[0], color[1], color[2])
+                # if (color[0] != 1 or color[1] != 1 or color[2] != 1):
+                    # if self.vertex_color_attribute_isfound(obj):
+                        # # for this need to reset the links Base Color to BSDF to base color to Vertex Base Color Mul
+                        # # reset the links
+                        # reset_base_color_links(mat, obj)
+        return {"FINISHED"}
+
+
+class MSFS_OT_glTfSettingsMaterialData(bpy.types.Operator):
     """This addon changes some of the internal property names. glTf Settings will be updated for ALL materials."""
 
     bl_idname = "msfs.gltfsetttings_material_data"
@@ -63,6 +184,7 @@ class MSFS_OT_glTfSettingsMaterialData(bpy.types.Operator): # TODO: Remove event
                         return True
         return False
 
+
     def execute(self, context):
         # Ensure the material has a shader node tree
         for material in bpy.data.materials:
@@ -75,6 +197,7 @@ class MSFS_OT_glTfSettingsMaterialData(bpy.types.Operator): # TODO: Remove event
                         node.node_tree = proper_occlusion_node_tree
                         print(f"Reassigned 'glTF Settings.xxx' to 'glTF Settings' in material  '{material.name}'",  node.node_tree.name)
         return {"FINISHED"}
+
 
 class MSFS_OT_MigrateColorFixData(bpy.types.Operator): # TODO: Remove eventually
     """This addon changes the color nodes, metallic, roughness values to the BSDF color if there is no link input"""
@@ -522,7 +645,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
                     print("execute - make change old new", mat[old_property], mat[new_property])
                 except:
                     print("execute - ERROR did not carry over", mat, old_property, mat.get(old_property), new_property, mat.get(new_property))
-
                 del mat[old_property]
         print("execute - make change to property - old new DONE")
         # Base Color is a special case - can only have 3 values, we need 4
@@ -705,8 +827,12 @@ class MSFS_PT_Material(bpy.types.Panel):
         # layout.use_property_decorate = True
 
         mat = context.active_object.active_material
+        obj = context.active_object
 
         if mat:
+            if MSFS_OT_vertex_color_white_Data.vertex_color_white_attribute_is_required(mat, obj):
+                layout.operator(MSFS_OT_vertex_color_white_Data.bl_idname)
+
             if MSFS_OT_glTfSettingsMaterialData.gltf_settings_with_dot_present():
                 layout.operator(MSFS_OT_glTfSettingsMaterialData.bl_idname)
 
@@ -874,6 +1000,15 @@ class MSFS_PT_Material(bpy.types.Panel):
                     box,
                     mat,
                     "msfs_emissive_scale",
+                    enabled=(
+                        mat.msfs_material_type
+                        not in ["msfs_invisible", "msfs_environment_occluder"]
+                    ),
+                )
+                self.draw_prop(
+                    box,
+                    mat,
+                    "msfs_vertexcolor_scale",
                     enabled=(
                         mat.msfs_material_type
                         not in ["msfs_invisible", "msfs_environment_occluder"]

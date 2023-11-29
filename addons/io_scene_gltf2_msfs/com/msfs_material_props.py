@@ -106,6 +106,7 @@ class AsoboMaterialCommon:
         RoughnessFactor = 1.0
         NormalScale = 1.0
         EmissiveScale = 1.0
+        VertexColorScale = 0.0
         AlphaMode = "OPAQUE"
         AlphaCutoff = 0.5
         DoubleSided = False
@@ -273,6 +274,16 @@ class AsoboMaterialCommon:
         max=100.0,
         default=Defaults.EmissiveScale,
         update=MSFS_Material_Property_Update.update_emissive_scale,
+        options=set(),
+    )
+
+    bpy.types.Material.msfs_vertexcolor_scale = bpy.props.FloatProperty(
+        name="Vertex Color Scale",
+        description="Controls the intensity of the Vertex Color. A value of 1.0 means that the material is fully tinted with the Vertex Color. This can be used in addition to an base/detail texture and in this case, it will control the vertex color Strength of this one.",
+        min=0.0,
+        max=1.0,
+        default=Defaults.VertexColorScale,
+        update=MSFS_Material_Property_Update.update_vertexcolor_scale,
         options=set(),
     )
 
