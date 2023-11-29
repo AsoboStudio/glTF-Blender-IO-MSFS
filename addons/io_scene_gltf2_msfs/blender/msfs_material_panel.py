@@ -184,7 +184,6 @@ class MSFS_OT_glTfSettingsMaterialData(bpy.types.Operator):
                         return True
         return False
 
-
     def execute(self, context):
         # Ensure the material has a shader node tree
         for material in bpy.data.materials:
@@ -610,11 +609,6 @@ class MSFS_OT_MigrateMaterialData(bpy.types.Operator): # TODO: Remove eventually
         "msfs_anisotropic_direction_texture": "msfs_extra_slot1_texture",
         "msfs_clearcoat_texture": "msfs_dirt_texture",
     }
-    #"msfs_color_base_mix": " - related to vertex alpha node"
-    #"msfs_color_alpha_mix": " - related to vertex alpha node"
-
-    # not implemented
-    # msfs_wiper_mask_texture, msfs_responsive_aa, msfs_ao_use_uv2 
 
     @staticmethod
     def old_properties_present(mat):
