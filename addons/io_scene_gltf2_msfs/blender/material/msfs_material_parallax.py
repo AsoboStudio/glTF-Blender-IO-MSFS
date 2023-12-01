@@ -58,11 +58,14 @@ class MSFS_Parallax(MSFS_Material):
         nodeAlbedoDetailMix = self.getNodeByName(MSFS_ShaderNodes.albedoDetailMix.value)
         nodeBehindGlassTex = self.getNodeByName(MSFS_ShaderNodes.behindGlassTex.value)
         nodeBaseColorMulRGB = self.getNodeByName(MSFS_ShaderNodes.baseColorMulRGB.value)
+        nodeVertexColorBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.vertexColorBaseMul.value)
+        nodeVertexColor = self.getNodeByName(MSFS_ShaderNodes.vertexColor.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
         nodeBehindGlassTex.image = tex
         self.updateColorLinks()
         
         ## TODO - check if this is good
-        self.link(nodeBaseColorMulRGB.outputs[0], nodeAlbedoDetailMix.inputs[1])
+        #self.link(nodeBaseColorMulRGB.outputs[0], nodeAlbedoDetailMix.inputs[1])
+        self.link(nodeVertexColorBaseColorRGB.outputs[0], nodeAlbedoDetailMix.inputs[1])
         self.link(nodeAlbedoDetailMix.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
