@@ -91,6 +91,7 @@ class Export:
             MSFSGizmo.export(gltf2_scene.nodes, blender_scene, export_settings)
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
+        # blender 4.0 issue with detail textures added twice once correct and once as a regular basecolor texture
         print("gather_material_hook - Started with gltf2_material", gltf2_material, gltf2_material.pbr_metallic_roughness, gltf2_material.pbr_metallic_roughness.base_color_texture)
         # #print("exportsettings", export_settings)
         print("gather_material_hook - blender material", blender_material, blender_material.msfs_detail_color_texture, blender_material.msfs_base_color_texture)
@@ -104,7 +105,6 @@ class Export:
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
         print("gather_material_hook - Done")
 
-# blender 4.0 issue with detail textures added twice once correct and once as a regular basecolor texture
     # def gather_texture_info_hook(self, gltf2_io, blender_shader_sockets, export_settings):
         # print("gather_texture_info_hook - Started with ", blender_shader_sockets)
         # #print("exportsettings", export_settings)

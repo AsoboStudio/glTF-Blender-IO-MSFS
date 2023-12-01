@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import bpy
+
 from .material.msfs_material_anisotropic import MSFS_Anisotropic
 from .material.msfs_material_clearcoat import MSFS_Clearcoat
 from .material.msfs_material_environment_occluder import \
@@ -121,7 +123,9 @@ class MSFS_Material_Property_Update:
             self.msfs_alpha_mode = "OPAQUE"
         elif self.msfs_material_type == "msfs_parallax":
             msfs_mat = MSFS_Parallax(self, buildTree=True)
-            self.msfs_alpha_mode = "MASK"  # rumbaflappy says should be opaque
+            self.msfs_alpha_mode = "MASK"
+            # Material Setting Blend_Method per rumbaflappy
+            self.blend_method = 'OPAQUE'
         elif self.msfs_material_type == "msfs_anisotropic":
             msfs_mat = MSFS_Anisotropic(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
@@ -209,7 +213,7 @@ class MSFS_Material_Property_Update:
         self.msfs_parallax_room_number_xy = 1
         self.msfs_parallax_room_size_x = 1.0
         self.msfs_parallax_room_size_y = 1.0
-        self.msfs_parallax_scale = 0.5
+        self.msfs_parallax_scale = 0.0
         self.msfs_pearl_brightness = 0.0
         self.msfs_pearl_range = 0.0
         self.msfs_pearl_shift = 0.0
@@ -236,6 +240,7 @@ class MSFS_Material_Property_Update:
         msfs = MSFS_Material_Property_Update.getMaterial(self)
         if msfs is not None and type(msfs) is not MSFS_Invisible:
             msfs.setBaseColorTex(self.msfs_base_color_texture)
+            msfs.set_vertex_color_white(self, self.msfs_base_color_texture)
 
     @staticmethod
     def update_comp_texture(self, context):
@@ -260,6 +265,7 @@ class MSFS_Material_Property_Update:
         msfs = MSFS_Material_Property_Update.getMaterial(self)
         if msfs is not None and type(msfs) is not MSFS_Invisible:
             msfs.setDetailColorTex(self.msfs_detail_color_texture)
+            msfs.set_vertex_color_white(self, self.msfs_detail_color_texture)
 
     @staticmethod
     def update_detail_comp_texture(self, context):
@@ -333,6 +339,12 @@ class MSFS_Material_Property_Update:
         msfs = MSFS_Material_Property_Update.getMaterial(self)
         if msfs is not None:
             msfs.setNormalScale(self.msfs_normal_scale)
+
+    @staticmethod
+    def update_vertexcolor_scale(self, context):
+        msfs = MSFS_Material_Property_Update.getMaterial(self)
+        if msfs is not None:
+            msfs.setVertexColorScale(self.msfs_vertexcolor_scale)
 
     @staticmethod
     def update_color_sss(self, context):

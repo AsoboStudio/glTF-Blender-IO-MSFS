@@ -329,7 +329,6 @@ class MSFS_Material:
         ## Links
         self.link(mulBaseColorRGBNode.inputs[self.inputs0], vertexColorNode.outputs[1])
         #mulBaseColorRGBNode.inputs[self.inputs0].default_value = 1.0 # added by ron
-        print("Vertex color and alpha values", vertexColorNode.outputs[0].default_value[0], vertexColorNode.outputs[0].default_value[1], vertexColorNode.outputs[0].default_value[2], vertexColorNode.outputs[0].default_value[3], vertexColorNode.outputs[1].default_value)
         self.link(mulBaseColorRGBNode.inputs[self.inputs1], baseColorRGBNode.outputs[0])
         self.link(mulBaseColorRGBNode.inputs[self.inputs2], blendColorMapNode.outputs[0])
         
@@ -368,7 +367,7 @@ class MSFS_Material:
         # In[1] : Vertex Color -> Out[1]
         # In[2] : Blend Color Map
         VertexColorBaseColorMulNode = self.addNode(
-            name = MSFS_ShaderNodes.vertexColorBaseMul.value,
+            name = MSFS_ShaderNodes.vertexBaseColorMul.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeMixRGB.value if bpy.app.version < (3, 4, 0) else MSFS_ShaderNodesTypes.shaderNodeMix.value,
             data_type = "RGBA",
             blend_type = "MULTIPLY",
@@ -378,9 +377,8 @@ class MSFS_Material:
         )
         
         ## Links
-        VertexColorBaseColorMulNode.inputs[self.inputs0].default_value = 1.0
+        VertexColorBaseColorMulNode.inputs[self.inputs0].default_value = 0.0
         self.link(VertexColorBaseColorMulNode.inputs[self.inputs1], vertexColorNode.outputs[0])
-        self.link(VertexColorBaseColorMulNode.inputs[self.inputs2], mulBaseColorRGBNode.outputs[self.outputs0])
 
         #### UV MAPS
         ## UV Frame
@@ -805,6 +803,12 @@ class MSFS_Material:
             nodeEmissiveScale.outputs[0].default_value = scale
             self.updateEmissiveLinks()
 
+    def setVertexColorScale(self, scale):
+        nodeVertexColorScale = self.getNodeByName(MSFS_ShaderNodes.vertexBaseColorMul.value)
+        if nodeVertexColorScale is not None:
+            nodeVertexColorScale.inputs[0].default_value = scale
+            self.updateColorLinks()
+
     def setEmissiveColor(self, color):
         nodeEmissiveColor = self.getNodeByName(MSFS_ShaderNodes.emissiveColor.value)
         if nodeEmissiveColor is not None:
@@ -865,7 +869,7 @@ class MSFS_Material:
         nodeMulBaseColorA = self.getNodeByName(MSFS_ShaderNodes.baseColorMulA.value)
         nodeBlendColorMap = self.getNodeByName(MSFS_ShaderNodes.blendColorMap.value)
         nodeBlendAlphaMap = self.getNodeByName(MSFS_ShaderNodes.blendAlphaMap.value)
-        nodeVertexColorBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.vertexColorBaseMul.value)
+        nodeVertexColorBaseColorRGB = self.getNodeByName(MSFS_ShaderNodes.vertexBaseColorMul.value)
         nodeVertexColor = self.getNodeByName(MSFS_ShaderNodes.vertexColor.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
@@ -878,43 +882,40 @@ class MSFS_Material:
         self.link(nodeDetailColorTex.outputs[1], nodeBlendAlphaMap.inputs[1])
         self.link(nodeBaseColorA.outputs[0], nodeMulBaseColorA.inputs[1])
         self.link(nodeBaseColorRGB.outputs[0], nodeMulBaseColorRGB.inputs[self.inputs1])
+        self.link(nodeVertexColor.outputs[0], nodeVertexColorBaseColorRGB.inputs[self.inputs2])
+        self.link(nodeVertexColorBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
 
         # no tex
         if not nodeBaseColorTex.image and not nodeDetailColorTex.image:
-            self.link(nodeBaseColorRGB.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            self.link(nodeBaseColorRGB.outputs[0], nodeVertexColorBaseColorRGB.inputs[self.inputs1])
             self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
+
         # has basecolor - no detailColor
         elif nodeBaseColorTex.image and not nodeDetailColorTex.image:
             nodeBlendColorMap.blend_type = "ADD"
             #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
-            self.link(nodeVertexColor.outputs[0], nodeVertexColorBaseColorRGB.inputs[self.inputs1])
-            self.link(nodeVertexColorBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             self.link(nodeBaseColorTex.outputs[1], nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
+            self.link(nodeVertexColorBaseColorRGB.inputs[self.inputs1], nodeMulBaseColorRGB.outputs[self.outputs0])
+
         # no basecolor - has detailColor
         # Blender 4.0+ issue with finding a texture here on alpha channel - puts DetailColor in BaseColor slot also along with ASOBO extension
         elif not nodeBaseColorTex.image and nodeDetailColorTex.image:
-            # blender 4.0+ messes with the basecolor and puts the DetailColor - for scratches into the BaseColor slot in the PBRMetallicRoughness, but already in the ASOBO
-            # extensions for DetailColor - seems the alpha is triggering this - there is no Alpha in the Detail Color Scratches so rewire the links
             nodeBlendColorMap.blend_type = "ADD"
             #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
-            self.link(nodeVertexColor.outputs[0], nodeVertexColorBaseColorRGB.inputs[self.inputs1])
-            #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodeVertexColorBaseColorRGB.inputs[self.inputs2])
-            self.link(nodeVertexColorBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
             # Alpha links
             self.link(nodeDetailColorTex.outputs[1],nodeMulBaseColorA.inputs[0])
             self.link(nodeMulBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
-            # commnet out above line for workaround
-            # added by ron for Blender 4.0 base color issue
-            #self.link(nodeBaseColorA.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.alpha.value])
+            self.link(nodeVertexColorBaseColorRGB.inputs[self.inputs1], nodeMulBaseColorRGB.outputs[self.outputs0])
+
         # has both tex
         else:
             nodeBlendColorMap.blend_type = "MULTIPLY"
             nodeMulBaseColorRGB.blend_type = "MULTIPLY"
             #self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
-            self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodeVertexColorBaseColorRGB.inputs[self.inputs1])
-            self.link(nodeVertexColorBaseColorRGB.outputs[self.outputs0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.baseColor.value])
+            self.link(nodeMulBaseColorRGB.outputs[self.outputs0], nodeVertexColorBaseColorRGB.inputs[self.inputs2])
             self.link(nodeBlendAlphaMap.outputs[0], nodeMulBaseColorA.inputs[0])
+            self.link(nodeVertexColorBaseColorRGB.inputs[self.inputs1], nodeMulBaseColorRGB.outputs[self.outputs0])
 
     def updateNormalLinks(self):
         nodeNormalTex = self.getNodeByName(MSFS_ShaderNodes.normalTex.value)
@@ -1085,6 +1086,29 @@ class MSFS_Material:
     def unLinkNodeInput(self, node, inputIndex):
         for link in node.inputs[inputIndex].links:
             self.node_tree.links.remove(link)
+
+    def set_vertex_color_white(self, mat, tex):
+        # now adding a base color triggers vertex color links - they make object black in blender - show texture by making mesh color attribute white
+        # add color attribute to mesh for mesh with this material
+        # has to be an easier efficient way to get mesh object from material
+        if tex is not None:
+            for obj in bpy.context.scene.objects:
+                if obj.type == 'MESH':
+                    for mat_slot in obj.material_slots:
+                        if mat_slot.material.name == mat.name:
+                            if len(obj.data.color_attributes) > 0:
+                            #for ca in obj.data.color_attributes:
+                                #if ca.name == 'Vertex_Color_White':
+                                print("update_base_color_texture - found color attribute - no update")
+                                return
+                            # None found - make new Vertex_Color_white and assing to mesh
+                            # Create a new color attribute - seems to be white already ????
+                            print("update_base_color_texture - found mesh object with material base color texture - update", obj, mat.name, mat.msfs_base_color_texture, mat.msfs_detail_color_texture)
+                            color_attribute = obj.data.color_attributes.new(
+                                                  name='Col',
+                                                  type='BYTE_COLOR',
+                                                  domain='CORNER',
+                                              )
 
     def free(self):
         if self.node_tree.users == 1:
