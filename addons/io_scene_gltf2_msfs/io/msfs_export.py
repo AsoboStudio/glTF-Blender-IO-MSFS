@@ -23,6 +23,15 @@ from .msfs_material import MSFSMaterial
 from .msfs_unique_id import MSFS_unique_id
 
 
+def equality_check(arr1, arr2, size1, size2):
+   if (size1 != size2):
+      return False
+   for i in range(0, size2):
+      # blender python color channel issues in floats ???
+      if (int(arr1[i] * 10000000)/10000000 != int(arr2[i] * 10000000)/10000000):
+         return False
+   return True
+
 class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):
@@ -93,16 +102,15 @@ class Export:
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         # blender 3.3 removes base color values with base color texture - have to add back in
         print("gather_material_hook - Started with gltf2_material", gltf2_material, gltf2_material.pbr_metallic_roughness, gltf2_material.pbr_metallic_roughness.base_color_texture, gltf2_material.pbr_metallic_roughness.base_color_factor)
-        # #print("exportsettings", export_settings)
-        print("gather_material_hook - blender material", blender_material, blender_material.msfs_base_color_texture, blender_material.msfs_base_color_factor)
-        # if it has a detail color texture then set basecolor to none
         base_color = blender_material.msfs_base_color_factor
-        print("gather_material_hook - blender material - delete base color before", blender_material, blender_material.msfs_base_color_texture, base_color[0], base_color[1], base_color[2], base_color[3])
-        if gltf2_material.pbr_metallic_roughness.base_color_factor is None:
-            #gltf2_material.pbr_metallic_roughness.base_color_factor = base_color
+        gltf2_base_color = gltf2_material.pbr_metallic_roughness.base_color_factor
+        print("gather_material_hook - blender material - set base color factor before", blender_material, blender_material.msfs_base_color_texture, base_color[0], base_color[1], base_color[2], base_color[3])
+        if not equality_check(base_color, gltf2_base_color, len(base_color), len(gltf2_base_color)):
+            print("gather_material_hook - changing")
             gltf2_material.pbr_metallic_roughness.base_color_factor = [base_color[0],base_color[1],base_color[2],base_color[3]]
-        print("gather_material_hook - blender material - delete base color after", blender_material, blender_material.msfs_base_color_texture, blender_material.msfs_base_color_factor, gltf2_material.pbr_metallic_roughness.base_color_factor)
+        print("gather_material_hook - blender material - set base color after", blender_material, blender_material.msfs_base_color_texture, blender_material.msfs_base_color_factor, gltf2_material.pbr_metallic_roughness.base_color_factor)
         if self.properties.enabled:
             print("gather_material_hook - export")
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
         print("gather_material_hook - Done")
+

@@ -24,7 +24,7 @@ def equality_check(arr1, arr2, size1, size2):
    if (size1 != size2):
       return False
    for i in range(0, size2):
-      # blender pyhon color channel issues in floats ???
+      # blender python color channel issues in floats ???
       if (int(arr1[i] * 10000000)/10000000 != int(arr2[i] * 10000000)/10000000):
          return False
    return True
@@ -1144,10 +1144,10 @@ class MSFS_PT_Material(bpy.types.Panel):
                         )
 
                     if mat.msfs_material_type == "msfs_windshield":
-                        emissive_texture_name = "Secondary Details(A)"
+                        emissive_texture_name = "Secondary Details (Dirt)(A)"
                         extra_slot1_texture = "Wiper Mask (RG)"
                         detail_color_texture_name = (
-                            "Details Scratch(R), Icing Mask(Dirt)(G), Fingerprints(B)"
+                            "Details Scratch(R), Icing Mask(G), Fingerprints(B)"
                         )
                         detail_normal_texture_name = "Icing Normal (use DetailMap UV)"
                     elif mat.msfs_material_type == "msfs_geo_decal_frosted":
