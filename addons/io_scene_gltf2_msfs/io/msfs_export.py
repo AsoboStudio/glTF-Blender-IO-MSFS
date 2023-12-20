@@ -23,6 +23,15 @@ from .msfs_material import MSFSMaterial
 from .msfs_unique_id import MSFS_unique_id
 
 
+def equality_check(arr1, arr2, size1, size2):
+   if (size1 != size2):
+      return False
+   for i in range(0, size2):
+      # blender python color channel issues in floats ???
+      if (int(arr1[i] * 10000000)/10000000 != int(arr2[i] * 10000000)/10000000):
+         return False
+   return True
+
 class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):
@@ -102,8 +111,9 @@ class Export:
 
         # blender 3.3 removes base color values with base color texture - have to add back in
         base_color = blender_material.msfs_base_color_factor
+        gltf2_base_color = gltf2_material.pbr_metallic_roughness.base_color_factor
         print("gather_material_hook - blender material - set base color factor before", blender_material, blender_material.msfs_base_color_texture, base_color[0], base_color[1], base_color[2], base_color[3])
-        if gltf2_material.pbr_metallic_roughness.base_color_factor is None:
+        if not equality_check(base_color, gltf2_base_color, len(base_color), len(gltf2_base_color)):
             gltf2_material.pbr_metallic_roughness.base_color_factor = [base_color[0],base_color[1],base_color[2],base_color[3]]
 
         if self.properties.enabled:

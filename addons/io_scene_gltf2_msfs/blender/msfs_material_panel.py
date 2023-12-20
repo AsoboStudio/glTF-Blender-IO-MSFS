@@ -27,7 +27,7 @@ def equality_check(arr1, arr2, size1, size2):
    if (size1 != size2):
       return False
    for i in range(0, size2):
-      # blender pyhon color channel issues in floats ???
+      # blender python color channel issues in floats ???
       if (int(arr1[i] * 10000000)/10000000 != int(arr2[i] * 10000000)/10000000):
          return False
    return True
