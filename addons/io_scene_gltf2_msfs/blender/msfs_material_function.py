@@ -641,15 +641,21 @@ class MSFS_Material:
 
         # Fix the normal view by reversing the green channel
         # since blender can only render openGL normal textures
+        # make the blue channel = 1.0 in all values - per rhumbaflappy - fsdeveloper.com
         RGBCurvesNode = self.addNode(
             name = MSFS_ShaderNodes.RGBCurves.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeRGBCurve.value,
             location = (-300.0, -400.0),
             frame = normalFrame
         )
+        # Green invert
         curveMapping = RGBCurvesNode.mapping.curves[1]
         curveMapping.points[0].location = (0.0, 1.0)
         curveMapping.points[1].location = (1.0, 0.0)
+        # Blue 1.0 to 1.0
+        curveMapping = RGBCurvesNode.mapping.curves[2]
+        curveMapping.points[0].location = (0.0, 1.0)
+        curveMapping.points[1].location = (1.0, 1.0)
 
         ## Normal Map Sampler
         # In[1] : Normal Texture -> Out[0]

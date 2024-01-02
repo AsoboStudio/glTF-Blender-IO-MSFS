@@ -108,7 +108,7 @@ class MSFS_Material_Property_Update:
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
             self.msfs_roughness_factor = 0.0
-            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.01]
+            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.1]
         elif self.msfs_material_type == "msfs_porthole":
             msfs_mat = MSFS_Porthole(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
@@ -117,7 +117,7 @@ class MSFS_Material_Property_Update:
             self.msfs_alpha_mode = "BLEND"
             self.msfs_metallic_factor = 0.0
             self.msfs_roughness_factor = 0.0
-            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.01]
+            self.msfs_base_color_factor = [1.0, 1.0, 1.0, 0.1]
         elif self.msfs_material_type == "msfs_clearcoat":
             msfs_mat = MSFS_Clearcoat(self, buildTree=True)
             self.msfs_alpha_mode = "OPAQUE"
@@ -201,7 +201,7 @@ class MSFS_Material_Property_Update:
         self.msfs_glass_deformation_factor = 0.0
         self.msfs_glass_reflection_mask_factor = 0.0
         self.msfs_metallic_blend_factor = 0.0
-        self.msfs_metallic_factor = 1.0
+        self.msfs_metallic_factor = 0.0
         self.msfs_no_cast_shadow = False
         self.msfs_normal_blend_factor = 1.0
         self.msfs_normal_scale = 1.0
@@ -221,7 +221,7 @@ class MSFS_Material_Property_Update:
         self.msfs_responsive_aa = False
         self.msfs_road_collision_material = False
         self.msfs_roughness_blend_factor = 1.0
-        self.msfs_roughness_factor = 1.0
+        self.msfs_roughness_factor = 0.5
         self.msfs_sss_color = [0.8, 0.8, 0.8, 1.0]
         self.msfs_use_pearl = False
         self.msfs_uv_offset_u = 0.0

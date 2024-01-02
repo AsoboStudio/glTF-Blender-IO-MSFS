@@ -65,6 +65,28 @@ def set_vertex_color_white(mat, obj):
                                       )
 
 
+# def reset_base_color_links(mat, obj):
+        # # Ensure the mesh has a vertex_color_white attribute if it has a base color texture - detail color texture
+        # if (mat and obj.type == "MESH"):
+            # for n in mat.node_tree.nodes:
+                # # possible check is base color is not (1,1,1) don't check alpha
+                # if n.label == MSFS_ShaderNodes.baseColorRGB.value:
+                    # #print("mat, obj", mat, obj)
+                    # color = n.outputs[0].default_value
+                    # #print("color", color, color[0], color[1], color[2])
+                    # if (color[0] != 1 or color[1] != 1 or color[2] != 1):
+                        # if MSFS_OT_vertex_color_white_Data.vertex_color_attribute_isfound(obj):
+                            # nodes = mat.node_tree.nodes
+                            # links = mat.node_tree.links
+                            # for n in nodes:
+                                # #print("node",n, n.label)
+                                # if (n.label == MSFS_ShaderNodes.vertexBaseColorMul.value):
+                                    # basecolorsocket = n.outputs[0]
+                                    # print("socket",basecolorsocket,n, n.label)
+                                    # if not(basecolorsocket.is_linked):
+                                        # print("BasecolorMul link is to be reset")
+                                        # mat.updateColorLinks()
+
 
 class MSFS_OT_vertex_color_white_Data(bpy.types.Operator):
     """This addon changes some of the internal property names. vertex_color_white will be applied to mesh."""
@@ -87,6 +109,31 @@ class MSFS_OT_vertex_color_white_Data(bpy.types.Operator):
                         #print("vertex_color_white_attribute_is_required - required")
                         return True
         return False
+
+
+    # @staticmethod
+    # def basecolor_link_is_required(mat, obj):
+        # # Ensure the mesh has a vertex_color_white attribute if it has a base color texture - detail color texture
+        # if (mat and obj.type == "MESH"):
+            # for n in mat.node_tree.nodes:
+                # # possible check is base color is not (1,1,1) don't check alpha
+                # if n.label == MSFS_ShaderNodes.baseColorRGB.value:
+                    # #print("mat, obj", mat, obj)
+                    # color = n.outputs[0].default_value
+                    # #print("color", color, color[0], color[1], color[2])
+                    # if (color[0] != 1 or color[1] != 1 or color[2] != 1):
+                        # if MSFS_OT_vertex_color_white_Data.vertex_color_attribute_isfound(obj):
+                            # nodes = mat.node_tree.nodes
+                            # links = mat.node_tree.links
+                            # for n in nodes:
+                                # #print("node",n, n.label)
+                                # if (n.label == MSFS_ShaderNodes.vertexBaseColorMul.value):
+                                    # basecolorsocket = n.outputs[0]
+                                    # if not(basecolorsocket.is_linked):
+                                        # #print("No BasecolorMul link!")
+                                        # return True
+        # return False
+
 
     @staticmethod
     def vertex_color_attribute_isfound(obj):
@@ -1097,10 +1144,10 @@ class MSFS_PT_Material(bpy.types.Panel):
                         )
 
                     if mat.msfs_material_type == "msfs_windshield":
-                        emissive_texture_name = "Secondary Details(A)"
+                        emissive_texture_name = "Secondary Details (Dirt)(A)"
                         extra_slot1_texture = "Wiper Mask (RG)"
                         detail_color_texture_name = (
-                            "Details Scratch(R), Icing Mask(Dirt)(G), Fingerprints(B)"
+                            "Details Scratch(R), Icing Mask(G), Fingerprints(B)"
                         )
                         detail_normal_texture_name = "Icing Normal (use DetailMap UV)"
                     elif mat.msfs_material_type == "msfs_geo_decal_frosted":
