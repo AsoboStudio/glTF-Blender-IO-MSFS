@@ -102,8 +102,8 @@ class AsoboMaterialCommon:
     class Defaults:
         BaseColorFactor = [1.0, 1.0, 1.0, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
-        MetallicFactor = 0.0
-        RoughnessFactor = 0.5
+        MetallicFactor = 1.0
+        RoughnessFactor = 1.0
         NormalScale = 1.0
         EmissiveScale = 1.0
         VertexColorScale = 0.0
