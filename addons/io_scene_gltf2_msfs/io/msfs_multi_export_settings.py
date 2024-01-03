@@ -111,7 +111,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Renderable Objects Check
     use_renderable: bpy.props.BoolProperty(
         name="Renderable Objects",
-        description="Export renderable objects only",
+        description="Export renderable objects only",        
         default=False,
     )
 
