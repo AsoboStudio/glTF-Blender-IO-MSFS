@@ -117,7 +117,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     ## Export Custom Propreties Check
     export_extras: bpy.props.BoolProperty(
         name="Custom Properties",
-        description="Export custom properties as glTF extras",
+        description="Export custom properties as glTF extras. Must be disabled for export dedicated to Microsoft Flight Simulator",
         default=False,
     )
     
@@ -685,8 +685,11 @@ class MSFS_PT_export_include(bpy.types.Panel):
 
         col2 = layout.column(heading="Data", align=True)
         col2.prop(settings, "export_extras")
-        col2.prop(settings, "export_cameras")
-        col2.prop(settings, "export_lights")
+        if (settings.enable_msfs_extension):
+            col2.enabled = False
+        col3 = layout.column(heading="", align=True)
+        col3.prop(settings, "export_cameras")
+        col3.prop(settings, "export_lights")
  
  
 class MSFS_PT_export_transform(bpy.types.Panel):
