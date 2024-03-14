@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bpy
-import math
-
 from io_scene_gltf2.io.com.gltf2_io import Node
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
 
@@ -130,16 +127,12 @@ class MSFSGizmo:
         for node in nodes:
             collisions = []  # TODO: make sure node is mesh?
             for child in list(node.children):
-                blender_object = blender_scene.objects.get(
-                    child.name
-                )  # The glTF exporter will ALWAYS set the node name as the blender name
-
+                blender_object = blender_scene.objects.get(child.name)  # The glTF exporter will ALWAYS set the node name as the blender name
                 if blender_object is None: # However, there are cases where the exporter creates fake nodes that don't exist in the scene
                     continue
-
-                if (
-                    blender_object.parent is None or blender_object.parent.type != "MESH"
-                ):  # We only need the collision gizmos that are parented to a mesh
+                
+                # We only need the collision gizmos that are parented to a mesh
+                if (blender_object.parent is None or blender_object.parent.type != "MESH"):  
                     continue
 
                 if blender_object.msfs_gizmo_type != "NONE":

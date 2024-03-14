@@ -216,8 +216,9 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
 
         for _, (empty, gizmo) in enumerate(self.__class__.empties.copy().items()):
             if empty not in found_empties:
-                self.gizmos.remove(gizmo)
                 del self.__class__.empties[empty]
+                if gizmo:
+                    self.gizmos.remove(gizmo)
 
         # Check if there are any new gizmo empties, and if so create new gizmo. We can't do this in the above loop due to the crash mentioned above
         for object in context.view_layer.objects:
