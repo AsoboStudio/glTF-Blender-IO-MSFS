@@ -29,10 +29,15 @@ class MultiExporterLOD(bpy.types.PropertyGroup):
 
 
 class MultiExporterLODGroup(bpy.types.PropertyGroup):
+    
+    def update_relative_path(self, context):
+        if self.folder_path == "//":
+            self.folder_path = self.folder_path + '\\'
+
     group_name: bpy.props.StringProperty(name="", default="")
     expanded: bpy.props.BoolProperty(name="", default=True)
     lods: bpy.props.CollectionProperty(type=MultiExporterLOD)
-    folder_name: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH")
+    folder_path: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH", description="Path to the directory where you want your model to be exported", update=update_relative_path)
     generate_xml: bpy.props.BoolProperty(name="", default=False)
     overwrite_guid: bpy.props.BoolProperty(name="", description="If an XML file already exists in the location to export to, the GUID will be overwritten", default=False)
 
@@ -216,7 +221,7 @@ class MSFS_PT_MultiExporterObjectsView(bpy.types.Panel):
                         if lod_group.generate_xml:
                             box.prop(lod_group, "overwrite_guid", text="Overwrite GUID")
 
-                        box.prop(lod_group, "folder_name", text="Export Path")
+                        box.prop(lod_group, "folder_path", text="Export Path")
 
                         col = box.column()
                         for lod in lod_group.lods:

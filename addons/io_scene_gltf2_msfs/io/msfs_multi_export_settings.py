@@ -52,9 +52,9 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
 
     ## MSFS extensions Check
     def msfs_enable_msfs_extension_update(self, context):
-        props = bpy.context.scene.msfs_exporter_properties
+        props = bpy.context.scene.msfs_exporter_settings
         settings = context.scene.msfs_multi_exporter_settings
-        props.enabled = settings.enable_msfs_extension
+        props.enable_msfs_extension = settings.enable_msfs_extension
 
     enable_msfs_extension: bpy.props.BoolProperty(
         name='Use Microsoft Flight Simulator Extensions',
@@ -65,7 +65,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
 
     ## Asobo Unique ID Check
     def msfs_use_unique_id_extension_update(self, context):
-        props = bpy.context.scene.msfs_exporter_properties
+        props = bpy.context.scene.msfs_exporter_settings
         settings = context.scene.msfs_multi_exporter_settings
         props.use_unique_id = settings.use_unique_id
     

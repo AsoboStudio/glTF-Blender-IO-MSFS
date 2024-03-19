@@ -198,7 +198,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
     @staticmethod
     def export(file_path):
         settings = bpy.context.scene.msfs_multi_exporter_settings
-        bpy.context.scene.msfs_exporter_properties.use_unique_id = settings.use_unique_id
+        bpy.context.scene.msfs_exporter_settings.use_unique_id = settings.use_unique_id
         gltf = None
         if (bpy.app.version < (3, 3, 0)):
             gltf = export_blender_under_3_3(file_path, settings)
@@ -220,7 +220,10 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
             for lod_group in lod_groups:
                 # Generate XML if needed
                 if lod_group.generate_xml:
-                    xml_path = bpy.path.abspath(os.path.join(lod_group.folder_name, lod_group.group_name + ".xml"))
+                    export_folder_path = lod_group.folder_path
+                    if export_folder_path == '//\\':
+                        export_folder_path = export_folder_path.rsplit('\\')[0]
+                    xml_path = bpy.path.abspath(os.path.join(export_folder_path, lod_group.group_name + ".xml"))
                     found_guid = None
 
                     if os.path.exists(xml_path):
@@ -289,8 +292,8 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                         else:
                             select_recursive(lod.objectLOD)
                         
-                        if lod_group.folder_name != "":
-                            exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(lod_group.folder_name), os.path.splitext(lod.file_name)[0]), ".gltf")
+                        if export_folder_path != "":
+                            exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(export_folder_path), os.path.splitext(lod.file_name)[0]), ".gltf")
                             MSFS_OT_MultiExportGLTF2.export(exportPath)
                         else:
                             self.report({'ERROR'}, "[EXPORT][ERROR] Object : " + lod.file_name + " does not have an export path set.")
@@ -309,8 +312,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             for obj in layer.collection.all_objects:
                                 if obj in list(bpy.context.window.view_layer.objects):
                                     obj.select_set(True)
-                    if preset.file_path != "":
-                        exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(preset.file_path), preset.name), ".gltf")
+                    if preset.folder_path != "":
+                        export_folder_path = preset.folder_path
+                        if export_folder_path == '//\\':
+                            export_folder_path = export_folder_path.rsplit('\\')[0]
+                        exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(export_folder_path), preset.name), ".gltf")
                         MSFS_OT_MultiExportGLTF2.export(exportPath)
                     else:
                         self.report({'ERROR'}, "[EXPORT][ERROR] Preset : " + preset.name + " does not have an export path set.")
@@ -336,7 +342,7 @@ class MSFS_PT_MultiExporter(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.scene.msfs_exporter_properties
+        return context.scene.msfs_exporter_settings
 
     def draw(self, context):
         layout = self.layout
