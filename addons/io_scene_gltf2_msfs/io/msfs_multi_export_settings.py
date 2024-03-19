@@ -371,7 +371,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     export_force_sampling: bpy.props.BoolProperty(
         name="Always Sample Animations",
         description="Apply sampling to all animations",
-        default=True,
+        default=False,
     )
 
     ## Animation mode export -> >= 3.6
@@ -683,14 +683,18 @@ class MSFS_PT_export_include(bpy.types.Panel):
         if (bpy.app.version >= (3, 3, 0)):
             col2.prop(settings, "use_active_scene")
 
-        col2 = layout.column(heading="Data", align=True)
-        col2.prop(settings, "export_extras")
         if (settings.enable_msfs_extension):
+            col2 = layout.column(heading="", align=True)
+            col2.prop(settings, "export_extras")
             col2.enabled = False
-        col3 = layout.column(heading="", align=True)
-        col3.prop(settings, "export_cameras")
-        col3.prop(settings, "export_lights")
- 
+            col3 = layout.column(heading="Data", align=True)
+            col3.prop(settings, "export_lights")
+            col3.prop(settings, "export_cameras")
+        else:
+            col2 = layout.column(heading="Data", align=True)
+            col2.prop(settings, "export_extras")
+            col2.prop(settings, "export_lights")
+            col2.prop(settings, "export_cameras")
  
 class MSFS_PT_export_transform(bpy.types.Panel):
     bl_space_type = "VIEW_3D"

@@ -136,7 +136,7 @@ class MSFS_Material_Property_Update:
     def reset_material_prop_object(self):
         self.msfs_alpha_cutoff = 0.5
         self.msfs_base_color_blend_factor = 1.0
-        self.msfs_base_color_factor = [0.8, 0.8, 0.8, 1.0]
+        self.msfs_base_color_factor = [1.0, 1.0, 1.0, 1.0]
         self.msfs_base_color_texture = None
         self.msfs_blend_mask_texture = None
         self.msfs_clamp_uv_x = False
@@ -188,7 +188,7 @@ class MSFS_Material_Property_Update:
         self.msfs_road_collision_material = False
         self.msfs_roughness_blend_factor = 1.0
         self.msfs_roughness_factor = 1.0
-        self.msfs_sss_color = [0.8, 0.8, 0.8, 1.0]
+        self.msfs_sss_color = [1.0, 1.0, 1.0, 1.0]
         self.msfs_use_pearl = False
         self.msfs_uv_offset_u = 0.0
         self.msfs_uv_offset_v = 0.0

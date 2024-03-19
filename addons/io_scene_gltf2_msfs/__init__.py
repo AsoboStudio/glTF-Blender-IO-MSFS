@@ -42,10 +42,16 @@ class MSFS_ImporterProperties(bpy.types.PropertyGroup):
 
 class MSFS_ExporterProperties(bpy.types.PropertyGroup):
 
+    def msfs_enable_msfs_extension_update(self, context):
+        props = bpy.context.scene.msfs_exporter_properties
+        settings = context.scene.msfs_multi_exporter_settings
+        props.enabled = settings.enable_msfs_extension
+
     enabled: bpy.props.BoolProperty(
         name='Microsoft Flight Simulator Extensions',
         description='Enable MSFS glTF export extensions',
         default=True,
+        update=msfs_enable_msfs_extension_update
     )
 
     use_unique_id: bpy.props.BoolProperty(
@@ -96,7 +102,7 @@ class GLTF_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
 
     def draw_header(self, context):
         layout = self.layout
-        layout.label(text="MSFS Extensions", icon='TOOL_SETTINGS')
+        layout.label(text="Microsoft Flight Simulator Extensions", icon='TOOL_SETTINGS')
 
     def draw(self, context):
         props = bpy.context.scene.msfs_exporter_properties
