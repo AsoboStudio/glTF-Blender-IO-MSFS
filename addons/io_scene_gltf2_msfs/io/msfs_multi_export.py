@@ -219,11 +219,12 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
 
             for lod_group in lod_groups:
                 # Generate XML if needed
-                if lod_group.generate_xml:
-                    export_folder_path = lod_group.folder_path
-                    if export_folder_path == '//\\':
+                export_folder_path = lod_group.folder_path
+                if export_folder_path == '//\\':
                         export_folder_path = export_folder_path.rsplit('\\')[0]
-                    xml_path = bpy.path.abspath(os.path.join(export_folder_path, lod_group.group_name + ".xml"))
+                exportPath = bpy.path.abspath(exportPath)
+                if lod_group.generate_xml:
+                    xml_path = os.path.join(export_folder_path, lod_group.group_name + ".xml")
                     found_guid = None
 
                     if os.path.exists(xml_path):
@@ -293,7 +294,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             select_recursive(lod.objectLOD)
                         
                         if export_folder_path != "":
-                            exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(export_folder_path), os.path.splitext(lod.file_name)[0]), ".gltf")
+                            exportPath = bpy.path.ensure_ext(os.path.join(export_folder_path, os.path.splitext(lod.file_name)[0]), ".gltf")
                             MSFS_OT_MultiExportGLTF2.export(exportPath)
                         else:
                             self.report({'ERROR'}, "[EXPORT][ERROR] Object : " + lod.file_name + " does not have an export path set.")
@@ -312,11 +313,13 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                             for obj in layer.collection.all_objects:
                                 if obj in list(bpy.context.window.view_layer.objects):
                                     obj.select_set(True)
+                                    
                     if preset.folder_path != "":
                         export_folder_path = preset.folder_path
                         if export_folder_path == '//\\':
                             export_folder_path = export_folder_path.rsplit('\\')[0]
-                        exportPath = bpy.path.ensure_ext(os.path.join(bpy.path.abspath(export_folder_path), preset.name), ".gltf")
+                        export_folder_path = bpy.path.abspath(export_folder_path)
+                        exportPath = bpy.path.ensure_ext(os.path.join(export_folder_path, preset.name), ".gltf")
                         MSFS_OT_MultiExportGLTF2.export(exportPath)
                     else:
                         self.report({'ERROR'}, "[EXPORT][ERROR] Preset : " + preset.name + " does not have an export path set.")
