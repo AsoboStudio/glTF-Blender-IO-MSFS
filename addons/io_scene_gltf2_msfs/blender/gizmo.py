@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bpy
-import bgl
-import gpu
-import bmesh
-import numpy as np
-from mathutils import Matrix
 from math import radians
+
+import bgl
+import bmesh
+import bpy
+import gpu
+import numpy as np
 from gpu_extras.batch import batch_for_shader
+from mathutils import Matrix
 
 
 class MSFSGizmoProperties():

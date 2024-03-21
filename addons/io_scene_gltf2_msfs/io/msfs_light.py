@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import math
+
 import bpy
 from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
-from mathutils import Matrix, Quaternion, Euler
+from mathutils import Quaternion
+
 
 class MSFSLight:
     bl_options = {"UNDO"}

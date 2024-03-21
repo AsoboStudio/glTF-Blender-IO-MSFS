@@ -16,6 +16,7 @@
 
 import bpy
 
+
 class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
     #### General Options
     ## keep original texture option Check
