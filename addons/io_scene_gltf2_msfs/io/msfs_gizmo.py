@@ -32,12 +32,18 @@ class MSFSGizmo:
         nodes = gltf_scene.nodes
         for node_idx in nodes:
             node = import_settings.data.nodes[node_idx]
+
             # Check extensions in mesh
             if node.mesh is None:
                 continue
+
             mesh = import_settings.data.meshes[node.mesh]
-            extension = mesh.extensions.get(MSFSGizmo.extension_name)
-            if extension is None:
+            extension = ""
+            if mesh.extensions:
+                extension = mesh.extensions.get(MSFSGizmo.extension_name)
+                if extension is None:
+                    continue
+            else:
                 continue
 
             for gizmo_object in extension.get("gizmo_objects"):
@@ -46,16 +52,16 @@ class MSFSGizmo:
 
                 scale = [1.0, 1.0, 1.0]
                 if gizmo_type == "sphere":
-                    scale[0] = params.get("radius")
-                    scale[1] = params.get("radius")
-                    scale[2] = params.get("radius")
+                    scale[0] = params.get("radius")**(1./3.)
+                    scale[1] = params.get("radius")**(1./3.)
+                    scale[2] = params.get("radius")**(1./3.)
                 elif gizmo_type == "box":
                     scale[0] = params.get("length") / 2
                     scale[1] = params.get("width") / 2
                     scale[2] = params.get("height") / 2
                 elif gizmo_type == "cylinder":
-                    scale[0] = params.get("radius")
-                    scale[1] = params.get("radius")
+                    scale[0] = params.get("radius")**(1./2.)
+                    scale[1] = params.get("radius")**(1./2.)
                     scale[2] = params.get("height")
 
                 # Flip scale to convert from MSFS gizmo scale system
@@ -97,9 +103,12 @@ class MSFSGizmo:
         """
         Set proper gizmo properties on the blender object
         """
-        if gltf2_node.extensions is None:
+        if gltf2_node is None:
             return
 
+        if  gltf2_node.extensions is None:
+            return
+            
         extension = gltf2_node.extensions.get("gizmo_blender_data")
         if extension is None:
             return

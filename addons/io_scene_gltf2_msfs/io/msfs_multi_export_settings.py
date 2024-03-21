@@ -503,7 +503,7 @@ class MSFS_MultiExporterSettings(bpy.types.PropertyGroup):
             "Reset pose bones between each action exported. "
             "This is needed when some bones are not keyed on some animations"
         ),
-        default=True
+        default=False
     )
 
     ## Use rest position check -> >= 3.6
