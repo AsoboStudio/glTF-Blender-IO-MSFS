@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
 import bpy
 
 from .msfs_multi_export import MSFS_OT_MultiExportGLTF2
@@ -28,9 +26,13 @@ class MultiExporterPreset(bpy.types.PropertyGroup):
 
     def __init__(self) -> None:
         super().__init__()
-
+        
+    def update_relative_path(self, context):
+        if self.folder_path == "//":
+            self.folder_path = self.folder_path + '\\'
+            
     name: bpy.props.StringProperty(name="", default="", description="Name of the glTF to export")
-    file_path: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH", description="Path to the directory where you want your model to be exported")
+    folder_path: bpy.props.StringProperty(name="", default="", subtype="DIR_PATH", description="Path to the directory where you want your model to be exported", update=update_relative_path)
     enabled: bpy.props.BoolProperty(name="", default=False, description="Enable/Disable the preset for the export")
     expanded: bpy.props.BoolProperty(name="", default=True, description="Expand/Collapse preset.")
     layers: bpy.props.CollectionProperty(type=MultiExporterPresetLayer)
@@ -43,7 +45,7 @@ class MSFS_OT_AddPreset(bpy.types.Operator):
         presets = bpy.context.scene.msfs_multi_exporter_presets
         preset = presets.add()
         preset.name = f"Preset {len(presets)}"
-        preset.file_path = ""
+        preset.folder_path = ""
 
         return {"FINISHED"}
 
@@ -163,7 +165,7 @@ class MSFS_PT_MultiExporterPresetsView(bpy.types.Panel):
             if preset.expanded:
                 box.prop(preset, "enabled", text="Enabled")
                 box.prop(preset, "name", text="Name")
-                box.prop(preset, "file_path", text="Export Path")
+                box.prop(preset, "folder_path", text="Export Path")
                 box.operator(MSFS_OT_EditLayers.bl_idname, text="Edit Layers").preset_index = i
                 box.operator(MSFS_OT_RemovePreset.bl_idname, text="Remove").preset_index = i
 

@@ -19,8 +19,9 @@ from ..blender.msfs_material_prop_update import MSFS_Material_Property_Update
 
 
 class AsoboMaterialCommon:
+    SerializedName = ""
     class Defaults:
-        BaseColorFactor = [0.8, 0.8, 0.8, 1.0]
+        BaseColorFactor = [1.0, 1.0, 1.0, 1.0]
         EmissiveFactor = [0.0, 0.0, 0.0]
         MetallicFactor = 1.0
         RoughnessFactor = 1.0
@@ -237,11 +238,6 @@ class AsoboMaterialCommon:
     ):  # This must be called first, as it sets a few parameters that the rest of the extensions might rely on
         from ..io.msfs_material import MSFSMaterial
 
-        extensions = gltf2_material.extensions
-        if extensions is None:
-            return
-
-        assert isinstance(extensions, dict)
         # Every flight sim asset has ASOBO_normal_map_convention, so we check if it's being used to set material. We set blender_material to standard. If the blender_material is another type, it will get changed later.
         if "ASOBO_normal_map_convention" in import_settings.data.extensions_used:
             blender_material.msfs_material_type = "msfs_standard"
@@ -1205,7 +1201,7 @@ class AsoboSSS:
     SerializedName = "ASOBO_material_SSS"  # This entire extension is disabled for the time being. Keeping just in case
 
     class Defaults:
-        SSSColor = [0.8, 0.8, 0.8, 1.0]
+        SSSColor = [1.0, 1.0, 1.0, 1.0]
     
     bpy.types.Material.msfs_sss_color = bpy.props.FloatVectorProperty(
         name="SSS Color",

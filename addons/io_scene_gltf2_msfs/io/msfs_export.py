@@ -25,7 +25,7 @@ from .msfs_unique_id import MSFS_unique_id
 class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):
-        if self.properties.enabled == True:
+        if self.properties.enable_msfs_extension == True:
             if gltf2_asset.extensions is None:
                 gltf2_asset.extensions = {}
             gltf2_asset.extensions["ASOBO_normal_map_convention"] = self.Extension(
@@ -37,13 +37,12 @@ class Export:
             gltf2_asset.generator += " and Asobo Studio MSFS Blender I/O v" + get_version_string()
 
     def gather_gltf_extensions_hook(self, gltf2_plan, export_settings):
-        if self.properties.enabled:
+        if self.properties.enable_msfs_extension:
             for i, image in enumerate(gltf2_plan.images):
                 image.uri = os.path.basename(urllib.parse.unquote(image.uri))
 
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
-        if self.properties.enabled:
-
+        if self.properties.enable_msfs_extension:
             if gltf2_object.extensions is None:
                 gltf2_object.extensions = {}
 
@@ -54,7 +53,7 @@ class Export:
                 MSFSLight.export(gltf2_object, blender_object)
     
     def gather_joint_hook(self, gltf2_node, blender_bone, export_settings):
-        if self.properties.enabled:
+        if self.properties.enable_msfs_extension:
 
             if gltf2_node.extensions is None:
                 gltf2_node.extensions = {}
@@ -63,9 +62,9 @@ class Export:
                 MSFS_unique_id.export(gltf2_node, blender_bone)
 
     def gather_scene_hook(self, gltf2_scene, blender_scene, export_settings):
-        if self.properties.enabled:
+        if self.properties.enable_msfs_extension:
             MSFSGizmo.export(gltf2_scene.nodes, blender_scene, export_settings)
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
-        if self.properties.enabled:
+        if self.properties.enable_msfs_extension:
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
