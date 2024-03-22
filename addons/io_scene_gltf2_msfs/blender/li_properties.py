@@ -14,7 +14,6 @@
 
 import bpy
 
-from bpy.props import IntProperty, BoolProperty, StringProperty, FloatProperty, EnumProperty, FloatVectorProperty, PointerProperty
 
 class MSFS_attached_behavior(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name = "behavior", default = "")

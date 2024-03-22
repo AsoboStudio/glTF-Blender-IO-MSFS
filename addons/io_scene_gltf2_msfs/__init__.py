@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bpy
+import importlib
 import inspect
 import pkgutil
-import importlib
 from pathlib import Path
+
+import bpy
 
 bl_info = {
     "name": "Microsoft Flight Simulator glTF Extension",
-    "author": "Luca Pierabella, Wing42, pepperoni505, ronh991, tml1024, and others",
+    "author": "Luca Pierabella, Yasmine Khodja, Wing42, pepperoni505, ronh991, and others",
     "description": "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator",
-    "blender": (3, 1, 0),
-    "version": (1,3,0),
+    "blender": (3, 3, 0),
+    "version": (1, 3, 3),
     "location": "File > Import-Export",
     "category": "Import-Export",
     "tracker_url": "https://github.com/AsoboStudio/glTF-Blender-IO-MSFS"
@@ -33,22 +34,29 @@ def get_version_string():
     return str(bl_info['version'][0]) + '.' + str(bl_info['version'][1]) + '.' + str(bl_info['version'][2])
 
 class MSFS_ImporterProperties(bpy.types.PropertyGroup):
-    enabled: bpy.props.BoolProperty(
+    enable_msfs_extension: bpy.props.BoolProperty(
         name='Microsoft Flight Simulator Extensions',
         description='Enable MSFS glTF import extensions',
         default=True
     )
 
 class MSFS_ExporterProperties(bpy.types.PropertyGroup):
-    enabled: bpy.props.BoolProperty(
+    def msfs_enable_msfs_extension_update(self, context):
+        props = bpy.context.scene.msfs_exporter_settings
+        settings = bpy.context.scene.msfs_multi_exporter_settings
+        settings.enable_msfs_extension = props.enable_msfs_extension
+
+    enable_msfs_extension: bpy.props.BoolProperty(
         name='Microsoft Flight Simulator Extensions',
         description='Enable MSFS glTF export extensions',
-        default=True
+        default=True,
+        update=msfs_enable_msfs_extension_update
     )
+
     use_unique_id: bpy.props.BoolProperty(
-        name='use_unique_id',
-        description='use ASOBO_unique_id extension',
-        default=False
+        name='Use ASOBO Unique ID',
+        description='use ASOBO Unique ID extension',
+        default=True,
     )
     
 
@@ -76,7 +84,7 @@ class GLTF_PT_MSFSImporterExtensionPanel(bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        layout.prop(props, 'enabled', text="Enabled")
+        layout.prop(props, 'enable_msfs_extension', text="Enabled")
 
 class GLTF_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
@@ -93,18 +101,18 @@ class GLTF_PT_MSFSExporterExtensionPanel(bpy.types.Panel):
 
     def draw_header(self, context):
         layout = self.layout
-        layout.label(text="MSFS Extensions", icon='TOOL_SETTINGS')
+        layout.label(text="Microsoft Flight Simulator Extensions", icon='TOOL_SETTINGS')
 
     def draw(self, context):
-        props = bpy.context.scene.msfs_exporter_properties
+        props = bpy.context.scene.msfs_exporter_settings
 
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False  # No animation.
 
-        layout.prop(props, 'enabled', text="Enabled")
-        if props.enabled:
-            layout.prop(props, 'use_unique_id', text="Enable ASOBO_unique_id extension")
+        layout.prop(props, 'enable_msfs_extension', text="Enabled")
+        if props.enable_msfs_extension:
+            layout.prop(props, 'use_unique_id', text="Enable ASOBO Unique ID extension")
 
 def recursive_module_search(path, root=""):
     for _, name, ispkg in pkgutil.iter_modules([str(path)]):
@@ -161,7 +169,7 @@ def register():
             pass
 
     bpy.types.Scene.msfs_importer_properties = bpy.props.PointerProperty(type=MSFS_ImporterProperties)
-    bpy.types.Scene.msfs_exporter_properties = bpy.props.PointerProperty(type=MSFS_ExporterProperties)
+    bpy.types.Scene.msfs_exporter_settings = bpy.props.PointerProperty(type=MSFS_ExporterProperties)
 
 
 def register_panel():
@@ -208,16 +216,24 @@ def unregister_panel():
         if hasattr(module, "unregister_panel"):
             module.unregister_panel()
 
+
+##################################################################################
 from .io.msfs_import import Import
+
+
 class glTF2ImportUserExtension(Import):
     def __init__(self):
         self.properties = bpy.context.scene.msfs_importer_properties
 
+
+##################################################################################
 from .io.msfs_export import Export
+
+
 class glTF2ExportUserExtension(Export):
     def __init__(self):
         # We need to wait until we create the gltf2UserExtension to import the gltf2 modules
         # Otherwise, it may fail because the gltf2 may not be loaded yet
         from io_scene_gltf2.io.com.gltf2_io_extensions import Extension
         self.Extension = Extension
-        self.properties = bpy.context.scene.msfs_exporter_properties
+        self.properties = bpy.context.scene.msfs_exporter_settings

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bpy
-from .msfs_light import MSFSLight
 from .msfs_gizmo import MSFSGizmo
+from .msfs_light import MSFSLight
 from .msfs_material import MSFSMaterial
+
 
 class Import:
 

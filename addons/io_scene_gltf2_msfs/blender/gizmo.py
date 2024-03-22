@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bpy
-import bgl
-import gpu
-import bmesh
-import numpy as np
-from mathutils import Matrix
 from math import radians
+
+import bgl
+import bmesh
+import bpy
+import gpu
+import numpy as np
 from gpu_extras.batch import batch_for_shader
+from mathutils import Matrix
 
 
 class MSFSGizmoProperties():
@@ -216,8 +217,9 @@ class MSFSCollisionGizmoGroup(bpy.types.GizmoGroup):
 
         for _, (empty, gizmo) in enumerate(self.__class__.empties.copy().items()):
             if empty not in found_empties:
-                self.gizmos.remove(gizmo)
                 del self.__class__.empties[empty]
+                if gizmo:
+                    self.gizmos.remove(gizmo)
 
         # Check if there are any new gizmo empties, and if so create new gizmo. We can't do this in the above loop due to the crash mentioned above
         for object in context.view_layer.objects:

@@ -13,6 +13,9 @@
 # limitations under the License.
 
 from ..msfs_material_function import MSFS_Material
+from .utils.msfs_material_enum import (MSFS_FrameNodes,
+                                       MSFS_PrincipledBSDFInputs,
+                                       MSFS_ShaderNodes, MSFS_ShaderNodesTypes)
 
 
 class MSFS_Clearcoat(MSFS_Material):
@@ -20,4 +23,48 @@ class MSFS_Clearcoat(MSFS_Material):
         super().__init__(material, buildTree)
 
     def customShaderTree(self):
-        super(MSFS_Clearcoat, self).defaultShaderStree()
+        super(MSFS_Clearcoat, self).defaultShadersTree()
+        self.clearcoatShaderTree()
+
+    def clearcoatShaderTree(self):
+        ## Clearcoat Frame
+        clearcoatFrame = self.addNode(
+            name = MSFS_FrameNodes.clearcoatFrame.value,
+            typeNode = MSFS_ShaderNodesTypes.nodeFrame.value,
+            color = (0.6, 0.2, 0.1)
+        )
+
+        ## Clearcoat Texture
+        # Out[0] : ClearcoatSeparate -> In[0]
+        clearcoatTexNode = self.addNode(
+            name = MSFS_ShaderNodes.clearcoatTex.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeTexImage.value,
+            location = (-1000.0, -500.0),
+            frame = clearcoatFrame
+        )
+
+        ## Clearcoat separate
+        # In[0] : ClearcoatTexture -> Out[0]
+        clearcoatSeparateNode = self.addNode(
+            name = MSFS_ShaderNodes.clearcoatSeparate.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeSeparateColor.value,
+            location = (-800.0, -500.0),
+            frame = clearcoatFrame
+        )
+
+        self.link(clearcoatTexNode.outputs[0], clearcoatSeparateNode.inputs[0])
+
+    def setClearcoatDirtTexture(self, tex):
+        nodeClearcoat = self.getNodeByName(MSFS_ShaderNodes.clearcoatTex.value)
+        nodeClearcoatSeparate = self.getNodeByName(MSFS_ShaderNodes.clearcoatSeparate.value)
+        nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
+
+        if tex:
+            nodeClearcoat.image = tex
+            nodeClearcoat.image.colorspace_settings.name = "Non-Color"
+
+            self.link(nodeClearcoatSeparate.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.clearcoat.value])
+            self.link(nodeClearcoatSeparate.outputs[1], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.clearcoatRoughness.value])
+        else:
+            self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.clearcoat.value)
+            self.unLinkNodeInput(nodePrincipledBSDF, MSFS_PrincipledBSDFInputs.clearcoatRoughness.value)
