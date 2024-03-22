@@ -11,17 +11,17 @@ Vitus of [Wing42](https://wing42.com/), [tml1024](https://github.com/tml1024), [
 
 :warning: **NOTE:1** This plugin cannot import glTF files that have been built into a Microsoft Flight Simulator package through the sim's Package Builder.
 <br>
+
 :warning: **NOTE:2** This plugin is NOT compatible with the legacy exporter developed for FSX and P3D and MSFS.  Remove these plugin (Prefered) or disabled these plugins.
 
 <br>
-<br> 
+
+:warning: The version **1.3.x** is compatible with Blender **3.3.x LTS** and **3.6.x LTS** only. We can't guarantee not having bugs with other unstable versions 
 
 # Installation
 
 You may install the blender export two ways. First using the Edit Preferences menu and Install tab, or copy paste the program files to your APPDATA folder.
 To install the Blender plugin please follow these simple steps:
-
-This version 1.3.x is compatible with Blender 3.3.x and below.  This will not work with Blender 3.4 and higher.
 
 # How to remove the exporter (If you have not installed a previous version skip this section)
 
