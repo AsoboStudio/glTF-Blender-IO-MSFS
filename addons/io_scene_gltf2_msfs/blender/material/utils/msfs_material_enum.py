@@ -67,6 +67,7 @@ class MSFS_ShaderNodesTypes(Enum):
     shaderNodeRGB = "ShaderNodeRGB"
     shaderNodeValue = "ShaderNodeValue"
     shaderNodeRGBCurve = "ShaderNodeRGBCurve"
+    shaderNodeMapRange = "ShaderNodeMapRange"
 
 class MSFS_FrameNodes(Enum):
     baseColorFrame = "Base Color Frame"
@@ -95,6 +96,9 @@ class MSFS_ShaderNodes(Enum):
     occlusionMul = "Occlusion Multiplier"
     roughnessMul = "Roughness Multiplier"
     metallicMul = "Metallic Multiplier"
+    detailOMRMul = "Multiply detail OcclMetalRough"
+    detailOMRSubtract = "Subtract detail OcclMetalRough"
+    detailOMRClamp = "Clamp detail OcclMetalRough"
     emissiveTex = "Emissive Texture"
     emissiveColor = "Emissive RGB"
     emissiveScale = "Emissive Scale"
@@ -120,7 +124,7 @@ class MSFS_ShaderNodes(Enum):
     blendNormalMap = "Blend Normal Map"
     blendColorMap = "Blend Color Map"
     blendAlphaMap = "Blend Alpha Map"
-    blendCompMap = "Blend Occlusion(R) Roughness(G) Metallic(B) Map"
+    blendCompMap = "Add Occlusion(R) Roughness(G) Metallic(B)"
     vertexColor = "Vertex Color"
     albedoDetailMix = "Albedo Detail Mix"
     behindGlassTex = "Behind Glass"

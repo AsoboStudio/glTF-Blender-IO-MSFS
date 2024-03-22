@@ -443,6 +443,54 @@ class MSFS_Material:
             color = (0.1, 0.4, 0.6)
         )
 
+        ## Multiply Detail OMR
+        # In[0] : Detail OMR texture
+        # Out[0] : Substract Detail OMR
+        multiplyDetailOMR = self.addNode(
+            name = MSFS_ShaderNodes.detailOMRMul.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeVectorMath.value,
+            operation = "MULTIPLY",
+            location = (-500.0, 200.0),
+            width = 200.0,
+            frame = omrFrame
+        )
+        multiplyDetailOMR.inputs[1].default_value = (2.0, 2.0, 2.0)
+
+        ## Links
+        self.link(detailCompTexNode.outputs[0], multiplyDetailOMR.inputs[0])
+
+        ## Substract Detail OMR
+        # In[0] : Multiply Detail OMR
+        # Out[0] : Clamp Detail OMR
+        subtractDetailOMR = self.addNode(
+            name = MSFS_ShaderNodes.detailOMRSubtract.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeVectorMath.value,
+            operation = "SUBTRACT",
+            location = (-500.0, 150.0),
+            width = 200.0,
+            frame = omrFrame
+        )
+        subtractDetailOMR.inputs[1].default_value = (1.0, 1.0, 1.0)
+
+        ## Links
+        self.link(multiplyDetailOMR.outputs[0], subtractDetailOMR.inputs[0])
+
+        ## Map to clamp detail OMR
+        # In[0] : Substract Detail OMR
+        # Out[0] : Add Detail comp
+        clampDetailOMR = self.addNode(
+            name = MSFS_ShaderNodes.detailOMRClamp.value,
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeMapRange.value,
+            location = (-500.0, 100.0),
+            width = 200.0,
+            frame = omrFrame
+        )
+        clampDetailOMR.data_type = "FLOAT_VECTOR"
+        clampDetailOMR.interpolation_type = "LINEAR"
+
+        ## Links
+        self.link(subtractDetailOMR.outputs[0], clampDetailOMR.inputs[6]) ## input[6] == "Vector"
+
         ## Metallic scale
         # Out[0] : Metallic Multiplier -> In[0] 
         # Out[0] : PrincipledBSDF -> In["Metallic"] 
@@ -464,24 +512,22 @@ class MSFS_Material:
         )
         
         ## Blend Detail Operations (OccMetalRough)
-        # Detail comp operators
+        # Add Detail comp 
         # In[0] : Vertex Color -> Out[1]
         # In[1] : Comp Texture -> Out[0]
         # In[2] : Detail Comp Texture -> Out[0]
         blendCompMapNode = self.addNode(
             name = MSFS_ShaderNodes.blendCompMap.value,
-            typeNode = MSFS_ShaderNodesTypes.shaderNodeMixRGB.value,
-            blend_type = "MULTIPLY",
+            typeNode = MSFS_ShaderNodesTypes.shaderNodeVectorMath.value,
+            operation = "ADD",
             location = (-150.0, 200.0),
             width = 300.0,
             frame = omrFrame
-        )     
-        blendCompMapNode.inputs[0].default_value = 1.0
+        )
         
         ## Links
-        self.link(blendCompMapNode.inputs[0], vertexColorNode.outputs[1])
-        self.link(blendCompMapNode.inputs[1], compTexNode.outputs[0])
-        self.link(blendCompMapNode.inputs[2], detailCompTexNode.outputs[0])
+        self.link(compTexNode.outputs[0], blendCompMapNode.inputs[0])
+        self.link(clampDetailOMR.outputs[1], blendCompMapNode.inputs[1])
 
         ## Split Occlusion Metallic Roughness
         # In[0] : Blend Comp Map -> Out[0]
@@ -554,7 +600,7 @@ class MSFS_Material:
             name = MSFS_ShaderNodes.emissiveMul.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeMixRGB.value,
             blend_type = "MULTIPLY",
-            location = (200.0, 0.0),
+            location = (250.0, -50.0),
             frame = emissiveFrame
         )
 
@@ -891,11 +937,6 @@ class MSFS_Material:
         nodeGltfSettings = self.getNodeByName(MSFS_ShaderNodes.glTFSettings.value)
         nodePrincipledBSDF = self.getNodeByName(MSFS_ShaderNodes.principledBSDF.value)
 
-        # blend comp
-        # !!!! input orders matters for the exporter here
-        self.link(nodeCompTex.outputs[0], nodeBlendCompMap.inputs[1])
-        self.link(nodeDetailCompTex.outputs[0], nodeBlendCompMap.inputs[2])
-
         # occlMetalRough
         self.link(nodeBlendCompMap.outputs[0], nodeSeparateComp.inputs[0])
         self.link(nodeMetallicScale.outputs[0], nodeMulMetallic.inputs[0])
@@ -913,13 +954,6 @@ class MSFS_Material:
             self.link(nodeMulRoughness.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.roughness.value])
             self.link(nodeMulMetallic.outputs[0], nodePrincipledBSDF.inputs[MSFS_PrincipledBSDFInputs.metallic.value])
 
-            if nodeCompTex.image and nodeDetailCompTex.image:
-                nodeBlendCompMap.blend_type = "MULTIPLY"
-            else: # we have only one of the two images
-                nodeBlendCompMap.blend_type = "ADD"
-
-
-
     def setBlendMode(self, blendMode):
         if blendMode == "BLEND":
             self.makeAlphaBlend()
@@ -933,17 +967,14 @@ class MSFS_Material:
     def toggleVertexBlendMapMask(self, useVertex=True):
         nodeVertexColor = self.getNodeByName(MSFS_ShaderNodes.vertexColor.value)
         nodeBlendColorMap = self.getNodeByName(MSFS_ShaderNodes.blendColorMap.value)
-        nodeBlendCompMap = self.getNodeByName(MSFS_ShaderNodes.blendCompMap.value)
         nodeBlendNormalMap = self.getNodeByName(MSFS_ShaderNodes.blendNormalMap.value)
         nodeBlendMaskTex = self.getNodeByName(MSFS_ShaderNodes.blendMaskTex.value)
         # vertexcolor mask
         if useVertex:
             self.link(nodeVertexColor.outputs[1], nodeBlendColorMap.inputs[0])
-            self.link(nodeVertexColor.outputs[1], nodeBlendCompMap.inputs[0])
             self.link(nodeVertexColor.outputs[1], nodeBlendNormalMap.inputs[0])
         else:
             self.link(nodeBlendMaskTex.outputs[0], nodeBlendColorMap.inputs[0])
-            self.link(nodeBlendMaskTex.outputs[0], nodeBlendCompMap.inputs[0])
             self.link(nodeBlendMaskTex.outputs[0], nodeBlendNormalMap.inputs[0])
 
     def makeOpaque(self):
