@@ -222,7 +222,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
                 export_folder_path = lod_group.folder_path
                 if export_folder_path == '//\\':
                         export_folder_path = export_folder_path.rsplit('\\')[0]
-                exportPath = bpy.path.abspath(exportPath)
+                export_folder_path = bpy.path.abspath(export_folder_path)
                 if lod_group.generate_xml:
                     xml_path = os.path.join(export_folder_path, lod_group.group_name + ".xml")
                     found_guid = None
