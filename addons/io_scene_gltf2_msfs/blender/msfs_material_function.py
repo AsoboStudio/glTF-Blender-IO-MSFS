@@ -251,7 +251,8 @@ class MSFS_Material:
             width = 200.0,
             frame = baseColorFrame
         )
-        blendColorMapNode.inputs[0].default_value = 1.0
+        #Input Factor
+        blendColorMapNode.inputs[self.inputs0].default_value = 1.0
         
         # links
         self.link(blendColorMapNode.inputs[0], vertexColorNode.outputs[1])
@@ -308,13 +309,14 @@ class MSFS_Material:
             width = 200.0,
             frame = baseColorFrame
         )
+        #Input Factor
         blendAlphaMapNode.inputs[0].default_value = 1.0
         
         ## Links
         self.link(blendAlphaMapNode.inputs[0], baseColorTexNode.outputs[1])
         self.link(blendAlphaMapNode.inputs[1], detailColorTexNode.outputs[1])
         
-        ## Base Color Multiplier
+        ## Base Color Multiplier A
         # In[1]: Base Color Alpha -> GroupInput[2]
         mulBaseColorANode = self.addNode(
             name = MSFS_ShaderNodes.baseColorMulA.value,
@@ -641,7 +643,7 @@ class MSFS_Material:
             location = (-300.0, -350.0),
             frame = normalFrame
         )
-
+        #Input Factor
         normalScaleNode.outputs[0].default_value = 1.0
 
         # Fix the normal view by reversing the green channel
@@ -652,6 +654,7 @@ class MSFS_Material:
             location = (-300.0, -400.0),
             frame = normalFrame
         )
+        # Green invert
         curveMapping = RGBCurvesNode.mapping.curves[1]
         curveMapping.points[0].location = (0.0, 1.0)
         curveMapping.points[1].location = (1.0, 0.0)
@@ -681,7 +684,7 @@ class MSFS_Material:
             frame = normalFrame
         )
 
-        ## Emissive Scale
+        ## Detail Normal Scale
         detailNormalScaleNode = self.addNode(
             name = MSFS_ShaderNodes.detailNormalScale.value,
             typeNode = MSFS_ShaderNodesTypes.shaderNodeValue.value,
@@ -704,6 +707,7 @@ class MSFS_Material:
             location = (200.0, -400.0),
             frame = normalFrame
         )
+        # Input Factor
         blendNormalMapNode.inputs[0].default_value = 1.0
         
         # Links
