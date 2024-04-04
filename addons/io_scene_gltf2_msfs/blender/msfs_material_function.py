@@ -252,7 +252,7 @@ class MSFS_Material:
             frame = baseColorFrame
         )
         #Input Factor
-        blendColorMapNode.inputs[self.inputs0].default_value = 1.0
+        blendColorMapNode.inputs[0].default_value = 1.0
         
         # links
         self.link(blendColorMapNode.inputs[0], vertexColorNode.outputs[1])
