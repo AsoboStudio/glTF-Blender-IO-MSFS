@@ -22,6 +22,15 @@ from .msfs_material import MSFSMaterial
 from .msfs_unique_id import MSFS_unique_id
 
 
+def equality_check(arr1, arr2, size1, size2):
+   if (size1 != size2):
+      return False
+   for i in range(0, size2):
+      # blender python color channel issues in floats ???
+      if (int(arr1[i] * 10000000)/10000000 != int(arr2[i] * 10000000)/10000000):
+         return False
+   return True
+
 class Export:
     
     def gather_asset_hook(self, gltf2_asset, export_settings):
