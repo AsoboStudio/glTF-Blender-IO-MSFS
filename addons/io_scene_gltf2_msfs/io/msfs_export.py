@@ -66,5 +66,20 @@ class Export:
             MSFSGizmo.export(gltf2_scene.nodes, blender_scene, export_settings)
 
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
+        # blender 3.3 removes base color values with base color texture - have to add back in
+        print("gather_material_hook - Started with gltf2_material", gltf2_material, gltf2_material.pbr_metallic_roughness, gltf2_material.pbr_metallic_roughness.base_color_texture, gltf2_material.pbr_metallic_roughness.base_color_factor)
+        base_color = blender_material.msfs_base_color_factor
+        gltf2_base_color = gltf2_material.pbr_metallic_roughness.base_color_factor
+        print("gather_material_hook - blender material - set base color factor before", blender_material, blender_material.msfs_base_color_texture, base_color[0], base_color[1], base_color[2], base_color[3], gltf2_base_color)
+        if base_color is not None and gltf2_base_color is None:
+            print("gather_material_hook - changing because none")
+            gltf2_material.pbr_metallic_roughness.base_color_factor = [base_color[0],base_color[1],base_color[2],base_color[3]]
+        if gltf2_base_color is not None:
+            if not equality_check(base_color, gltf2_base_color, len(base_color), len(gltf2_base_color)):
+                print("gather_material_hook - changing because different")
+                gltf2_material.pbr_metallic_roughness.base_color_factor = [base_color[0],base_color[1],base_color[2],base_color[3]]
+        print("gather_material_hook - blender material - set base color after", blender_material, blender_material.msfs_base_color_texture, blender_material.msfs_base_color_factor, gltf2_material.pbr_metallic_roughness.base_color_factor)
+
+
         if self.properties.enable_msfs_extension:
             MSFSMaterial.export(gltf2_material, blender_material, export_settings)
