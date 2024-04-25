@@ -282,7 +282,19 @@ class AsoboMaterialCommon:
 
     @staticmethod
     def to_extension(blender_material, gltf2_material, export_settings):
-        # All the properties here (besides some textures, which we handle elsewhere) are exported from the Khronos exporter
+
+        if gltf2_material.pbr_metallic_roughness:
+            gltf2_material.pbr_metallic_roughness.base_color_factor = [f for f in blender_material.msfs_base_color_factor] 
+            gltf2_material.emissive_factor = [f * blender_material.msfs_emissive_scale for f in blender_material.msfs_emissive_factor]
+            gltf2_material.pbr_metallic_roughness.metallic_factor = blender_material.msfs_metallic_factor
+            gltf2_material.pbr_metallic_roughness.roughness_factor = blender_material.msfs_roughness_factor
+        
+        if gltf2_material.normal_texture:
+            gltf2_material.normal_texture.scale = blender_material.msfs_normal_scale
+
+        if "KHR_materials_emissive_strength" in gltf2_material.extensions:
+            gltf2_material.extensions.pop("KHR_materials_emissive_strength")
+
         gltf2_material.emissive_factor = [f * blender_material.msfs_emissive_scale for f in blender_material.msfs_emissive_factor]
 
         if "KHR_materials_emissive_strength" in gltf2_material.extensions:

@@ -218,11 +218,11 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
             sort_by_collection = context.scene.multi_exporter_grouped_by_collections
 
             for lod_group in lod_groups:
-                # Generate XML if needed
                 export_folder_path = lod_group.folder_path
                 if export_folder_path == '//\\':
                         export_folder_path = export_folder_path.rsplit('\\')[0]
                 export_folder_path = bpy.path.abspath(export_folder_path)
+                # Generate XML if needed
                 if lod_group.generate_xml:
                     xml_path = os.path.join(export_folder_path, lod_group.group_name + ".xml")
                     found_guid = None
