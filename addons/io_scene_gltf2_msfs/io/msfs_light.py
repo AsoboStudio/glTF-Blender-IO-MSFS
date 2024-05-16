@@ -28,18 +28,28 @@ class MSFSLight:
         raise RuntimeError("%s should not be instantiated" % cls)
 
     @staticmethod
-    def create(gltf2_node, blender_node, blender_light, import_settings):
-        parent_light = import_settings.data.nodes[
-            gltf2_node.parent]  # The glTF exporter creates the actual light as a child of the node that has the Asobo extension
-        if parent_light.extensions:
-            extension = parent_light.extensions.get(MSFSLight.extension_name)
+    def create(vnode, gltf_node, gltf):
+        if gltf_node.extensions:
+            extension = gltf_node.extensions.get(MSFSLight.extension_name)
             if extension:
+                if extension.get("cone_angle") != 360:
+                    blender_light = bpy.data.lights.new(name=gltf_node.name, type="SPOT")
+                    blender_light.spot_size = extension.get("cone_angle")
+                else:
+                    blender_light = bpy.data.lights.new(name=gltf_node.name, type="POINT")
                 # Set Blender light properties
                 blender_light.color = extension.get("color")
                 blender_light.energy = extension.get("intensity")
-                if blender_light.type == "SPOT":
-                    blender_light.spot_size = extension.get("cone_angle")
 
+                blender_node = bpy.data.objects.new(gltf_node.name, blender_light)
+
+                # Set transform
+                trans, rot, scale = vnode.trs()
+                blender_node.location = trans
+                blender_node.rotation_mode = 'QUATERNION'
+                blender_node.rotation_quaternion = rot
+                blender_node.scale = scale
+                
                 # Set MSFS light properties
                 blender_node.msfs_light_has_symmetry = extension.get("has_symmetry")
                 blender_node.msfs_light_flash_frequency = extension.get("flash_frequency")
@@ -47,6 +57,16 @@ class MSFSLight:
                 blender_node.msfs_light_flash_phase = extension.get("flash_phase")
                 blender_node.msfs_light_rotation_speed = extension.get("rotation_speed")
                 blender_node.msfs_light_day_night_cycle = extension.get("day_night_cycle")
+
+                bpy.data.scenes[gltf.blender_scene].collection.objects.link(blender_node)
+
+    @staticmethod
+    def removeLightObject(vnode, gltf2_node, blender_node):
+        if gltf2_node.extensions:
+            extension = gltf2_node.extensions.get(MSFSLight.extension_name)
+            if extension:
+                bpy.data.objects.remove(blender_node)
+                vnode.blender_object = bpy.data.objects[gltf2_node.name]
 
     @staticmethod
     def export(gltf2_object, blender_object):
