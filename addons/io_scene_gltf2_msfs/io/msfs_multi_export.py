@@ -205,7 +205,7 @@ class MSFS_OT_MultiExportGLTF2(bpy.types.Operator):
         elif (bpy.app.version < (3, 6, 0)):
             gltf = export_blender_3_3(file_path, settings)
         else:
-            gltf = export_blender_3_3(file_path, settings)
+            gltf = export_blender_3_6(file_path, settings)
             
         if gltf is None:
                 print("[ASOBO] Export failed.")
